@@ -73,6 +73,10 @@ CModel3D::~CModel3D()
 HRESULT CModel3D::Init()
 {
 	// メンバ変数の初期化
+	m_pMesh = nullptr;									// メッシュ情報へのポインタ
+	m_pBuffer = nullptr;								// マテリアル情報へのポインタ
+	m_nNumMat = NULL;									// マテリアル情報の数
+	m_mtxWorld = {};									// ワールドマトリックス
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 位置
 	m_posOld = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 過去位置
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 向き
@@ -155,23 +159,24 @@ void CModel3D::Update()
 //=============================================================================
 void CModel3D::Draw()
 {
-	// レンダラーのゲット
-	CRenderer *pRenderer = CApplication::GetRenderer();
-
 	// デバイスの取得
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
+	LPDIRECT3DDEVICE9 pDevice = CApplication::GetRenderer()->GetDevice();
 
 	// 計算用マトリックス
-	D3DXMATRIX mtxRot, mtxTrans, mtxScaling;	
+	D3DXMATRIX mtxRot, mtxTrans, mtxScaling;
 
 	// 現在のマテリアル保存用
-	D3DMATERIAL9 matDef;	
+	D3DMATERIAL9 matDef;
 
 	// マテリアルデータへのポインタ
-	D3DXMATERIAL *pMat;									
+	D3DXMATERIAL *pMat;
 
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);											// 行列初期化関数
+
+	// サイズの反映
+	D3DXMatrixScaling(&mtxScaling, m_size.x, m_size.y, m_size.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxScaling);					// 行列掛け算関数
 
 	// 向きの反映
 	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_rot.y, m_rot.x, m_rot.z);			// 行列回転関数
@@ -181,33 +186,27 @@ void CModel3D::Draw()
 	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);				// 行列移動関数
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);					// 行列掛け算関数
 
-	// サイズの反映
-	D3DXMatrixScaling(&mtxScaling, m_size.x, m_size.y, m_size.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxScaling);				// 行列掛け算関数
-
 	// ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
 
-	if (m_pBuffer != nullptr)
-	{
-		// 現在のマテリアルを保持
-		pDevice->GetMaterial(&matDef);
+	// 現在のマテリアルを保持
+	pDevice->GetMaterial(&matDef);
 
-		// マテリアルデータへのポインタを取得
+	if (m_pBuffer != nullptr)
+	{// マテリアルデータへのポインタを取得
 		pMat = (D3DXMATERIAL*)m_pBuffer->GetBufferPointer();
 
 		for (int nCntMat = 0; nCntMat < (int)m_nNumMat; nCntMat++)
-		{
-			// マテリアルの設定
+		{// マテリアルの設定
 			pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
 
 			// モデルパーツの描画
 			m_pMesh->DrawSubset(nCntMat);
 		}
+	}
 
-		// 保持していたマテリアルを戻す
-		pDevice->SetMaterial(&matDef);
-	}	
+	// 保持していたマテリアルを戻す
+	pDevice->SetMaterial(&matDef);
 }
 
 //=============================================================================

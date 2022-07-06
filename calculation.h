@@ -11,7 +11,8 @@
 // プロトタイプ宣言
 //***************************************************************
 // 制御関数
-D3DXVECTOR3	WorldCastVtx(D3DXVECTOR3 vtx, D3DXVECTOR3 FormerPos, D3DXVECTOR3 FormerRot);		// ワールド座標にキャスト
-float RotNormalization(float fRot);																// 角度の正規化
+D3DXVECTOR3	WorldCastVtx(D3DXVECTOR3 vtx, D3DXVECTOR3 FormerPos, D3DXVECTOR3 FormerRot);				// ワールド座標にキャスト
+D3DXVECTOR3	WorldCastVtx(D3DXVECTOR3 vtx, D3DXVECTOR3 FormerPos, D3DXQUATERNION FormeQuaternion);		// ワールド座標にキャスト
+float RotNormalization(float fRot);																		// 角度の正規化
 
 #endif

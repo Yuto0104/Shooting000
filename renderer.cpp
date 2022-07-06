@@ -201,7 +201,9 @@ void CRenderer::DrawFPS()
 	RECT rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 	TCHAR str[256];
 
-	wsprintf(str, _T("FPS : %d\n"), GetFps());
+//	wsprintf(str, _T("FPS : %d\n"), GetFps());
+	D3DXVECTOR3 chacck = CApplication::GetCamera()->GetPosV();
+	wsprintf(str, _T("FPS : %d\n"), chacck.z);
 
 	// テキスト描画
 	m_pFont->DrawText(NULL, str, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xff, 0xff, 0xff, 0xff));

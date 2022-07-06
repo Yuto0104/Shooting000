@@ -1,8 +1,8 @@
 //=============================================================================
 //
-// モーションキャラクター3Dクラス(model3D.h)
+// 3Dモーションプレイヤークラス(model3D.h)
 // Author : 唐﨑結斗
-// 概要 : モーションキャラクター3D生成を行う
+// 概要 : 3Dモーションプレイヤー生成を行う
 //
 //=============================================================================
 
@@ -11,32 +11,31 @@
 //*****************************************************************************
 #include <assert.h>
 
-#include "motion_char3D.h"
-#include "motion.h"
+#include "motion_player3D.h"
 #include "renderer.h"
 #include "application.h"
 
 //=============================================================================
 // インスタンス生成
 // Author : 唐﨑結斗
-// 概要 : モーションキャラクター3Dを生成する
+// 概要 : 3Dモーションプレイヤーを生成する
 //=============================================================================
-CMotionChar3D * CMotionChar3D::Create(char * pName)
+CMotionPlayer3D * CMotionPlayer3D::Create(char * pName)
 {
 	// オブジェクトインスタンス
-	CMotionChar3D *pMotionChar3D = nullptr;
+	CMotionPlayer3D *pMotionPlayer3D = nullptr;
 
 	// メモリの解放
-	pMotionChar3D = new CMotionChar3D;
+	pMotionPlayer3D = new CMotionPlayer3D;
 
 	// メモリの確保ができなかった
-	assert(pMotionChar3D != nullptr);
+	assert(pMotionPlayer3D != nullptr);
 
 	// 数値の初期化
-	pMotionChar3D->Init(pName);
+	pMotionPlayer3D->Init(pName);
 
 	// インスタンスを返す
-	return pMotionChar3D;
+	return pMotionPlayer3D;
 }
 
 //=============================================================================
@@ -44,9 +43,9 @@ CMotionChar3D * CMotionChar3D::Create(char * pName)
 // Author : 唐﨑結斗
 // 概要 : インスタンス生成時に行う処理
 //=============================================================================
-CMotionChar3D::CMotionChar3D()
+CMotionPlayer3D::CMotionPlayer3D()
 {
-	
+
 }
 
 //=============================================================================
@@ -54,7 +53,7 @@ CMotionChar3D::CMotionChar3D()
 // Author : 唐﨑結斗
 // 概要 : インスタンス終了時に行う処理
 //=============================================================================
-CMotionChar3D::~CMotionChar3D()
+CMotionPlayer3D::~CMotionPlayer3D()
 {
 
 }
@@ -64,20 +63,10 @@ CMotionChar3D::~CMotionChar3D()
 // Author : 唐﨑結斗
 // 概要 : 頂点バッファを生成し、メンバ変数の初期値を設定
 //=============================================================================
-HRESULT CMotionChar3D::Init(char *pMotionName)
+HRESULT CMotionPlayer3D::Init(char *pMotionName)
 {
 	// 初期化
-	CModel3D::Init();
-
-	// モーション情報
-	m_pMotion = new CMotion(pMotionName);
-	assert(m_pMotion != nullptr);
-
-	// メンバ変数の初期化
-	m_nNumMotion = 0;
-	m_nNumMotionOld = m_nNumMotion;
-	m_bMotion = false;
-	m_bMotionBlend = false;
+	CMotionChar3D::Init(pMotionName);
 
 	return E_NOTIMPL;
 }
@@ -87,19 +76,10 @@ HRESULT CMotionChar3D::Init(char *pMotionName)
 // Author : 唐﨑結斗
 // 概要 : テクスチャのポインタと頂点バッファの解放
 //=============================================================================
-void CMotionChar3D::Uninit()
+void CMotionPlayer3D::Uninit()
 {
-	if (m_pMotion != nullptr)
-	{// 終了処理
-		m_pMotion->Uninit();
-
-		// メモリの解放
-		delete m_pMotion;
-		m_pMotion = nullptr;
-	}
-
 	// 終了
-	CModel3D::Uninit();
+	CMotionChar3D::Uninit();
 }
 
 //=============================================================================
@@ -107,33 +87,10 @@ void CMotionChar3D::Uninit()
 // Author : 唐﨑結斗
 // 概要 : 2D更新を行う
 //=============================================================================
-void CMotionChar3D::Update()
+void CMotionPlayer3D::Update()
 {
 	// 更新
-	CModel3D::Update();
-
-	// 現在のモーション番号の保管
-	m_nNumMotionOld = m_nNumMotion;
-
-	if (!m_bMotion)
-	{// 使用してるモーションがない場合
-		m_nNumMotion = 0;
-	}
-
-	if (m_nNumMotionOld != m_nNumMotion)
-	{// モーションタイプが変更された時
-		m_pMotion->CntReset((int)(m_nNumMotionOld));
-		m_bMotionBlend = true;
-	}
-
-	if (m_bMotionBlend)
-	{// モーションブレンドを使用してる
-		m_bMotionBlend = m_pMotion->MotionBlend((int)(m_nNumMotion));
-	}
-	else if (!m_bMotionBlend)
-	{// モーションブレンドを使用してない場合
-		m_bMotion = m_pMotion->PlayMotion((int)(m_nNumMotion));
-	}
+	CMotionChar3D::Update();
 }
 
 //=============================================================================
@@ -141,14 +98,9 @@ void CMotionChar3D::Update()
 // Author : 唐﨑結斗
 // 概要 : 2D描画を行う
 //=============================================================================
-void CMotionChar3D::Draw()
+void CMotionPlayer3D::Draw()
 {
 	// 描画
-	CModel3D::Draw();
-
-	// ワールドマトリックスの取得
-	D3DXMATRIX mtxWorld = GetMtxWorld();
-
-	// パーツの描画設定
-	m_pMotion->SetParts(mtxWorld);
+	CMotionChar3D::Draw();
 }
+

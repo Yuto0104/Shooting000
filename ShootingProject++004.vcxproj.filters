@@ -117,6 +117,9 @@
     <ClInclude Include="motion_char3D.h">
       <Filter>ヘッダー ファイル\object\3D\Motion</Filter>
     </ClInclude>
+    <ClInclude Include="motion_player3D.h">
+      <Filter>ヘッダー ファイル\object\3D\Motion</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="texture.cpp">
@@ -189,6 +192,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="motion_char3D.cpp">
+      <Filter>ソース ファイル\object\3D\Motion</Filter>
+    </ClCompile>
+    <ClCompile Include="motion_player3D.cpp">
       <Filter>ソース ファイル\object\3D\Motion</Filter>
     </ClCompile>
   </ItemGroup>

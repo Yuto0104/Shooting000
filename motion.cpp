@@ -125,12 +125,10 @@ void CMotion::SetParts(D3DXMATRIX mtxWorld)
 		if ((m_parts + i)->nIdxModelParent == -1)
 		{// 親モデルのインデックス数が-1の時
 		 // 新規深度値とZバッファの深度値が同じ値ならテスト成功にする
-		 //pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
 			mtxParent = mtxWorld;
 		}
 		else
 		{// 新規深度値とZバッファの深度値が同じ値ならテスト成功にする
-			//pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_GREATEREQUAL);
 			mtxParent = (m_parts + (m_parts + i)->nIdxModelParent)->mtxWorld;
 		}
 

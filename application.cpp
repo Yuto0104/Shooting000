@@ -29,6 +29,7 @@
 #include "object3D.h"
 #include "model3D.h"
 #include "motion_char3D.h"
+#include "motion_player3D.h"
 
 //*****************************************************************************
 // 静的メンバ変数宣言
@@ -118,11 +119,11 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	CLight::Create(D3DXVECTOR3(-0.2f, -0.5f, 0.7f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 
 	// オブジェクトの生成
-	CObject2D::Create()->SetPos(D3DXVECTOR3(50.0f, 90.0f, 0.0f));
-	CObject2D::Create()->SetPos(D3DXVECTOR3(700.0f, 600.0f, 0.0f));
-	CEnemy2D::Create(D3DXVECTOR3(800.0f, 100.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 0.0f);
-	CEnemy2D::Create(D3DXVECTOR3(700.0f, 200.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 0.0f);
-	CEnemy2D::Create(D3DXVECTOR3(640.0f, 360.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 0.0f);
+	//CObject2D::Create()->SetPos(D3DXVECTOR3(50.0f, 90.0f, 0.0f));
+	//CObject2D::Create()->SetPos(D3DXVECTOR3(700.0f, 600.0f, 0.0f));
+	//CEnemy2D::Create(D3DXVECTOR3(800.0f, 100.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 0.0f);
+	//CEnemy2D::Create(D3DXVECTOR3(700.0f, 200.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 0.0f);
+	//CEnemy2D::Create(D3DXVECTOR3(640.0f, 360.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 0.0f);
 
 	CObject3D *pObject3D = CObject3D::Create();
 	pObject3D->SetPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
@@ -139,9 +140,28 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	pModel3D->SetSize(D3DXVECTOR3(5.0f, 5.0f, 5.0f));
 
 	CMotionChar3D *pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
+	pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
-	m_pPlayer2D = CPlayer2D::Create();
-	m_pPlayer2D->SetPos(D3DXVECTOR3(640.0f, 360.0f, 0.0f));
+	pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
+	pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, 0.0f, -300.0f));
+
+	pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
+	pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, 100.0f, -150.0f));
+
+	pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
+	pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, -100.0f, -150.0f));
+
+	pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
+	pMotionChar3D->SetPos(D3DXVECTOR3(-40.0f, 0.0f, 0.0f));
+
+	pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
+	pMotionChar3D->SetPos(D3DXVECTOR3(-80.0f, 0.0f, 0.0f));
+
+	CMotionPlayer3D *pMotionPlayer3D = CMotionPlayer3D::Create("data/MOTION/motionShark.txt");
+	pMotionPlayer3D->SetPos(D3DXVECTOR3(40.0f, 0.0f, 0.0f));
+
+	//m_pPlayer2D = CPlayer2D::Create();
+	//m_pPlayer2D->SetPos(D3DXVECTOR3(640.0f, 360.0f, 0.0f));
 
 	return S_OK;
 }

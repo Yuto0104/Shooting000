@@ -60,6 +60,8 @@ public:
 	void Set(void);												// 設定
 	void SetViewType(VIEW_TYPE type) { m_viewType = type; }		// タイプの設定
 
+	//D3DXMATRIX transformQuaternionToRotMat(D3DXQUATERNION inQuaternion);
+	D3DXVECTOR3 GetPosV() { return m_posV; }
 private:
 	//--------------------------------------------------------------------
 	// メンバ関数
@@ -70,17 +72,21 @@ private:
 	//--------------------------------------------------------------------
 	// メンバ変数
 	//--------------------------------------------------------------------
-	CMove			*m_pRoll;			// 移動クラスのインスタンス(角度)
-	D3DXVECTOR3		m_posV;				// 視点
-	D3DXVECTOR3		m_posR;				// 注視点
-	D3DXVECTOR3		m_vecU;				// 上方向ベクトル
-	D3DXVECTOR3		m_rot;				// 向き
-	D3DXVECTOR3		m_rotMove;			// 移動方向
-	D3DXMATRIX		m_mtxProj;			// プロジェクションマトリックス
-	D3DXMATRIX		m_mtxView;			// ビューマトリックス
-	VIEW_TYPE		m_viewType;			// 投影の種別
-	float			m_fDistance;		// 視点から注視点までの距離
-	float			m_fRotMove;			// 移動方向
+	CMove				*m_pRoll;			// 移動クラスのインスタンス(角度)
+	D3DXQUATERNION		m_quaternion;		// クオータニオン
+	D3DXMATRIX			m_mtxWorld;			// ワールドマトリックス
+	D3DXMATRIX			m_mtxProj;			// プロジェクションマトリックス
+	D3DXMATRIX			m_mtxView;			// ビューマトリックス
+	D3DXVECTOR3			m_posV;				// 視点
+	D3DXVECTOR3			m_posR;				// 注視点
+	D3DXVECTOR3			m_vecU;				// 上方向ベクトル
+	D3DXVECTOR3			m_rot;				// 向き
+	D3DXVECTOR3			m_rotMove;			// 移動方向
+	VIEW_TYPE			m_viewType;			// 投影の種別
+	float				m_fDistance;		// 視点から注視点までの距離
+	float				m_fRotMove;			// 移動方向
+
+	D3DXVECTOR3			m_axisVec;			// 回転方向のベクトル
 };
 
 #endif
