@@ -36,21 +36,22 @@ public:
 	//--------------------------------------------------------------------
 	// メンバ変数
 	//--------------------------------------------------------------------
-	HRESULT Init() override;														// 初期化
-	HRESULT Init(char *pName);														// 初期化
-	void Uninit() override;															// 終了
-	void Update() override;															// 更新
-	void Draw() override;															// 描画
-	void SetPos(const D3DXVECTOR3 &pos) override;									// 位置のセッター
-	void SetPosOld(const D3DXVECTOR3 &posOld) override { m_posOld = posOld; }		// 過去位置のセッター
-	void SetRot(const D3DXVECTOR3 &rot) override;									// 向きのセッター
-	void SetSize(const D3DXVECTOR3 &size) override;									// 大きさのセッター
-	D3DXVECTOR3 GetPos() override { return m_pos; }									// 位置のゲッター
-	D3DXVECTOR3 GetPosOld()  override { return m_posOld; }							// 過去位置のゲッター
-	D3DXVECTOR3 GetRot()  override { return m_rot; }								// 向きのゲッター
-	D3DXVECTOR3 GetSize()  override { return m_size; }								// 大きさのゲッター
-	D3DXMATRIX GetMtxWorld() { return m_mtxWorld; }							// ワールドマトリックスの取得
-	void SetMtxWorld(D3DXMATRIX mtxWorld) { m_mtxWorld = mtxWorld; }		// ワールドマトリックスの設定
+	HRESULT Init() override;																		// 初期化
+	HRESULT Init(char *pName);																		// 初期化
+	void Uninit() override;																			// 終了
+	void Update() override;																			// 更新
+	void Draw() override;																			// 描画
+	void SetPos(const D3DXVECTOR3 &pos) override;													// 位置のセッター
+	void SetPosOld(const D3DXVECTOR3 &posOld) override { m_posOld = posOld; }						// 過去位置のセッター
+	void SetRot(const D3DXVECTOR3 &rot) override;													// 向きのセッター
+	void SetSize(const D3DXVECTOR3 &size) override;													// 大きさのセッター
+	void SetMtxWorld(D3DXMATRIX mtxWorld) { m_mtxWorld = mtxWorld; }								// ワールドマトリックスの設定
+	D3DXVECTOR3 GetPos() override { return m_pos; }													// 位置のゲッター
+	D3DXVECTOR3 GetPosOld()  override { return m_posOld; }											// 過去位置のゲッター
+	D3DXVECTOR3 GetRot()  override { return m_rot; }												// 向きのゲッター
+	D3DXVECTOR3 GetSize()  override { return m_size; }												// 大きさのゲッター
+	D3DXMATRIX GetMtxWorld() { return m_mtxWorld; }													// ワールドマトリックスの取得
+	D3DXVECTOR3	WorldCastVtx(D3DXVECTOR3 vtx, D3DXVECTOR3 FormerPos, D3DXVECTOR3 FormerRot);		// ローカル座標をワールド座標に変換する
 
 private:
 	//--------------------------------------------------------------------

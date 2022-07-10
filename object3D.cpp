@@ -209,6 +209,12 @@ void CObject3D::Draw()
 	// ライトを有効	
 	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
 
+	// Zテストの終了
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+
+	// αテストの終了
+	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+
 	// テクスチャの解除
 	pDevice->SetTexture(0, nullptr);
 }

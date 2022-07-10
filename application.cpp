@@ -30,6 +30,7 @@
 #include "model3D.h"
 #include "motion_char3D.h"
 #include "motion_player3D.h"
+#include "mesh.h"
 
 //*****************************************************************************
 // Ã“Iƒƒ“ƒo•Ï”éŒ¾
@@ -142,8 +143,8 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	CMotionChar3D *pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
 	pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
-	pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
-	pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, 0.0f, -300.0f));
+	//pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
+	//pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, 0.0f, -300.0f));
 
 	pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
 	pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, 100.0f, -150.0f));
@@ -158,10 +159,13 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	pMotionChar3D->SetPos(D3DXVECTOR3(-80.0f, 0.0f, 0.0f));
 
 	CMotionPlayer3D *pMotionPlayer3D = CMotionPlayer3D::Create("data/MOTION/motionShark.txt");
-	pMotionPlayer3D->SetPos(D3DXVECTOR3(40.0f, 0.0f, 0.0f));
-
+	pMotionPlayer3D->SetPos(D3DXVECTOR3(40.0f, 0.0f, -50.0f));
 	//m_pPlayer2D = CPlayer2D::Create();
 	//m_pPlayer2D->SetPos(D3DXVECTOR3(640.0f, 360.0f, 0.0f));
+
+	CMesh3D *pMesh3D = CMesh3D::Create();
+	pMesh3D->SetSize(D3DXVECTOR3(100.0f, 0, 100.0f));
+	pMesh3D->SetBlock(CMesh3D::DOUBLE_INT(3, 3));
 
 	return S_OK;
 }

@@ -41,10 +41,12 @@ public:
 	//--------------------------------------------------------------------
 	// メンバ関数
 	//--------------------------------------------------------------------
-	virtual HRESULT Init(char *pMotionName);	// 初期化(オーバーロード)
-	void Uninit() override;						// 終了
-	void Update() override;						// 更新
-	void Draw() override;						// 描画
+	virtual HRESULT Init(char *pMotionName);									// 初期化
+	void Uninit() override;														// 終了
+	void Update() override;														// 更新
+	void Draw() override;														// 描画
+	void SetNumMotion(int nNumMotion) { m_nNumMotion = nNumMotion; }		// モーションナンバーの設定
+	int GetNumMotion() { return m_nNumMotion; }									// モーションナンバーの取得
 	
 private:
 	//--------------------------------------------------------------------

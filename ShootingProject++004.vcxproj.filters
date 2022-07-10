@@ -120,6 +120,12 @@
     <ClInclude Include="motion_player3D.h">
       <Filter>ヘッダー ファイル\object\3D\Motion</Filter>
     </ClInclude>
+    <ClInclude Include="bullet3D.h">
+      <Filter>ヘッダー ファイル\object\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="mesh.h">
+      <Filter>ヘッダー ファイル\object\3D</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="texture.cpp">
@@ -196,6 +202,12 @@
     </ClCompile>
     <ClCompile Include="motion_player3D.cpp">
       <Filter>ソース ファイル\object\3D\Motion</Filter>
+    </ClCompile>
+    <ClCompile Include="bullet3D.cpp">
+      <Filter>ソース ファイル\object\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="mesh.cpp">
+      <Filter>ソース ファイル\object\3D</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
