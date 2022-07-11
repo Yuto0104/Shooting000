@@ -31,6 +31,7 @@
 #include "motion_char3D.h"
 #include "motion_player3D.h"
 #include "mesh.h"
+#include "sphere.h"
 
 //*****************************************************************************
 // Ã“Iƒƒ“ƒo•Ï”éŒ¾
@@ -164,8 +165,25 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	//m_pPlayer2D->SetPos(D3DXVECTOR3(640.0f, 360.0f, 0.0f));
 
 	CMesh3D *pMesh3D = CMesh3D::Create();
-	pMesh3D->SetSize(D3DXVECTOR3(100.0f, 0, 100.0f));
-	pMesh3D->SetBlock(CMesh3D::DOUBLE_INT(3, 3));
+	pMesh3D->SetSize(D3DXVECTOR3(2000.0f, 0, 2000.0f));
+	pMesh3D->SetBlock(CMesh3D::DOUBLE_INT(100, 100));
+	//pMesh3D->SetSplitTex(true);
+
+	CSphere *pSphere = CSphere::Create();
+	pSphere->SetRot(D3DXVECTOR3(D3DX_PI, 0.0f, 0.0f));
+	pSphere->SetSize(D3DXVECTOR3(100.0f, 0, 100.0f));
+	pSphere->SetBlock(CMesh3D::DOUBLE_INT(100, 100));
+	//pSphere->SetSplitTex(true);
+	pSphere->SetRadius(1000.0f);
+	pSphere->SetSphereRange(D3DXVECTOR2(D3DX_PI * 2.0f, D3DX_PI * -0.25f));
+
+	pSphere = CSphere::Create();
+	pSphere->SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	pSphere->SetSize(D3DXVECTOR3(100.0f, 0, 100.0f));
+	pSphere->SetBlock(CMesh3D::DOUBLE_INT(100, 100));
+	//pSphere->SetSplitTex(true);
+	pSphere->SetRadius(1000.0f);
+	pSphere->SetSphereRange(D3DXVECTOR2(D3DX_PI * 2.0f, D3DX_PI * -0.25f));
 
 	return S_OK;
 }

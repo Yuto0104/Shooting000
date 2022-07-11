@@ -152,7 +152,7 @@ void CObject3D::Draw()
 	if (m_bBillboard)
 	{// ビルボードである
 		// ライトを無効
-		pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
+		pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 
 		// ビューマトリックスの設定
 		pDevice->GetTransform(D3DTS_VIEW, &mtxView);

@@ -20,7 +20,7 @@
 // Author : 唐﨑結斗
 // 概要 : 3Dモデルを生成する
 //=============================================================================
-CModel3D * CModel3D::Create(char * pName)
+CModel3D * CModel3D::Create(const char *pName)
 {
 	// オブジェクトインスタンス
 	CModel3D *pModel3D = nullptr;
@@ -90,7 +90,7 @@ HRESULT CModel3D::Init()
 // Author : 唐﨑結斗
 // 概要 : 頂点バッファを生成し、メンバ変数の初期値を設定
 //=============================================================================
-HRESULT CModel3D::Init(char * pName)
+HRESULT CModel3D::Init(const char * pName)
 {
 	// メンバ変数の初期化
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 位置

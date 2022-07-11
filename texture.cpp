@@ -53,6 +53,7 @@ void CTexture::Init(void)
 		"data/TEXTURE/695783_VvJuOyc1.png",			// 2D弾
 		"data/TEXTURE/explosion000.png",			// 2D爆発
 		"data/TEXTURE/ボス.png",					// 2Dエネミー
+		"data/TEXTURE/sky002.jpg",					// 空(0)
 	};
 
 	for (int nCnt = 0; nCnt < MAX_TYPE; nCnt++)

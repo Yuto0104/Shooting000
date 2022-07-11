@@ -43,6 +43,12 @@
     <Filter Include="ソース ファイル\object\3D\Motion">
       <UniqueIdentifier>{4c7c7ef5-4555-4336-9668-72ce3e99ba61}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\object\3D\mesh">
+      <UniqueIdentifier>{4cbcb481-777e-43ad-bfc5-5c60af52ef81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\object\3D\mesh">
+      <UniqueIdentifier>{a6fe3cae-f577-4cc3-bb21-254dc003c098}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="texture.h">
@@ -124,7 +130,10 @@
       <Filter>ヘッダー ファイル\object\3D</Filter>
     </ClInclude>
     <ClInclude Include="mesh.h">
-      <Filter>ヘッダー ファイル\object\3D</Filter>
+      <Filter>ヘッダー ファイル\object\3D\mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="sphere.h">
+      <Filter>ヘッダー ファイル\object\3D\mesh</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -206,8 +215,11 @@
     <ClCompile Include="bullet3D.cpp">
       <Filter>ソース ファイル\object\3D</Filter>
     </ClCompile>
+    <ClCompile Include="sphere.cpp">
+      <Filter>ソース ファイル\object\3D\mesh</Filter>
+    </ClCompile>
     <ClCompile Include="mesh.cpp">
-      <Filter>ソース ファイル\object\3D</Filter>
+      <Filter>ソース ファイル\object\3D\mesh</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

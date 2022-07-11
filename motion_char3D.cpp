@@ -21,7 +21,7 @@
 // Author : 唐﨑結斗
 // 概要 : モーションキャラクター3Dを生成する
 //=============================================================================
-CMotionChar3D * CMotionChar3D::Create(char * pName)
+CMotionChar3D * CMotionChar3D::Create(const char * pName)
 {
 	// オブジェクトインスタンス
 	CMotionChar3D *pMotionChar3D = nullptr;
@@ -64,13 +64,13 @@ CMotionChar3D::~CMotionChar3D()
 // Author : 唐﨑結斗
 // 概要 : 頂点バッファを生成し、メンバ変数の初期値を設定
 //=============================================================================
-HRESULT CMotionChar3D::Init(char *pMotionName)
+HRESULT CMotionChar3D::Init(const char *pName)
 {
 	// 初期化
 	CModel3D::Init();
 
 	// モーション情報
-	m_pMotion = new CMotion(pMotionName);
+	m_pMotion = new CMotion(pName);
 	assert(m_pMotion != nullptr);
 
 	// メンバ変数の初期化

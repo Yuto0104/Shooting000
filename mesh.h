@@ -115,7 +115,7 @@ public:
 	~CMesh3D();
 
 	//--------------------------------------------------------------------
-	// オーバーライド関数
+	// メンバ関数
 	//--------------------------------------------------------------------
 	HRESULT Init() override;														// 初期化
 	void Uninit() override;															// 終了
@@ -129,34 +129,33 @@ public:
 	D3DXVECTOR3 GetPosOld() override { return m_posOld; }							// 過去位置のゲッター
 	D3DXVECTOR3 GetRot() override { return m_rot; }									// 向きのゲッター
 	D3DXVECTOR3 GetSize() override { return m_size; }								// 大きさのゲッター
-
-	//--------------------------------------------------------------------
-	// メンバ関数
-	//--------------------------------------------------------------------
-	void SetMtxWorld(D3DXMATRIX mtxWorld) { m_mtxWorld = mtxWorld; }		// ワールドマトリックスのセッター
-	D3DXMATRIX GetMtxWorld() { return m_mtxWorld; }							// ワールドマトリックスのゲッター
-	void SetBlock(DOUBLE_INT block);										// ブロック数のセッター
-	DOUBLE_INT GetBlock() { return m_block; }								// ブロック数のゲッター
+	void SetMtxWorld(D3DXMATRIX mtxWorld) { m_mtxWorld = mtxWorld; }				// ワールドマトリックスのセッター
+	D3DXMATRIX GetMtxWorld() { return m_mtxWorld; }									// ワールドマトリックスのゲッター
+	void SetBlock(DOUBLE_INT block);												// ブロック数のセッター
+	DOUBLE_INT GetBlock() { return m_block; }										// ブロック数のゲッター
+	DOUBLE_INT GetLine() { return m_line; }											// ライン数のゲッター
+	void SetSplitTex(bool bSplitTex);												// テクスチャ分割するかのセッター
+	bool GetSplitTex() { return m_bSplitTex; }										// テクスチャ分割するかのゲッター
+	void LoadTex(CTexture::TEXTURE_TYPE type) { m_typeTex = type; }					// テクスチャの設定
 
 protected:
 	//--------------------------------------------------------------------
 	// メンバ関数
 	//--------------------------------------------------------------------
-	void SetVtx();															// 頂点座標などの設定
-	void SetTex(const bool bSplit);											// テクスチャ座標の設定
-	void LoadTex(CTexture::TEXTURE_TYPE type) { m_typeTex = type; }			// テクスチャの設定
-	void SetIndexBuff();													// インデックスバッファの設定
-
-private:
-	//--------------------------------------------------------------------
-	// メンバ関数
-	//--------------------------------------------------------------------
-	void SetMeshInfo();					// メッシュの数値の計算
+	virtual void SetVtx();									// 頂点座標などの設定
+	virtual void SetTex(const bool bSplit);					// テクスチャ座標の設定
+	void SetIndexBuff();									// インデックスバッファの設定
+	void SetMeshInfo();										// メッシュの数値の計算
 
 	//--------------------------------------------------------------------
 	// メンバ変数
 	//--------------------------------------------------------------------
-	LPDIRECT3DVERTEXBUFFER9			m_pVtxBuff;							// 頂点バッファ
+	LPDIRECT3DVERTEXBUFFER9	m_pVtxBuff;			 // 頂点バッファ
+
+private:
+	//--------------------------------------------------------------------
+	// メンバ変数
+	//--------------------------------------------------------------------
 	LPDIRECT3DINDEXBUFFER9			m_pIdxBuff;							// インデックスバッファへのポインタ
 	D3DXMATRIX						m_mtxWorld;							// ワールドマトリックス
 	D3DXVECTOR3						m_pos;								// 位置

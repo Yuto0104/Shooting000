@@ -75,7 +75,7 @@ CMotionPlayer3D::~CMotionPlayer3D()
 // Author : 唐﨑結斗
 // 概要 : 頂点バッファを生成し、メンバ変数の初期値を設定
 //=============================================================================
-HRESULT CMotionPlayer3D::Init(char *pMotionName)
+HRESULT CMotionPlayer3D::Init(const char *pMotionName)
 {
 	// 初期化
 	CMotionChar3D::Init(pMotionName);

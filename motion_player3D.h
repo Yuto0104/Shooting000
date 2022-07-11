@@ -54,7 +54,7 @@ public:
 	//--------------------------------------------------------------------
 	// メンバ関数
 	//--------------------------------------------------------------------
-	HRESULT Init(char *pMotionName) override;	// 初期化
+	HRESULT Init(const char *pMotionName) override;	// 初期化
 	void Uninit() override;						// 終了
 	void Update() override;						// 更新
 	void Draw() override;						// 描画

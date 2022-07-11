@@ -91,7 +91,7 @@ public:
 	//--------------------------------------------------------------------
 	// コンストラクタとデストラクタ
 	//--------------------------------------------------------------------
-	CMotion(char *pFileName);
+	CMotion(const char *pFileName);
 	~CMotion();
 
 	//--------------------------------------------------------------------
@@ -110,7 +110,7 @@ public:
 	bool MotionBlend(const int nCntMotionSet);	
 
 	// モーション読み込み
-	void LoodSetMotion(char *pFileName);
+	void LoodSetMotion(const char *pFileName);
 
 	// 終了
 	void Uninit(void);

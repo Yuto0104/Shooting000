@@ -20,7 +20,7 @@
 // Author : 唐﨑結斗
 // 概要 : インスタンス生成時に行う処理
 //=============================================================================
-CMotion::CMotion(char * pFileName)
+CMotion::CMotion(const char * pFileName)
 {
 	// パーツ名の初期化
 	memset(&m_partsFile, 0, sizeof(m_partsFile));
@@ -293,7 +293,7 @@ bool CMotion::MotionBlend(const int nCntMotionSet)
 // Author : 唐﨑結斗
 // 概要 : パーツとモーションの読み込み、初期化を呼び出す
 //=============================================================================
-void CMotion::LoodSetMotion(char * pFileName)
+void CMotion::LoodSetMotion(const char * pFileName)
 {
 	// 変数宣言
 	char aString[128] = {};			// 文字列比較用の変数

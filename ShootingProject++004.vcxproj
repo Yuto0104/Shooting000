@@ -177,6 +177,7 @@
     <ClInclude Include="motion_char3D.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="sound.h" />
+    <ClInclude Include="sphere.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="tex_anim.h" />
   </ItemGroup>
@@ -206,6 +207,7 @@
     <ClCompile Include="player2D.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="sound.cpp" />
+    <ClCompile Include="sphere.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="tex_anim.cpp" />
   </ItemGroup>
