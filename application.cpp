@@ -32,6 +32,7 @@
 #include "motion_player3D.h"
 #include "mesh.h"
 #include "sphere.h"
+#include "circle_polygon3D.h"
 
 //*****************************************************************************
 // 静的メンバ変数宣言
@@ -42,7 +43,9 @@ CMouse *CApplication::m_pMouse = {};							// マウスインスタンス
 CTexture *CApplication::m_pTexture = nullptr;					// テクスチャインスタンス
 CSound *CApplication::m_pSound = nullptr;						// サウンドインスタンス
 CCamera *CApplication::m_pCamera = nullptr;						// カメラインスタンス
+CCamera *CApplication::m_pCameraBG = nullptr;						// カメラインスタンス
 CPlayer2D *CApplication::m_pPlayer2D = nullptr;					// プレイヤーインタンス
+CMotionPlayer3D *CApplication::m_MotionPlayer3D = nullptr;		// モーションプレイヤーインスタンス
 
 //=============================================================================
 // コンストラクタ
@@ -76,7 +79,7 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	m_pTexture = new CTexture;
 	m_pSound = new CSound;
 	m_pCamera = new CCamera;
-
+	m_pCameraBG = new CCamera;
 	// 入力デバイスのメモリ確保
 	m_pKeyboard = new CKeyboard;
 	m_pMouse = new CMouse;
@@ -99,7 +102,11 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	// 初期化処理
 	assert(m_pCamera != nullptr);
 	m_pCamera->Init();
-	//m_pCamera->SetViewType(CCamera::TYPE_PARALLEL);
+	m_pCamera->SetViewType(CCamera::TYPE_PARALLEL);
+
+	// 初期化処理
+	assert(m_pCameraBG != nullptr);
+	m_pCameraBG->Init();
 
 	// 初期化処理
 	assert(m_pKeyboard != nullptr);
@@ -127,7 +134,7 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	//CEnemy2D::Create(D3DXVECTOR3(700.0f, 200.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 0.0f);
 	//CEnemy2D::Create(D3DXVECTOR3(640.0f, 360.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 0.0f);
 
-	CObject3D *pObject3D = CObject3D::Create();
+	/*CObject3D *pObject3D = CObject3D::Create();
 	pObject3D->SetPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	pObject3D->SetSize(D3DXVECTOR3(100.0f, 100.0f, 0.0f));
 
@@ -135,19 +142,20 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	pObject3D->SetPos(D3DXVECTOR3(-500.0f, 0.0f, 0.0f));
 	pObject3D->SetRot(D3DXVECTOR3(0.0f, D3DX_PI * 0.5f, 0.0f));
 	pObject3D->SetSize(D3DXVECTOR3(100.0f, 100.0f, 0.0f));
-	pObject3D->SetBillboard(true);
+	pObject3D->SetBillboard(true);*/
 
-	CModel3D *pModel3D = CModel3D::Create("data/MODEL/airplane000.x");
+	/*CModel3D *pModel3D = CModel3D::Create("data/MODEL/airplane000.x");
 	pModel3D->SetPos(D3DXVECTOR3(100.0f, 0.0f, 0.0f));
-	pModel3D->SetSize(D3DXVECTOR3(5.0f, 5.0f, 5.0f));
+	pModel3D->SetSize(D3DXVECTOR3(5.0f, 5.0f, 5.0f));*/
 
 	CMotionChar3D *pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
 	pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	pMotionChar3D->SetObjectDrowType(CObject::DROWTYPE_BG);
 
 	//pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
 	//pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, 0.0f, -300.0f));
 
-	pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
+	/*pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
 	pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, 100.0f, -150.0f));
 
 	pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
@@ -157,17 +165,19 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	pMotionChar3D->SetPos(D3DXVECTOR3(-40.0f, 0.0f, 0.0f));
 
 	pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
-	pMotionChar3D->SetPos(D3DXVECTOR3(-80.0f, 0.0f, 0.0f));
+	pMotionChar3D->SetPos(D3DXVECTOR3(-80.0f, 0.0f, 0.0f))*/;
 
-	CMotionPlayer3D *pMotionPlayer3D = CMotionPlayer3D::Create("data/MOTION/motionShark.txt");
-	pMotionPlayer3D->SetPos(D3DXVECTOR3(40.0f, 0.0f, -50.0f));
+	m_MotionPlayer3D = CMotionPlayer3D::Create("data/MOTION/motionShark.txt");
+	m_MotionPlayer3D->SetPos(D3DXVECTOR3(40.0f, 0.0f, -50.0f));
+	m_MotionPlayer3D->SetRot(D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
 	//m_pPlayer2D = CPlayer2D::Create();
 	//m_pPlayer2D->SetPos(D3DXVECTOR3(640.0f, 360.0f, 0.0f));
 
 	CMesh3D *pMesh3D = CMesh3D::Create();
 	pMesh3D->SetSize(D3DXVECTOR3(2000.0f, 0, 2000.0f));
 	pMesh3D->SetBlock(CMesh3D::DOUBLE_INT(100, 100));
-	//pMesh3D->SetSplitTex(true);
+	pMesh3D->SetSplitTex(true);
+	pMesh3D->SetObjectDrowType(CObject::DROWTYPE_BG);
 
 	CSphere *pSphere = CSphere::Create();
 	pSphere->SetRot(D3DXVECTOR3(D3DX_PI, 0.0f, 0.0f));
@@ -175,15 +185,12 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	pSphere->SetBlock(CMesh3D::DOUBLE_INT(100, 100));
 	//pSphere->SetSplitTex(true);
 	pSphere->SetRadius(1000.0f);
-	pSphere->SetSphereRange(D3DXVECTOR2(D3DX_PI * 2.0f, D3DX_PI * -0.25f));
+	pSphere->SetSphereRange(D3DXVECTOR2(D3DX_PI * 2.0f, D3DX_PI * -0.35f));
+	pSphere->SetObjectDrowType(CObject::DROWTYPE_BG);
 
-	pSphere = CSphere::Create();
-	pSphere->SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-	pSphere->SetSize(D3DXVECTOR3(100.0f, 0, 100.0f));
-	pSphere->SetBlock(CMesh3D::DOUBLE_INT(100, 100));
-	//pSphere->SetSplitTex(true);
-	pSphere->SetRadius(1000.0f);
-	pSphere->SetSphereRange(D3DXVECTOR2(D3DX_PI * 2.0f, D3DX_PI * -0.25f));
+	/*CCirclePolygon3D *pCirclePolygon3D = CCirclePolygon3D::Create();
+	pCirclePolygon3D->SetPos(D3DXVECTOR3(0.0f, 10.0f, 0.0f));
+	pCirclePolygon3D->SetObjectDrowType(CObject::DROWTYPE_BG);*/
 
 	return S_OK;
 }
@@ -249,6 +256,15 @@ void CApplication::Uninit()
 		m_pCamera = nullptr;
 	}
 
+	if (m_pCameraBG != nullptr)
+	{// 終了処理
+		m_pCameraBG->Uninit();
+
+		// メモリの解放
+		delete m_pCameraBG;
+		m_pCameraBG = nullptr;
+	}
+
 	// ライトの解放
 	CLight::ReleaseAll();
 
@@ -266,6 +282,7 @@ void CApplication::Update()
 	m_pKeyboard->Update();
 	m_pMouse->Update();
 	m_pCamera->Update();
+	m_pCameraBG->Update();
 	m_pRenderer->Update();
 }
 

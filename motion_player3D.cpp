@@ -15,8 +15,11 @@
 #include "renderer.h"
 #include "application.h"
 #include "keyboard.h"
+#include "mouse.h"
 
+#include "calculation.h"
 #include "bullet3D.h"
+#include "camera.h"
 
 //*****************************************************************************
 // 定数定義
@@ -79,6 +82,7 @@ HRESULT CMotionPlayer3D::Init(const char *pMotionName)
 {
 	// 初期化
 	CMotionChar3D::Init(pMotionName);
+	SetColorType(CModel3D::TYPE_WHITE);
 
 	return E_NOTIMPL;
 }
@@ -116,6 +120,40 @@ void CMotionPlayer3D::Update()
 	// モーション番号の設定
 	SetNumMotion(m_motionType);
 
+	CCamera *pCamera = CApplication::GetCamera();
+
+	D3DXVECTOR3 pos = GetPos();
+	D3DXVECTOR3 minScreen = WorldCastScreen(&D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1280.0f, 720.0f, 0.0f), &pCamera->GetMtxView(), &pCamera->GetMtxProj());
+	D3DXVECTOR3 maxScreen = WorldCastScreen(&D3DXVECTOR3(1280.0f, 720.0f, 0.0f), D3DXVECTOR3(1280.0f, 720.0f, 0.0f), &pCamera->GetMtxView(), &pCamera->GetMtxProj());
+
+	if (pos.x < minScreen.x)
+	{
+		pos.x = minScreen.x;
+		SetPos(pos);
+	}
+	if (pos.x > maxScreen.x)
+	{
+		pos.x = maxScreen.x;
+		SetPos(pos);
+	}
+
+	// 入力情報の取得
+	CKeyboard *pKeyboard = CApplication::GetKeyboard();
+
+	if (pKeyboard->GetTrigger(DIK_Q))
+	{
+		if (GetColorType() == CObject::TYPE_WHITE)
+		{// モーションの再読み込み
+			ReloadMotion("data/MOTION/motion.txt");
+			SetColorType(CObject::TYPE_BLACK);
+		}
+		else if(GetColorType() == CObject::TYPE_BLACK)
+		{// モーションの再読み込み
+			ReloadMotion("data/MOTION/motionShark.txt");
+			SetColorType(CObject::TYPE_WHITE);
+		}
+	}
+	
 	// 更新
 	CMotionChar3D::Update();
 }
@@ -155,7 +193,7 @@ void CMotionPlayer3D::Rotate()
 	}
 
 	// 向きの設定
-	SetRot(rot);
+	//SetRot(rot);
 }
 
 //=============================================================================
@@ -238,7 +276,7 @@ void CMotionPlayer3D::Move()
 		D3DXVECTOR3 move = D3DXVECTOR3(sinf(m_rotDest.y), 0.0f, cosf(m_rotDest.y));
 
 		// 移動
-		pos += move * 1.0f;
+		pos += move * 10.0f;
 
 		// 目的の向きの反転
 		m_rotDest.y -= D3DX_PI;
@@ -276,6 +314,16 @@ void CMotionPlayer3D::Shot(void)
 	// 変数宣言
 	D3DXVECTOR3 bulletPos;		// 弾の発射位置
 	CBullet3D *pBullet3D;		// 3D弾の生成
+	D3DXCOLOR bulletColor;		// 弾の色
+
+	if (GetColorType() == CObject::TYPE_WHITE)
+	{// 弾の色の設定
+		bulletColor = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+	else if (GetColorType() == CObject::TYPE_BLACK)
+	{// 弾の色の設定
+		bulletColor = D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f);
+	}
 
 	if (pKeyboard->GetPress(DIK_SPACE)
 		&& !m_bLockShot)
@@ -292,6 +340,8 @@ void CMotionPlayer3D::Shot(void)
 		pBullet3D->SetSize(D3DXVECTOR3(10.0f, 10.0f, 0.0f));
 		pBullet3D->SetMoveVec(D3DXVECTOR3(rot.x + D3DX_PI * -0.5f, rot.y, 0.0f));
 		pBullet3D->SetSpeed(10.0f);
+		pBullet3D->SetColor(bulletColor);
+		pBullet3D->SetColorType(GetColorType());
 
 		// カウントの初期化
 		m_nCntShot = 0;
@@ -326,7 +376,10 @@ void CMotionPlayer3D::Shot(void)
 			pBullet3D->SetSize(D3DXVECTOR3(10.0f, 10.0f, 0.0f));
 			pBullet3D->SetMoveVec(D3DXVECTOR3(rot.x + D3DX_PI * -0.5f, rot.y, 0.0f));
 			pBullet3D->SetSpeed(10.0f);
+			pBullet3D->SetColor(bulletColor);
+			pBullet3D->SetColorType(GetColorType());
 
+			// 弾の座標の算出
 			bulletPos = D3DXVECTOR3(-20.0f, 18.0f, -45.0f);
 
 			// ワールド座標にキャスト
@@ -338,6 +391,8 @@ void CMotionPlayer3D::Shot(void)
 			pBullet3D->SetSize(D3DXVECTOR3(10.0f, 10.0f, 0.0f));
 			pBullet3D->SetMoveVec(D3DXVECTOR3(rot.x + D3DX_PI * -0.5f, rot.y, 0.0f));
 			pBullet3D->SetSpeed(10.0f);
+			pBullet3D->SetColor(bulletColor);
+			pBullet3D->SetColorType(GetColorType());
 
 			// カウントの初期化
 			m_nCntShot = 0;

@@ -49,7 +49,7 @@ CObject3D::CObject3D()
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 位置
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 向き
 	m_size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 大きさ
-	m_col = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);			// カラー
+	m_color = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);			// カラー
 	m_fAngle = 0.0f;									// 対角線の角度
 	m_fLength = 0.0f;									// 対角線の長さ
 }
@@ -85,12 +85,15 @@ HRESULT CObject3D::Init()
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 位置
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 向き
 	m_size = D3DXVECTOR3(10.0f, 10.0f, 0.0f);		// 大きさ
-	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);		// カラー
+	m_color = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);		// カラー
 	m_typeTex = CTexture::TYPE_2DBULLET;			// テクスチャタイプ
 	m_bBillboard = false;							// ビルボードかどうか
 
 	// 頂点座標などの設定
 	SetVtx();
+
+	// 頂点カラーを設定
+	SetCol();
 
 	// テクスチャ座標の設定
 	SetTex(D3DXVECTOR2(0.0f, 0.0f), D3DXVECTOR2(1.0f, 1.0f));
@@ -262,6 +265,20 @@ void CObject3D::SetSize(const D3DXVECTOR3 & size)
 }
 
 //=============================================================================
+// 色の設定
+// Author : 唐﨑結斗
+// 概要 : 色を設定する
+//=============================================================================
+void CObject3D::SetColor(D3DXCOLOR color)
+{
+	// 色の設定
+	m_color = color;
+
+	// 頂点カラーの設定
+	SetCol();
+}
+
+//=============================================================================
 // 頂点座標などの設定
 // Author : 唐﨑結斗
 // 概要 : 3D頂点座標、rhw、頂点カラーを設定する
@@ -286,11 +303,28 @@ void CObject3D::SetVtx()
 	pVtx[2].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 	pVtx[3].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 
+	//頂点バッファをアンロック
+	m_pVtxBuff->Unlock();
+}
+
+//=============================================================================
+// 頂点カラーの設定
+// Author : 唐﨑結斗
+// 概要 : 頂点カラーを設定する
+//=============================================================================
+void CObject3D::SetCol()
+{
+	//頂点情報へのポインタを生成
+	VERTEX_3D *pVtx;
+
+	//頂点バッファをロックし、頂点情報へのポインタを取得
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
 	// 頂点カラーの設定
-	pVtx[0].col = m_col;
-	pVtx[1].col = m_col;
-	pVtx[2].col = m_col;
-	pVtx[3].col = m_col;
+	pVtx[0].col = m_color;
+	pVtx[1].col = m_color;
+	pVtx[2].col = m_color;
+	pVtx[3].col = m_color;
 
 	//頂点バッファをアンロック
 	m_pVtxBuff->Unlock();

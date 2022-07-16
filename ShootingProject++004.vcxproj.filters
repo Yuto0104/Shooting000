@@ -99,9 +99,6 @@
     <ClInclude Include="keyboard.h">
       <Filter>ヘッダー ファイル\input</Filter>
     </ClInclude>
-    <ClInclude Include="object3D.h">
-      <Filter>ヘッダー ファイル\object\3D</Filter>
-    </ClInclude>
     <ClInclude Include="move.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -134,6 +131,12 @@
     </ClInclude>
     <ClInclude Include="sphere.h">
       <Filter>ヘッダー ファイル\object\3D\mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="circle_polygon3D.h">
+      <Filter>ヘッダー ファイル\object\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="object3D.h">
+      <Filter>ヘッダー ファイル\object\3D</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -182,9 +185,6 @@
     <ClCompile Include="keyboard.cpp">
       <Filter>ソース ファイル\input</Filter>
     </ClCompile>
-    <ClCompile Include="object3D.cpp">
-      <Filter>ソース ファイル\object\3D</Filter>
-    </ClCompile>
     <ClCompile Include="move.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -220,6 +220,12 @@
     </ClCompile>
     <ClCompile Include="mesh.cpp">
       <Filter>ソース ファイル\object\3D\mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="circle_polygon3D.cpp">
+      <Filter>ソース ファイル\object\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="object3D.cpp">
+      <Filter>ソース ファイル\object\3D</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

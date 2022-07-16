@@ -26,7 +26,8 @@ public:
 	// 定数定義
 	//--------------------------------------------------------------------
 	static const float				ROTATE_SPEED;
-	static const unsigned int		MAX_CNT_SHOT = (15);			// 弾発射までのカウント
+	static const unsigned int		MAX_CNT_SHOT = 15;			// 弾発射までのカウント
+	static const unsigned int		MAX_MOTION = 2;				// モーションのカウント
 
 	//=============================================================================
 	// モーションのタイプ列挙型
@@ -70,11 +71,11 @@ private:
 	//--------------------------------------------------------------------
 	// メンバ変数
 	//--------------------------------------------------------------------
-	D3DXVECTOR3		m_rotDest;				// 目的の向き
-	MOTION_TYPE		m_motionType;			// モーションタイプ
-	int				m_nCntShot;				// 弾発射までのカウント
-	bool			m_bPressShot;			// 長押し弾を使用してるかどうか
-	bool			m_bLockShot;			// 弾発射が可能かどうか
+	D3DXVECTOR3		m_rotDest;						// 目的の向き
+	MOTION_TYPE		m_motionType;					// モーションタイプ
+	int				m_nCntShot;						// 弾発射までのカウント
+	bool			m_bPressShot;					// 長押し弾を使用してるかどうか
+	bool			m_bLockShot;					// 弾発射が可能かどうか
 };
 
 #endif

@@ -45,7 +45,8 @@ public:
 	void Uninit() override;														// 終了
 	void Update() override;														// 更新
 	void Draw() override;														// 描画
-	void SetNumMotion(int nNumMotion) { m_nNumMotion = nNumMotion; }		// モーションナンバーの設定
+	void ReloadMotion(const char *pName);										// モーションの再読み込み
+	void SetNumMotion(int nNumMotion) { m_nNumMotion = nNumMotion; }			// モーションナンバーの設定
 	int GetNumMotion() { return m_nNumMotion; }									// モーションナンバーの取得
 	
 private:

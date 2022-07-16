@@ -93,3 +93,56 @@ float RotNormalization(float fRot)
 
 	return fRot;
 }
+
+//---------------------------------------------------------------------------
+// スクリーン座標をワールド座標へのキャスト
+// Author : 唐﨑結斗
+// 概要 : 
+//---------------------------------------------------------------------------
+D3DXVECTOR3 WorldCastScreen(D3DXVECTOR3 *screenPos,			// スクリーン座標
+	D3DXVECTOR3 screenSize,									// スクリーンサイズ
+	D3DXMATRIX* mtxView,									// ビューマトリックス
+	D3DXMATRIX* mtxProjection)								// プロジェクションマトリックス
+{
+	// 変数宣言
+	D3DXVECTOR3 ScreenPos;
+
+	// 計算用マトリックスの宣言
+	D3DXMATRIX InvView, InvPrj, VP, InvViewport;
+
+	// 各行列の逆行列を算出
+	D3DXMatrixInverse(&InvView, NULL, mtxView);
+	D3DXMatrixInverse(&InvPrj, NULL, mtxProjection);
+	D3DXMatrixIdentity(&VP);
+
+	VP._11 = screenSize.x / 2.0f; VP._22 = -screenSize.y / 2.0f;
+	VP._41 = screenSize.x / 2.0f; VP._42 = screenSize.y / 2.0f;
+
+	D3DXMatrixInverse(&InvViewport, NULL, &VP);
+
+	// ワールド座標へのキャスト
+	D3DXMATRIX mtxWorld = InvViewport * InvPrj * InvView;
+	D3DXVec3TransformCoord(&ScreenPos, screenPos, &mtxWorld);
+
+	return ScreenPos;
+}
+
+D3DXVECTOR3 ScreenCastWorld(D3DXVECTOR3 * screenPos, D3DXVECTOR3 screenSize, D3DXMATRIX * mtxView, D3DXMATRIX * mtxProjection, D3DXMATRIX *mtxWorld)
+{
+	// 変数宣言
+	D3DXVECTOR3 ScreenPos;
+
+	// 計算用マトリックスの宣言
+	D3DXMATRIX VP, InvViewport;
+
+	// 各行列の逆行列を算出
+	VP._11 = screenSize.x / 2.0f; VP._22 = -screenSize.y / 2.0f;
+	VP._41 = screenSize.x / 2.0f; VP._42 = screenSize.y / 2.0f;
+
+	// 行列掛け算関数
+	D3DXMatrixMultiply(&InvViewport, mtxWorld, &VP);
+	D3DXMatrixMultiply(&InvViewport, mtxWorld, mtxProjection);
+	D3DXMatrixMultiply(&InvViewport, mtxWorld, mtxView);
+
+	return D3DXVECTOR3(InvViewport._41, InvViewport._42, InvViewport._43);
+}

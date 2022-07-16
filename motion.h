@@ -118,6 +118,9 @@ public:
 	// カウントリセット
 	void CntReset(const int nNumMotionOld);
 
+	// モーションの再読み込み
+	void ReloadMotion(const char *pFileName);
+
 private:
 	//--------------------------------------------------------------------
 	// メンバ変数

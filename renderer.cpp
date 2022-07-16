@@ -170,12 +170,9 @@ void CRenderer::Draw()
 	// Direct3D‚É‚æ‚é•`‰æ‚ÌŠJŽn
 	if (SUCCEEDED(m_pD3DDevice->BeginScene()))
 	{
-		CCamera* pCamera = CApplication::GetCamera();
-
-		pCamera->Set();
-
 		// ƒ|ƒŠƒSƒ“‚Ì•`‰æˆ—
-		CObject::DrawAll();
+		CObject::DrawAll(CObject::DROWTYPE_BG);
+		CObject::DrawAll(CObject::DROWTYPE_GAME);
 
 #ifdef _DEBUG
 		// FPS•\Ž¦
@@ -201,9 +198,9 @@ void CRenderer::DrawFPS()
 	RECT rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 	TCHAR str[256];
 
-//	wsprintf(str, _T("FPS : %d\n"), GetFps());
-	D3DXVECTOR3 chacck = CApplication::GetCamera()->GetPosV();
-	wsprintf(str, _T("FPS : %d\n"), chacck.z);
+	wsprintf(str, _T("FPS : %d\n"), GetFps());
+	/*D3DXVECTOR3 chacck = CApplication::GetCamera()->GetPosV();
+	wsprintf(str, _T("FPS : %d\n"), chacck.z);*/
 
 	// ƒeƒLƒXƒg•`‰æ
 	m_pFont->DrawText(NULL, str, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xff, 0xff, 0xff, 0xff));

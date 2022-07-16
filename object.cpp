@@ -12,9 +12,9 @@
 #include <assert.h>
 
 #include "object.h"
-#include "object2D.h"
-#include "player2D.h"
 #include "renderer.h"
+#include "application.h"
+#include "camera.h"
 
 //*****************************************************************************
 // 静的メンバ変数宣言
@@ -60,11 +60,22 @@ void CObject::UpdateAll(void)
 // Author : 唐﨑結斗
 // 概要 : 使用されてるインスタンスの描画処理を呼び出す
 //=============================================================================
-void CObject::DrawAll(void)
+void CObject::DrawAll(EObjectDrowType objectDrowType)
 {
+
+	if (objectDrowType == DROWTYPE_GAME)
+	{
+		CApplication::GetCamera()->Set();
+	}
+	else
+	{
+		CApplication::GetCameraBG()->Set();
+	}
+
 	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
 	{
-		if (m_apObject[nCntObject] != nullptr)
+		if (m_apObject[nCntObject] != nullptr
+			&& m_apObject[nCntObject]->m_objectDrowType == objectDrowType)
 		{// インスタンスが使用されてる
 			// オブジェクト描画処理
 			m_apObject[nCntObject]->Draw();
