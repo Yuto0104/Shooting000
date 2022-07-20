@@ -93,10 +93,10 @@ HRESULT CModel3D::Init()
 HRESULT CModel3D::Init(const char * pName)
 {
 	// メンバ変数の初期化
-	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 位置
-	m_posOld = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 過去位置
-	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 向き
-	m_size = D3DXVECTOR3(1.0f, 1.0f, 1.0f);				// 大きさ
+	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);					// 位置
+	m_posOld = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 過去位置
+	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);					// 向き
+	m_size = D3DXVECTOR3(1.0f, 1.0f, 1.0f);					// 大きさ
 
 	// レンダラーのゲット
 	CRenderer *pRenderer = CApplication::GetRenderer();

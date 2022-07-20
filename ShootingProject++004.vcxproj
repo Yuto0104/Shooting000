@@ -160,6 +160,7 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="circle_polygon3D.h" />
     <ClInclude Include="enemy2D.h" />
+    <ClInclude Include="enemy3D.h" />
     <ClInclude Include="explosion2D.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="keyboard.h" />
@@ -171,12 +172,14 @@
     <ClInclude Include="motion_player3D.h" />
     <ClInclude Include="mouse.h" />
     <ClInclude Include="move.h" />
+    <ClInclude Include="number.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="object2D.h" />
     <ClInclude Include="object3D.h" />
     <ClInclude Include="player2D.h" />
     <ClInclude Include="motion_char3D.h" />
     <ClInclude Include="renderer.h" />
+    <ClInclude Include="score.h" />
     <ClInclude Include="sound.h" />
     <ClInclude Include="sphere.h" />
     <ClInclude Include="texture.h" />
@@ -191,6 +194,7 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="circle_polygon3D.cpp" />
     <ClCompile Include="enemy2D.cpp" />
+    <ClCompile Include="enemy3D.cpp" />
     <ClCompile Include="explosion2D.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="keyboard.cpp" />
@@ -203,11 +207,13 @@
     <ClCompile Include="motion_player3D.cpp" />
     <ClCompile Include="mouse.cpp" />
     <ClCompile Include="move.cpp" />
+    <ClCompile Include="number.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="object2D.cpp" />
     <ClCompile Include="object3D.cpp" />
     <ClCompile Include="player2D.cpp" />
     <ClCompile Include="renderer.cpp" />
+    <ClCompile Include="score.cpp" />
     <ClCompile Include="sound.cpp" />
     <ClCompile Include="sphere.cpp" />
     <ClCompile Include="texture.cpp" />

@@ -12,8 +12,11 @@
 #include <assert.h>
 
 #include "bullet3D.h"
+#include "enemy3D.h"
 #include "renderer.h"
 #include "application.h"
+
+#include "score.h"
 
 //=============================================================================
 // インスタンス生成
@@ -48,6 +51,10 @@ CBullet3D::CBullet3D()
 	m_move = D3DXVECTOR3(0.0f,0.0f,0.0f);					// 移動量
 	m_moveVec = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 移動方向
 	m_fSpeed = 0.0f;										// 速度
+	m_nAttack = 0;											// 攻撃力
+
+	// オブジェクトの種別設定
+	SetObjType(CObject::OBJTYPE_3DBULLET);
 }
 
 //=============================================================================
@@ -75,6 +82,9 @@ HRESULT CBullet3D::Init()
 
 	// ビルボードオン
 	SetBillboard(true);
+
+	// 攻撃
+	m_nAttack = 20;
 
 	return S_OK;
 }
@@ -113,6 +123,46 @@ void CBullet3D::Update()
 
 	// 更新
 	CObject3D::Update();
+
+	// オブジェクトインスタンスの取得
+	CObject **apObject = CObject::GetObjectAll();
+
+	for (int nCntObj = 0; nCntObj < MAX_OBJECT; nCntObj++)
+	{
+		if (apObject[nCntObj] != nullptr)
+		{
+			if ((apObject[nCntObj]->GetObjType() == CObject::OBJTYPE_3DENEMY
+				|| apObject[nCntObj]->GetObjType() == CObject::OBJTYPE_3DPLAYER)
+				&& apObject[nCntObj]->GetObjType() != CObject::OBJTYPE_3DBULLET)
+			{// タイプが一致した場合
+				if (ColisonSphere3D(apObject[nCntObj], D3DXVECTOR3(GetSize().x, GetSize().y, GetSize().x), apObject[nCntObj]->GetColisonSize(), true))
+				{
+					if (apObject[nCntObj]->GetObjType() == CObject::OBJTYPE_3DENEMY
+						&& m_parent != TYPE_ENEMY)
+					{
+						CEnemy3D *pEnemy3D = (CEnemy3D*)apObject[nCntObj];
+
+						if (pEnemy3D->GetColorType() == GetColorType())
+						{
+							pEnemy3D->Hit(m_nAttack * 2);
+						}
+						else
+						{
+							pEnemy3D->Hit(m_nAttack);
+						}
+
+						Uninit();
+						break;
+					}
+					else if (apObject[nCntObj]->GetObjType() == CObject::OBJTYPE_3DPLAYER
+						&& m_parent != TYPE_PLAYER)
+					{
+
+					}
+				}
+			}
+		}
+	}
 }
 
 //=============================================================================

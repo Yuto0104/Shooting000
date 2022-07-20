@@ -28,11 +28,14 @@
 #include "enemy2D.h"
 #include "object3D.h"
 #include "model3D.h"
+#include "enemy3D.h"
 #include "motion_char3D.h"
 #include "motion_player3D.h"
 #include "mesh.h"
 #include "sphere.h"
 #include "circle_polygon3D.h"
+#include "number.h"
+#include "score.h"
 
 //*****************************************************************************
 // 静的メンバ変数宣言
@@ -43,9 +46,10 @@ CMouse *CApplication::m_pMouse = {};							// マウスインスタンス
 CTexture *CApplication::m_pTexture = nullptr;					// テクスチャインスタンス
 CSound *CApplication::m_pSound = nullptr;						// サウンドインスタンス
 CCamera *CApplication::m_pCamera = nullptr;						// カメラインスタンス
-CCamera *CApplication::m_pCameraBG = nullptr;						// カメラインスタンス
+CCamera *CApplication::m_pCameraBG = nullptr;					// カメラインスタンス
 CPlayer2D *CApplication::m_pPlayer2D = nullptr;					// プレイヤーインタンス
 CMotionPlayer3D *CApplication::m_MotionPlayer3D = nullptr;		// モーションプレイヤーインスタンス
+CScore *CApplication::m_pScore = nullptr;						// スコアインスタンス
 
 //=============================================================================
 // コンストラクタ
@@ -148,30 +152,18 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	pModel3D->SetPos(D3DXVECTOR3(100.0f, 0.0f, 0.0f));
 	pModel3D->SetSize(D3DXVECTOR3(5.0f, 5.0f, 5.0f));*/
 
+	CEnemy3D *pEnemy = CEnemy3D::Create("data/MODEL/airplane000.x");
+	pEnemy->SetPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	pEnemy->SetSize(D3DXVECTOR3(5.0f, 5.0f, 5.0f));
+	pEnemy->SetColorType(CObject::TYPE_WHITE);
+
 	CMotionChar3D *pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
 	pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	pMotionChar3D->SetObjectDrowType(CObject::DROWTYPE_BG);
 
-	//pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
-	//pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, 0.0f, -300.0f));
-
-	/*pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
-	pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, 100.0f, -150.0f));
-
-	pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
-	pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, -100.0f, -150.0f));
-
-	pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
-	pMotionChar3D->SetPos(D3DXVECTOR3(-40.0f, 0.0f, 0.0f));
-
-	pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
-	pMotionChar3D->SetPos(D3DXVECTOR3(-80.0f, 0.0f, 0.0f))*/;
-
-	m_MotionPlayer3D = CMotionPlayer3D::Create("data/MOTION/motionShark.txt");
+	m_MotionPlayer3D = CMotionPlayer3D::Create();
 	m_MotionPlayer3D->SetPos(D3DXVECTOR3(40.0f, 0.0f, -50.0f));
 	m_MotionPlayer3D->SetRot(D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
-	//m_pPlayer2D = CPlayer2D::Create();
-	//m_pPlayer2D->SetPos(D3DXVECTOR3(640.0f, 360.0f, 0.0f));
 
 	CMesh3D *pMesh3D = CMesh3D::Create();
 	pMesh3D->SetSize(D3DXVECTOR3(2000.0f, 0, 2000.0f));
@@ -191,6 +183,10 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	/*CCirclePolygon3D *pCirclePolygon3D = CCirclePolygon3D::Create();
 	pCirclePolygon3D->SetPos(D3DXVECTOR3(0.0f, 10.0f, 0.0f));
 	pCirclePolygon3D->SetObjectDrowType(CObject::DROWTYPE_BG);*/
+
+	m_pScore = CScore::Create(10);
+	m_pScore->SetScore(0);
+	m_pScore->SetPos(D3DXVECTOR3(1280.0f, m_pScore->GetSize().y / 2.0f, 0.0f));
 
 	return S_OK;
 }

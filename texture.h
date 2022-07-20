@@ -39,6 +39,7 @@ public:
 		TYPE_2DEXPLOSION,	// 2D爆発
 		TYPE_2DENEMY_000,	// 2Dエネミー(0)
 		TYPE_SKY_000,		// 空(0)
+		TYPE_NUMBER_000,	// ナンバー(0)
 		MAX_TYPE,			// 種別の最大数
 	};
 

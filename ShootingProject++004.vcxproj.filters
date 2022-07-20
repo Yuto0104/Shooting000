@@ -138,6 +138,15 @@
     <ClInclude Include="object3D.h">
       <Filter>ヘッダー ファイル\object\3D</Filter>
     </ClInclude>
+    <ClInclude Include="enemy3D.h">
+      <Filter>ヘッダー ファイル\object\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="number.h">
+      <Filter>ヘッダー ファイル\object\2D</Filter>
+    </ClInclude>
+    <ClInclude Include="score.h">
+      <Filter>ヘッダー ファイル\object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="texture.cpp">
@@ -226,6 +235,15 @@
     </ClCompile>
     <ClCompile Include="object3D.cpp">
       <Filter>ソース ファイル\object\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="enemy3D.cpp">
+      <Filter>ソース ファイル\object\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="number.cpp">
+      <Filter>ソース ファイル\object\2D</Filter>
+    </ClCompile>
+    <ClCompile Include="score.cpp">
+      <Filter>ソース ファイル\object</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

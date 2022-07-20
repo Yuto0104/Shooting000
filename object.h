@@ -53,6 +53,9 @@ public:
 		OBJTYPE_2DBULLET,			// バレット
 		OBJTYPE_2DENEMY,			// エネミー
 		OBJTYPE_2DEXPLOSION,		// 爆発
+		OBJTYPE_3DPLAYER,			// 3Dプレイヤー
+		OBJTYPE_3DENEMY,			// 3Dエネミー
+		OBJTYPE_3DBULLET,			// 3Dバレット
 		MAX_OBJTYPE,				// 種別の最大数
 	};
 
@@ -103,15 +106,18 @@ public:
 	EObjectDrowType GetObjectDrowType() { return m_objectDrowType; }									// オブジェクトの描画方法の設定
 	void SetColorType(COLOR_TYPE colorType) { m_colorType = colorType; }								// 色タイプの設定
 	COLOR_TYPE GetColorType() { return m_colorType; }													// 色タイプの設定
+	void SetColisonSize(const D3DXVECTOR3 &colisonSize) { m_colisonSize = colisonSize; }				// あたり判定の大きさのセッター
+	D3DXVECTOR3 GetColisonSize() { return m_colisonSize; }												// あたり判定の大きさの取得
 
 protected:
 	//--------------------------------------------------------------------
 	// メンバ関数
 	//--------------------------------------------------------------------
-	void Release(void);											// オブジェクトの解放
-	bool ColisonRange2D(CObject *target);						// 範囲の判定(2D)
-	bool ColisonRectangle2D(CObject *target,bool bExtrude);		// 矩形の判定(2D)
-	bool ColisonCircle2D(CObject *target, bool bExtrude);		// 円の判定(2D)
+	void Release(void);																					// オブジェクトの解放
+	bool ColisonRange2D(CObject *target);																// 範囲の判定(2D)
+	bool ColisonRectangle2D(CObject *target,bool bExtrude);												// 矩形の判定(2D)
+	bool ColisonCircle2D(CObject *target, bool bExtrude);												// 円の判定(2D)
+	bool ColisonSphere3D(CObject *target, D3DXVECTOR3 size, D3DXVECTOR3 targetSize, bool bExtrude);		// 球の判定(3D)
 
 private:
 	//--------------------------------------------------------------------
@@ -125,6 +131,7 @@ private:
 	EObjectType			m_objectType;		// オブジェクトの種別
 	EObjectDrowType		m_objectDrowType;	// オブジェクトの描画方法
 	COLOR_TYPE			m_colorType;		// 色の種別
+	D3DXVECTOR3			m_colisonSize;		// あたり判定の大きさ
 	int					m_nNumID;			// 格納先の番号
 };
 

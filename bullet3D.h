@@ -23,6 +23,17 @@ class CBullet3D : public CObject3D
 {
 public:
 	//--------------------------------------------------------------------
+	// 親のタイプ
+	//--------------------------------------------------------------------
+	enum PARENT_TYPE
+	{
+		TYPE_NONE = 0,		// タイプ無し
+		TYPE_PLAYER,		// プレイヤー
+		TYPE_ENEMY,			// エネミー
+		MAX_TYPE			// タイプ数の最大
+	};
+
+	//--------------------------------------------------------------------
 	// 静的メンバ関数
 	//--------------------------------------------------------------------
 	static CBullet3D *Create(void);				// 2Dオブジェクトの生成
@@ -42,6 +53,8 @@ public:
 	void Draw() override;											// 描画
 	void SetMoveVec(D3DXVECTOR3 moveVec) { m_moveVec = moveVec; }	// 移動方向
 	void SetSpeed(float fSpeed) { m_fSpeed = fSpeed; }				// 速度
+	void SetParent(PARENT_TYPE parent) { m_parent = parent; }		// 親タイプの設定
+	PARENT_TYPE GetParent() { return m_parent; }					// 親タイプの取得
 
 private:
 	//--------------------------------------------------------------------
@@ -49,7 +62,9 @@ private:
 	//--------------------------------------------------------------------
 	D3DXVECTOR3		m_move;					// 移動量
 	D3DXVECTOR3		m_moveVec;				// 移動方向
+	PARENT_TYPE		m_parent;				// 親タイプ
 	float			m_fSpeed;				// 速度
+	int				m_nAttack;				// 攻撃力
 };
 
 #endif

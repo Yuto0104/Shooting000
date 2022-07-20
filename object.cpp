@@ -268,3 +268,54 @@ bool CObject::ColisonCircle2D(CObject * target, bool bExtrude)
 	SetPos(pos);
 	return bCollision;
 }
+
+//=============================================================================
+// 球の判定
+// Author : 唐﨑結斗
+// 概要 : ターゲットとの球判定
+//=============================================================================
+bool CObject::ColisonSphere3D(CObject *target, D3DXVECTOR3 size, D3DXVECTOR3 targetSize, bool bExtrude)
+{
+	// 変数宣言
+	bool bCollision = false;
+
+	// 自分の情報を取得する
+	D3DXVECTOR3 pos = GetPos();
+	size /= 2.0f;
+
+	// 目標の情報取得
+	D3DXVECTOR3 posTarget = target->GetPos();
+	targetSize /= 2.0f;
+
+	// 判定を行う距離を算出
+	float fJudgeDistance = sqrtf((size.x * size.x) + (size.y * size.y) + (size.z * size.z));
+	fJudgeDistance += sqrtf((targetSize.x * targetSize.x) + (targetSize.y * targetSize.y) + (targetSize.z * targetSize.z));
+
+	// お互いの位置の差を算出
+	D3DXVECTOR3 distance = posTarget - pos;
+	float fDistance = sqrtf((distance.x * distance.x) + (distance.y * distance.y) + (distance.z * distance.z));
+
+	if (fDistance <= fJudgeDistance)
+	{// 位置の差が判定を行う距離より短い場合
+		bCollision = true;
+
+		if (bExtrude)
+		{
+			// 角度の算出
+			D3DXVECTOR3 rotDiff;
+			rotDiff.y = atan2f(distance.x, distance.z);
+			rotDiff.x = atan2f(sqrtf((distance.x * distance.x) + (distance.z * distance.z)), distance.y);
+			rotDiff.z = 0.0f;
+
+			// 位置の算出
+			pos.z = posTarget.z - sinf(rotDiff.x) * cosf(rotDiff.y) * fJudgeDistance;
+			pos.x = posTarget.x - sinf(rotDiff.x) * sinf(rotDiff.y) * fJudgeDistance;
+			pos.y = posTarget.y - cosf(rotDiff.x) * fJudgeDistance;
+
+			// 位置の設定
+			SetPos(pos);
+		}
+	}
+
+	return bCollision;
+}

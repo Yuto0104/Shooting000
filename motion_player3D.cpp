@@ -12,6 +12,7 @@
 #include <assert.h>
 
 #include "motion_player3D.h"
+#include "motion.h"
 #include "renderer.h"
 #include "application.h"
 #include "keyboard.h"
@@ -31,7 +32,7 @@ const float CMotionPlayer3D::ROTATE_SPEED = (0.1f);
 // Author : 唐﨑結斗
 // 概要 : 3Dモーションプレイヤーを生成する
 //=============================================================================
-CMotionPlayer3D * CMotionPlayer3D::Create(char * pName)
+CMotionPlayer3D * CMotionPlayer3D::Create()
 {
 	// オブジェクトインスタンス
 	CMotionPlayer3D *pMotionPlayer3D = nullptr;
@@ -43,7 +44,7 @@ CMotionPlayer3D * CMotionPlayer3D::Create(char * pName)
 	assert(pMotionPlayer3D != nullptr);
 
 	// 数値の初期化
-	pMotionPlayer3D->Init(pName);
+	pMotionPlayer3D->Init();
 
 	// インスタンスを返す
 	return pMotionPlayer3D;
@@ -57,10 +58,13 @@ CMotionPlayer3D * CMotionPlayer3D::Create(char * pName)
 CMotionPlayer3D::CMotionPlayer3D()
 {
 	m_rotDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 目的の向き
-	m_motionType = TYPE_NEUTRAL;					// モーションタイプ
+	m_nNumMotion = TYPE_NEUTRAL;					// モーションタイプ
 	m_nCntShot = 0;									// 弾発射までのカウント
 	m_bPressShot = false;							// 長押し弾を使用してるかどうか
 	m_bLockShot = false;							// 弾発射が可能かどうか
+
+	// オブジェクトの種別設定
+	SetObjType(CObject::OBJTYPE_3DENEMY);
 }
 
 //=============================================================================
@@ -78,11 +82,24 @@ CMotionPlayer3D::~CMotionPlayer3D()
 // Author : 唐﨑結斗
 // 概要 : 頂点バッファを生成し、メンバ変数の初期値を設定
 //=============================================================================
-HRESULT CMotionPlayer3D::Init(const char *pMotionName)
+HRESULT CMotionPlayer3D::Init()
 {
 	// 初期化
-	CMotionChar3D::Init(pMotionName);
+	CModel3D::Init();
+
+	// モーション情報
+	m_pMotion[0] = new CMotion("data/MOTION/motion.txt");
+	assert(m_pMotion[0] != nullptr);
+	m_pMotion[1] = new CMotion("data/MOTION/motionShark.txt");
+	assert(m_pMotion[1] != nullptr);
+
+	// メンバ変数の初期化
+	m_nNumMotion = 0;
+	m_nNumMotionOld = m_nNumMotion;
+	m_bMotion = false;
+	m_bMotionBlend = false;
 	SetColorType(CModel3D::TYPE_WHITE);
+	SetColisonSize(D3DXVECTOR3(50.0f, 50.0f, 50.0f));
 
 	return E_NOTIMPL;
 }
@@ -94,8 +111,20 @@ HRESULT CMotionPlayer3D::Init(const char *pMotionName)
 //=============================================================================
 void CMotionPlayer3D::Uninit()
 {
+	for (int nCntMotion = 0; nCntMotion < MAX_MOTION; nCntMotion++)
+	{
+		if (m_pMotion[nCntMotion] != nullptr)
+		{// 終了処理
+			m_pMotion[nCntMotion]->Uninit();
+
+			// メモリの解放
+			delete m_pMotion[nCntMotion];
+			m_pMotion[nCntMotion] = nullptr;
+		}
+	}	
+
 	// 終了
-	CMotionChar3D::Uninit();
+	CModel3D::Uninit();
 }
 
 //=============================================================================
@@ -106,7 +135,7 @@ void CMotionPlayer3D::Uninit()
 void CMotionPlayer3D::Update()
 {
 	// ニュートラルモーションの入力
-	m_motionType = TYPE_NEUTRAL;
+	m_nNumMotion = TYPE_NEUTRAL;
 
 	// 移動
 	Move();
@@ -117,45 +146,17 @@ void CMotionPlayer3D::Update()
 	// 弾の発射
 	Shot();
 
-	// モーション番号の設定
-	SetNumMotion(m_motionType);
+	// スクリーンのあたり判定
+	CollisionScreen();
 
-	CCamera *pCamera = CApplication::GetCamera();
+	// 色の変更
+	ChangeColor();
 
-	D3DXVECTOR3 pos = GetPos();
-	D3DXVECTOR3 minScreen = WorldCastScreen(&D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1280.0f, 720.0f, 0.0f), &pCamera->GetMtxView(), &pCamera->GetMtxProj());
-	D3DXVECTOR3 maxScreen = WorldCastScreen(&D3DXVECTOR3(1280.0f, 720.0f, 0.0f), D3DXVECTOR3(1280.0f, 720.0f, 0.0f), &pCamera->GetMtxView(), &pCamera->GetMtxProj());
+	// モーションの設定
+	MotionSet();
 
-	if (pos.x < minScreen.x)
-	{
-		pos.x = minScreen.x;
-		SetPos(pos);
-	}
-	if (pos.x > maxScreen.x)
-	{
-		pos.x = maxScreen.x;
-		SetPos(pos);
-	}
-
-	// 入力情報の取得
-	CKeyboard *pKeyboard = CApplication::GetKeyboard();
-
-	if (pKeyboard->GetTrigger(DIK_Q))
-	{
-		if (GetColorType() == CObject::TYPE_WHITE)
-		{// モーションの再読み込み
-			ReloadMotion("data/MOTION/motion.txt");
-			SetColorType(CObject::TYPE_BLACK);
-		}
-		else if(GetColorType() == CObject::TYPE_BLACK)
-		{// モーションの再読み込み
-			ReloadMotion("data/MOTION/motionShark.txt");
-			SetColorType(CObject::TYPE_WHITE);
-		}
-	}
-	
 	// 更新
-	CMotionChar3D::Update();
+	CModel3D::Update();
 }
 
 //=============================================================================
@@ -166,7 +167,13 @@ void CMotionPlayer3D::Update()
 void CMotionPlayer3D::Draw()
 {
 	// 描画
-	CMotionChar3D::Draw();
+	CModel3D::Draw();
+
+	// ワールドマトリックスの取得
+	D3DXMATRIX mtxWorld = GetMtxWorld();
+
+	// パーツの描画設定
+	m_pMotion[GetColorType() - 1]->SetParts(mtxWorld);
 }
 
 //=============================================================================
@@ -216,7 +223,7 @@ void CMotionPlayer3D::Move()
 		|| pKeyboard->GetPress(DIK_S))
 	{// 移動キーが押された
 		// 移動モーション
-		m_motionType = TYPE_MOVE;
+		m_nNumMotion = TYPE_MOVE;
 
 		if (pKeyboard->GetPress(DIK_W))
 		{// [↑]キーが押された時
@@ -301,7 +308,7 @@ void CMotionPlayer3D::Move()
 // Author : 唐﨑結斗
 // 概要 : キー入力が行われた場合、弾を発射する
 //=============================================================================
-void CMotionPlayer3D::Shot(void)
+void CMotionPlayer3D::Shot()
 {
 	// 入力情報の取得
 	CKeyboard *pKeyboard = CApplication::GetKeyboard();
@@ -407,6 +414,89 @@ void CMotionPlayer3D::Shot(void)
 			m_nCntShot = 0;
 			m_bLockShot = false;
 		}
+	}
+}
+
+//=============================================================================
+// スクリーンのあたり判定
+// Author : 唐﨑結斗
+// 概要 : スクリーンとプレイヤーのあたり判定を行う
+//=============================================================================
+void CMotionPlayer3D::CollisionScreen()
+{
+	// カメラの取得
+	CCamera *pCamera = CApplication::GetCamera();
+
+	// 位置の取得
+	D3DXVECTOR3 pos = GetPos();
+
+	// スクリーンの座標を取得
+	D3DXVECTOR3 minScreen = WorldCastScreen(&D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1280.0f, 720.0f, 0.0f), &pCamera->GetMtxView(), &pCamera->GetMtxProj());
+	D3DXVECTOR3 maxScreen = WorldCastScreen(&D3DXVECTOR3(1280.0f, 720.0f, 0.0f), D3DXVECTOR3(1280.0f, 720.0f, 0.0f), &pCamera->GetMtxView(), &pCamera->GetMtxProj());
+
+	if (pos.x < minScreen.x)
+	{
+		pos.x = minScreen.x;
+		SetPos(pos);
+	}
+	else if (pos.x > maxScreen.x)
+	{
+		pos.x = maxScreen.x;
+		SetPos(pos);
+	}
+}
+
+//=============================================================================
+// 色の変更
+// Author : 唐﨑結斗
+// 概要 : キーが押されると色を変更する
+//=============================================================================
+void CMotionPlayer3D::ChangeColor()
+{
+	// 入力情報の取得
+	CKeyboard *pKeyboard = CApplication::GetKeyboard();
+
+	if (pKeyboard->GetTrigger(DIK_Q))
+	{
+		if (GetColorType() == CObject::TYPE_WHITE)
+		{
+			SetColorType(CObject::TYPE_BLACK);
+		}
+		else if (GetColorType() == CObject::TYPE_BLACK)
+		{
+			SetColorType(CObject::TYPE_WHITE);
+		}
+	}
+}
+
+//=============================================================================
+// モーションの設定
+// Author : 唐﨑結斗
+// 概要 : モーションの変更やモーションブレンドの設定を行う
+//=============================================================================
+void CMotionPlayer3D::MotionSet()
+{
+	// 現在のモーション番号の保管
+	m_nNumMotionOld = m_nNumMotion;
+
+	if (!m_bMotion)
+	{// 使用してるモーションがない場合
+		m_nNumMotion = TYPE_NEUTRAL;
+	}
+
+	if (m_nNumMotionOld != m_nNumMotion)
+	{// モーションタイプが変更された時
+		m_pMotion[GetColorType() - 1]->CntReset((int)(m_nNumMotionOld));
+		m_bMotionBlend = true;
+	}
+
+	if (m_bMotionBlend)
+	{// モーションブレンドを使用してる
+		m_bMotionBlend = m_pMotion[GetColorType() - 1]->MotionBlend((int)(m_nNumMotion));
+	}
+	else if (!m_bMotionBlend)
+	{// モーションブレンドを使用してない場合
+		m_bMotion = m_pMotion[GetColorType() - 1]->PlayMotion((int)(m_nNumMotion));
 	}
 }
 
