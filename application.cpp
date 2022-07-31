@@ -36,6 +36,8 @@
 #include "circle_polygon3D.h"
 #include "number.h"
 #include "score.h"
+#include "life.h"
+#include "life_manager.h"
 
 //*****************************************************************************
 // 静的メンバ変数宣言
@@ -50,6 +52,7 @@ CCamera *CApplication::m_pCameraBG = nullptr;					// カメラインスタンス
 CPlayer2D *CApplication::m_pPlayer2D = nullptr;					// プレイヤーインタンス
 CMotionPlayer3D *CApplication::m_MotionPlayer3D = nullptr;		// モーションプレイヤーインスタンス
 CScore *CApplication::m_pScore = nullptr;						// スコアインスタンス
+CLifeManager *CApplication::m_pLifeManager = nullptr;			// ライフマネージャーインスタンス
 
 //=============================================================================
 // コンストラクタ
@@ -157,6 +160,11 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	pEnemy->SetSize(D3DXVECTOR3(5.0f, 5.0f, 5.0f));
 	pEnemy->SetColorType(CObject::TYPE_WHITE);
 
+	pEnemy = CEnemy3D::Create("data/MODEL/airplane000.x");
+	pEnemy->SetPos(D3DXVECTOR3(-100.0f, 0.0f, 0.0f));
+	pEnemy->SetSize(D3DXVECTOR3(5.0f, 5.0f, 5.0f));
+	pEnemy->SetColorType(CObject::TYPE_WHITE);
+
 	CMotionChar3D *pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
 	pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	pMotionChar3D->SetObjectDrowType(CObject::DROWTYPE_BG);
@@ -187,6 +195,10 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	m_pScore = CScore::Create(10);
 	m_pScore->SetScore(0);
 	m_pScore->SetPos(D3DXVECTOR3(1280.0f, m_pScore->GetSize().y / 2.0f, 0.0f));
+
+	m_pLifeManager = CLifeManager::Create();
+	m_pLifeManager->SetSize(D3DXVECTOR3(50.0f, 50.0f, 0.0f));
+	m_pLifeManager->SetPos(D3DXVECTOR3(0.0f, m_pLifeManager->GetSize().y / 2.0f, 0.0f));
 
 	return S_OK;
 }

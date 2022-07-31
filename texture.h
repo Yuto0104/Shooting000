@@ -40,6 +40,7 @@ public:
 		TYPE_2DENEMY_000,	// 2Dエネミー(0)
 		TYPE_SKY_000,		// 空(0)
 		TYPE_NUMBER_000,	// ナンバー(0)
+		TYPE_LIFE_000,		// ハート(0)
 		MAX_TYPE,			// 種別の最大数
 	};
 

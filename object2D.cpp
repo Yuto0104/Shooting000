@@ -46,7 +46,7 @@ CObject2D * CObject2D::Create(void)
 // Author : 唐﨑結斗
 // 概要 : インスタンス生成時に行う処理
 //=============================================================================
-CObject2D::CObject2D()
+CObject2D::CObject2D(int nPriority) : CObject(nPriority)
 {
 	m_pVtxBuff = nullptr;								// 頂点バッファ
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 位置
@@ -247,6 +247,31 @@ void CObject2D::SetVtx()
 	pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+	//頂点バッファをアンロック
+	m_pVtxBuff->Unlock();
+}
+
+//=============================================================================
+// 色の設定
+// Author : 唐﨑結斗
+// 概要 : 頂点カラーを設定する
+//=============================================================================
+void CObject2D::SetCol(const D3DCOLOR &col)
+{
+	m_col = col;
+
+	//頂点情報へのポインタを生成
+	VERTEX_2D *pVtx;
+
+	//頂点バッファをロックし、頂点情報へのポインタを取得
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	// 頂点カラーの設定
+	pVtx[0].col = m_col;
+	pVtx[1].col = m_col;
+	pVtx[2].col = m_col;
+	pVtx[3].col = m_col;
 
 	//頂点バッファをアンロック
 	m_pVtxBuff->Unlock();

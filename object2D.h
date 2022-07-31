@@ -45,7 +45,7 @@ public:
 	//--------------------------------------------------------------------
 	// コンストラクタとデストラクタ
 	//--------------------------------------------------------------------
-	CObject2D();
+	CObject2D(int nPriority = CObject::PRIORITY_LEVEL0);
 	~CObject2D() override;
 
 	//--------------------------------------------------------------------
@@ -69,6 +69,7 @@ protected:
 	// メンバ関数
 	//--------------------------------------------------------------------
 	void SetVtx();															// 頂点座標などの設定
+	void SetCol(const D3DCOLOR &col);										// 色のセッター
 	void SetTex(const D3DXVECTOR2 &minTex, const D3DXVECTOR2 &maxTex);		// テクスチャ座標の設定
 	void LoadTex(CTexture::TEXTURE_TYPE type) { m_typeTex = type; }			// テクスチャの設定
 

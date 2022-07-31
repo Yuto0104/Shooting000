@@ -143,21 +143,24 @@ void CPlayer2D::Update()
 	// 弾の発射
 	Shot();
 	
-	// オブジェクトインスタンスの取得
-	CObject **apObject = CObject::GetObjectAll();
-
-	for (int nCntObj = 0; nCntObj < MAX_OBJECT; nCntObj++)
+	for (int nCntPriority = 0; nCntPriority < CObject::MAX_LEVEL; nCntPriority++)
 	{
-		if (apObject[nCntObj] != nullptr)
+		for (int nCntObj = 0; nCntObj < MAX_OBJECT; nCntObj++)
 		{
-			if (apObject[nCntObj]->GetObjType() == CObject::OBJTYPE_2DENEMY
-				&& ColisonCircle2D(apObject[nCntObj], true))
-			{// タイプが一致した場合
-			 //m_nLife = 1;
-				break;
+			CObject *pObject = CObject::MyGetObject(nCntPriority, nCntObj);
+
+			if (pObject != nullptr)
+			{
+				if (pObject->GetObjType() == CObject::OBJTYPE_2DENEMY
+					&& ColisonCircle2D(pObject, true))
+				{// タイプが一致した場合
+					//m_nLife = 1;
+					break;
+				}
 			}
 		}
 	}
+	
 
 	// テクスチャ座標の設定
 	SetTex(D3DXVECTOR2(0.0f, 0.0f), D3DXVECTOR2(1.0f, 1.0f));

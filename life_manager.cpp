@@ -12,36 +12,32 @@
 #include <assert.h>
 #include <math.h>
 
-#include "score.h"
-#include "number.h"
+#include "life_manager.h"
+#include "life.h"
+#include "motion_player3D.h"
 #include "renderer.h"
 #include "application.h"
-
-//*****************************************************************************
-// 定数定義
-//*****************************************************************************
-const float CScore::ADD_COEFFICIENT = 0.15f;
 
 //=============================================================================
 // インスタンス生成
 // Author : 唐﨑結斗
 // 概要 : スコアを生成する
 //=============================================================================
-CScore *CScore::Create(int nDigit)
+CLifeManager *CLifeManager::Create()
 {
 	// オブジェクトインスタンス
-	CScore *pScore = nullptr;
+	CLifeManager *pLifeManager = nullptr;
 
-	pScore = new CScore;
+	pLifeManager = new CLifeManager;
 
 	// メモリの確保ができなかった
-	assert(pScore != nullptr);
+	assert(pLifeManager != nullptr);
 
 	// 数値の初期化
-	pScore->Init(nDigit);
+	pLifeManager->Init();
 
 	// インスタンスを返す
-	return pScore;
+	return pLifeManager;
 }
 
 //=============================================================================
@@ -49,16 +45,16 @@ CScore *CScore::Create(int nDigit)
 // Author : 唐﨑結斗
 // 概要 : インスタンス生成時に行う処理
 //=============================================================================
-CScore::CScore(int nPriority /*= CObject::PRIORITY_LEVEL3*/) : CObject(nPriority)
+CLifeManager::CLifeManager(int nPriority /*= CObject::PRIORITY_LEVEL3*/) : CObject(nPriority)
 {
-	m_pNumber = nullptr;								// ナンバー
-	m_pos = D3DXVECTOR3(0.0f,0.0f,0.0f);				// 位置
+	m_pLife = nullptr;									// ライフ
+	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 位置
 	m_posOld = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 過去の位置
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 向き
 	m_size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 大きさ
-	m_nDigit = 0;										// 桁数
-	m_nScore = 0;										// スコア
-	m_nDestScore = 0;									// 目的のスコア
+	m_nLife = 0;										// ライフ
+	m_nAddLife = 0;										// 追加ライフ
+	m_nMaxLife = 0;										// 最大ライフ
 }
 
 //=============================================================================
@@ -66,7 +62,7 @@ CScore::CScore(int nPriority /*= CObject::PRIORITY_LEVEL3*/) : CObject(nPriority
 // Author : 唐﨑結斗
 // 概要 : インスタンス終了時に行う処理
 //=============================================================================
-CScore::~CScore()
+CLifeManager::~CLifeManager()
 {
 
 }
@@ -76,24 +72,8 @@ CScore::~CScore()
 // Author : 唐﨑結斗
 // 概要 : 頂点バッファを生成し、メンバ変数の初期値を設定
 //=============================================================================
-HRESULT CScore::Init()
+HRESULT CLifeManager::Init()
 {
-	return S_OK;
-}
-
-//=============================================================================
-// 初期化
-// Author : 唐﨑結斗
-// 概要 : 頂点バッファを生成し、メンバ変数の初期値を設定
-//=============================================================================
-HRESULT CScore::Init(int nDigit)
-{
-	// 桁数の設定
-	m_nDigit = nDigit;
-
-	// スコアの設定
-	m_nScore = 0;
-
 	// 位置の設定
 	m_pos = D3DXVECTOR3(640.0f, 360.0f, 0.0f);
 
@@ -103,17 +83,8 @@ HRESULT CScore::Init(int nDigit)
 	// 大きさの設定
 	m_size = D3DXVECTOR3(300.0f, 50.0f, 0.0f);
 
-	// ナンバーのメモリ確保
-	m_pNumber = new CNumber*[nDigit];
-	assert(m_pNumber != nullptr);
-
-	for (int nCntDigit = 0; nCntDigit < m_nDigit; nCntDigit++)
-	{// ナンバーの設定
-		m_pNumber[nCntDigit] = CNumber::Create();
-	}
-
-	// ナンバーの設定
-	SetNumber();
+	// ライフの設定
+	SetLife();
 
 	return S_OK;
 }
@@ -123,21 +94,11 @@ HRESULT CScore::Init(int nDigit)
 // Author : 唐﨑結斗
 // 概要 : テクスチャのポインタと頂点バッファの解放
 //=============================================================================
-void CScore::Uninit()
+void CLifeManager::Uninit()
 {
-	if (m_pNumber != nullptr)
-	{// 終了処理
-		for (int nCntDigit = 0; nCntDigit < m_nDigit; nCntDigit++)
-		{
-			m_pNumber[nCntDigit]->Uninit();
-		}
+	UninitLifeAll();
 
-		// メモリの解放
-		delete[] m_pNumber;
-		m_pNumber = nullptr;
-	}
-
-	// スコアの解放
+	// ライフマネージャーの解放
 	Release();
 }
 
@@ -146,10 +107,9 @@ void CScore::Uninit()
 // Author : 唐﨑結斗
 // 概要 : 更新を行う
 //=============================================================================
-void CScore::Update()
+void CLifeManager::Update()
 {
-	// スコアの算出
-	CalScore();
+	
 }
 
 //=============================================================================
@@ -157,7 +117,7 @@ void CScore::Update()
 // Author : 唐﨑結斗
 // 概要 : 描画を行う
 //=============================================================================
-void CScore::Draw()
+void CLifeManager::Draw()
 {
 
 }
@@ -167,12 +127,12 @@ void CScore::Draw()
 // Author : 唐﨑結斗
 // 概要 : 位置のメンバ変数に引数を代入
 //=============================================================================
-void CScore::SetPos(const D3DXVECTOR3 &pos)
+void CLifeManager::SetPos(const D3DXVECTOR3 &pos)
 {
 	m_pos = pos;
 
-	// ナンバーの設定
-	SetNumber();
+	// ライフの設定
+	SetLife();
 }
 
 //=============================================================================
@@ -180,12 +140,12 @@ void CScore::SetPos(const D3DXVECTOR3 &pos)
 // Author : 唐﨑結斗
 // 概要 : 向きのメンバ変数に引数を代入
 //=============================================================================
-void CScore::SetRot(const D3DXVECTOR3 &rot)
+void CLifeManager::SetRot(const D3DXVECTOR3 &rot)
 {
 	m_rot = rot;
 
-	// ナンバーの設定
-	SetNumber();
+	// ライフの設定
+	SetLife();
 }
 
 //=============================================================================
@@ -193,90 +153,82 @@ void CScore::SetRot(const D3DXVECTOR3 &rot)
 // Author : 唐﨑結斗
 // 概要 : 大きさのメンバ変数に引数を代入
 //=============================================================================
-void CScore::SetSize(const D3DXVECTOR3 & size)
+void CLifeManager::SetSize(const D3DXVECTOR3 & size)
 {
 	m_size = size;
 
-	// ナンバーの設定
-	SetNumber();
+	// ライフの設定
+	SetLife();
 }
 
 //=============================================================================
-// スコアのセッター
+// ライフの終了
+// Author : 唐﨑結斗
+// 概要 : ライフの終了
+//=============================================================================
+void CLifeManager::UninitLifeAll()
+{
+	if (m_pLife != nullptr)
+	{// 終了処理
+		for (int nCntLife = 0; nCntLife < m_nMaxLife; nCntLife++)
+		{
+			m_pLife[nCntLife]->Uninit();
+		}
+
+		// メモリの解放
+		delete[] m_pLife;
+		m_pLife = nullptr;
+	}
+}
+
+//=============================================================================
+// ライフのセッター
 // Author : 唐﨑結斗
 // 概要 : スコアに数値を代入して、ナンバーの設定
 //=============================================================================
-void CScore::SetScore(int nScore)
+void CLifeManager::SetLife()
 {
-	m_nScore = nScore;
+	// プレイヤーの取得
+	CMotionPlayer3D * pMotionPlayer3D = CApplication::GetMotionPlayer3D();
 
-	for (int nCntDigit = 0; nCntDigit < m_nDigit; nCntDigit++)
-	{
-		int nNum0 = (int)pow(10, nCntDigit + 1);
-		int nNum1 = (int)pow(10, nCntDigit);
+	// ライフの終了
+	UninitLifeAll();
 
-		m_pNumber[nCntDigit]->SetNumber(m_nScore % nNum0 / nNum1);
-	}
-}
+	// ライフの設定
+	m_nLife = pMotionPlayer3D->GetLife();
+	m_nAddLife = pMotionPlayer3D->GetInvalidLife();
+	m_nMaxLife = CMotionPlayer3D::MAX_LIFE + m_nAddLife;
 
-//=============================================================================
-// ナンバーの設定
-// Author : 唐﨑結斗
-// 概要 : ナンバーの設定を行う
-//=============================================================================
-void CScore::SetNumber()
-{
-	// ナンバーの大きさの設定
-	D3DXVECTOR3 nomberSize = D3DXVECTOR3(m_size.x / m_nDigit, m_size.y, 0.0f);
+	// ライフのメモリ確保
+	m_pLife = new CLife*[m_nMaxLife];
+	assert(m_pLife != nullptr);
 
-	for (int nCntDigit = 0; nCntDigit < m_nDigit; nCntDigit++)
-	{
-		int nNumDigit = (m_nDigit - 1) - nCntDigit;
-
-		// 位置の設定
-		m_pNumber[nNumDigit]->SetPos(D3DXVECTOR3(m_pos.x - m_size.x + (nomberSize.x * nCntDigit), m_pos.y, 0.0f));
-
-		// 向きの設定
-		m_pNumber[nNumDigit]->SetRot(m_rot);
+	for (int nCntLife = 0; nCntLife < m_nMaxLife; nCntLife++)
+	{// ライフの設定
+		m_pLife[nCntLife] = CLife::Create();
 
 		// 大きさの設定
-		m_pNumber[nNumDigit]->SetSize(nomberSize);
+		m_pLife[nCntLife]->SetSize(D3DXVECTOR3(50.0f, 50.0f, 0.0f));
+
+		// ライフ大きさの取得
+		D3DXVECTOR3 lifeSize = m_pLife[nCntLife]->GetSize();
+
+		// 位置の設定
+		m_pLife[nCntLife]->SetPos(D3DXVECTOR3(m_pos.x + lifeSize.x / 2.0f + (lifeSize.x * nCntLife), m_pos.y, 0.0f));
+
+		// 向きの設定
+		m_pLife[nCntLife]->SetRot(m_rot);
+
+		m_pLife[nCntLife]->SetLifeState(CLife::STATE_INVALID);
 	}
-}
 
-//=============================================================================
-// スコアの加算
-// Author : 唐﨑結斗
-// 概要 : スコアを加算する
-//=============================================================================
-void CScore::AddScore(int nAdd)
-{
-	m_nDestScore += nAdd;
-}
-
-//=============================================================================
-// スコアを算出する
-// Author : 唐﨑結斗
-// 概要 : スコアを算出する
-//=============================================================================
-void CScore::CalScore()
-{
-	if (m_nDestScore > m_nScore)
+	for (int nCntLife = 0; nCntLife < m_nLife; nCntLife++)
 	{
-		int add = (m_nDestScore - m_nScore) * 0.15f;
-
-		if (add == 0)
-		{
-			add = 1;
-		}
-
-		m_nScore += add;
+		m_pLife[nCntLife]->SetLifeState(CLife::STATE_NORMAL);
 	}
 
-	if (m_nDestScore <= m_nScore)
+	for (int nCntLife = CMotionPlayer3D::MAX_LIFE; nCntLife < m_nMaxLife; nCntLife++)
 	{
-		m_nScore = m_nDestScore;
+		m_pLife[nCntLife]->SetLifeState(CLife::STATE_ADDITION);
 	}
-
-	SetScore(m_nScore);
 }

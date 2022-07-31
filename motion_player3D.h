@@ -33,6 +33,8 @@ public:
 	static const float				ROTATE_SPEED;
 	static const unsigned int		MAX_CNT_SHOT = 15;			// 弾発射までのカウント
 	static const unsigned int		MAX_MOTION = 2;				// モーションのカウント
+	static const unsigned int		MAX_LIFE = 5;				// ライフの最大値
+	static const unsigned int		MAX_ENERGY = 100;			// エネルギーの最大
 
 	//=============================================================================
 	// モーションのタイプ列挙型
@@ -60,10 +62,14 @@ public:
 	//--------------------------------------------------------------------
 	// メンバ関数
 	//--------------------------------------------------------------------
-	HRESULT Init() override;													// 初期化
-	void Uninit() override;														// 終了
-	void Update() override;														// 更新
-	void Draw() override;														// 描画
+	HRESULT Init() override;								// 初期化
+	void Uninit() override;									// 終了
+	void Update() override;									// 更新
+	void Draw() override;									// 描画
+	void Hit();												// ダメージ
+	void Charge();											// エネルギー吸収
+	int GetLife() { return m_nLife; }						// 体力のゲッター
+	int GetInvalidLife() { return m_nInvalidLife; }			// 追加体力のゲッター
 	
 private:
 	//--------------------------------------------------------------------
@@ -84,6 +90,9 @@ private:
 	int				m_nCntShot;						// 弾発射までのカウント
 	int				m_nNumMotion;					// 現在のモーション番号
 	int				m_nNumMotionOld;				// 過去のモーション番号
+	int				m_nLife;						// 寿命
+	int				m_nInvalidLife;					// 追加ライフ
+	int				m_nEnergy;						// エネルギー
 	bool			m_bMotion;						// モーションの使用状況
 	bool			m_bMotionBlend;					// モーションブレンドの使用状況
 	bool			m_bPressShot;					// 長押し弾を使用してるかどうか

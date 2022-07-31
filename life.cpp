@@ -1,8 +1,8 @@
 //=============================================================================
 //
-// 2Dナンバー(explosion2D.cpp)
+// ライフ(explosion2D.cpp)
 // Author : 唐﨑結斗
-// 概要 : 2Dナンバー生成を行う
+// 概要 : ライフ生成を行う
 //
 //=============================================================================
 
@@ -11,7 +11,7 @@
 //*****************************************************************************
 #include <assert.h>
 
-#include "number.h"
+#include "life.h"
 #include "renderer.h"
 #include "application.h"
 
@@ -20,21 +20,21 @@
 // Author : 唐﨑結斗
 // 概要 : 2Dバレットを生成する
 //=============================================================================
-CNumber * CNumber::Create()
+CLife * CLife::Create()
 {
 	// オブジェクトインスタンス
-	CNumber *pNumber = nullptr;
+	CLife *pLife = nullptr;
 
-	pNumber = new CNumber;
+	pLife = new CLife;
 
 	// メモリの確保ができなかった
-	assert(pNumber != nullptr);
+	assert(pLife != nullptr);
 
 	// 数値の初期化
-	pNumber->Init();
+	pLife->Init();
 
 	// インスタンスを返す
-	return pNumber;
+	return pLife;
 }
 
 //=============================================================================
@@ -42,9 +42,9 @@ CNumber * CNumber::Create()
 // Author : 唐﨑結斗
 // 概要 : インスタンス生成時に行う処理
 //=============================================================================
-CNumber::CNumber(int nPriority) : CObject2D(nPriority)
+CLife::CLife(int nPriority) : CObject2D(nPriority)
 {
-	m_nNumber = 0;
+
 }
 
 //=============================================================================
@@ -52,7 +52,7 @@ CNumber::CNumber(int nPriority) : CObject2D(nPriority)
 // Author : 唐﨑結斗
 // 概要 : インスタンス終了時に行う処理
 //=============================================================================
-CNumber::~CNumber()
+CLife::~CLife()
 {
 
 }
@@ -62,16 +62,21 @@ CNumber::~CNumber()
 // Author : 唐﨑結斗
 // 概要 : テクスチャの設定し、メンバ変数の初期値を設定
 //=============================================================================
-HRESULT CNumber::Init()
-{
-	// オブジェクト2Dの初期化
+HRESULT CLife::Init()
+{// オブジェクト2Dの初期化
 	CObject2D::Init();
 
 	// テクスチャの設定
-	LoadTex(CTexture::TYPE_NUMBER_000);
+	LoadTex(CTexture::TYPE_LIFE_000);
 
 	// テクスチャ座標の設定
-	SetTex(D3DXVECTOR2(0.0f, 0.0f), D3DXVECTOR2(1.0f / 10, 1.0f));
+	SetTex(D3DXVECTOR2(0.0f, 0.0f), D3DXVECTOR2(1.0f, 1.0f));
+
+	// サイズの設定
+	SetSize(D3DXVECTOR3(50.0f, 50.0f, 0.0f));
+
+	// 状態の設定
+	SetLifeState(STATE_NORMAL);
 
 	return S_OK;
 }
@@ -81,7 +86,7 @@ HRESULT CNumber::Init()
 // Author : 唐﨑結斗
 // 概要 : テクスチャのポインタと頂点バッファの解放
 //=============================================================================
-void CNumber::Uninit()
+void CLife::Uninit()
 {// オブジェクト2Dの終了
 	CObject2D::Uninit();
 }
@@ -91,9 +96,8 @@ void CNumber::Uninit()
 // Author : 唐﨑結斗
 // 概要 : 2D更新を行う
 //=============================================================================
-void CNumber::Update()
-{
-	// オブジェクト2Dの更新
+void CLife::Update()
+{// オブジェクト2Dの更新
 	CObject2D::Update();
 }
 
@@ -102,26 +106,36 @@ void CNumber::Update()
 // Author : 唐﨑結斗
 // 概要 : 2D描画を行う
 //=============================================================================
-void CNumber::Draw()
+void CLife::Draw()
 {// プレイヤー2Dの描画
 	CObject2D::Draw();
 }
 
 //=============================================================================
-// ナンバーの設定
+// ライフの状態の設定
 // Author : 唐﨑結斗
-// 概要 : ナンバーを設定し対応するテクスチャ座標を設定
+// 概要 : ライフの状態の設定
 //=============================================================================
-void CNumber::SetNumber(int nNumber)
+void CLife::SetLifeState(LIFE_STATE lifeState)
 {
-	// 数値の設定
-	m_nNumber = nNumber;
+	m_lifeState = lifeState;
 
-	// テクスチャ座標の1桁分の数値の設定
-	float fTexX = 1.0f / 10;
+	switch (m_lifeState)
+	{
+	case CLife::STATE_NORMAL:
+		SetCol(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+		break;
 
-	// テクスチャ座標の設定
-	SetTex(D3DXVECTOR2(0.0f + fTexX * m_nNumber, 0.0f), D3DXVECTOR2(fTexX + fTexX * m_nNumber, 1.0f));
+	case CLife::STATE_INVALID:
+		SetCol(D3DXCOLOR(0.5f, 0.0f, 0.0f, 0.5f));
+		break;
+
+	case CLife::STATE_ADDITION:
+		SetCol(D3DXCOLOR(0.0f, 0.8f, 1.0f, 1.0f));
+		break;
+
+	default:
+		assert(false);
+		break;
+	}
 }
-
-

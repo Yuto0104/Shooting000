@@ -147,6 +147,12 @@
     <ClInclude Include="score.h">
       <Filter>ヘッダー ファイル\object</Filter>
     </ClInclude>
+    <ClInclude Include="life.h">
+      <Filter>ヘッダー ファイル\object\2D</Filter>
+    </ClInclude>
+    <ClInclude Include="life_manager.h">
+      <Filter>ヘッダー ファイル\object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="texture.cpp">
@@ -243,6 +249,12 @@
       <Filter>ソース ファイル\object\2D</Filter>
     </ClCompile>
     <ClCompile Include="score.cpp">
+      <Filter>ソース ファイル\object</Filter>
+    </ClCompile>
+    <ClCompile Include="life.cpp">
+      <Filter>ソース ファイル\object\2D</Filter>
+    </ClCompile>
+    <ClCompile Include="life_manager.cpp">
       <Filter>ソース ファイル\object</Filter>
     </ClCompile>
   </ItemGroup>

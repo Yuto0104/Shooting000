@@ -21,6 +21,7 @@
 #include "calculation.h"
 #include "bullet3D.h"
 #include "camera.h"
+#include "life_manager.h"
 
 //*****************************************************************************
 // 定数定義
@@ -60,11 +61,14 @@ CMotionPlayer3D::CMotionPlayer3D()
 	m_rotDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 目的の向き
 	m_nNumMotion = TYPE_NEUTRAL;					// モーションタイプ
 	m_nCntShot = 0;									// 弾発射までのカウント
+	m_nLife = 0;									// 寿命
+	m_nInvalidLife = 0;								// 追加ライフ
+	m_nEnergy = 0;									// エネルギー
 	m_bPressShot = false;							// 長押し弾を使用してるかどうか
 	m_bLockShot = false;							// 弾発射が可能かどうか
 
 	// オブジェクトの種別設定
-	SetObjType(CObject::OBJTYPE_3DENEMY);
+	SetObjType(CObject::OBJTYPE_3DPLAYER);
 }
 
 //=============================================================================
@@ -100,6 +104,8 @@ HRESULT CMotionPlayer3D::Init()
 	m_bMotionBlend = false;
 	SetColorType(CModel3D::TYPE_WHITE);
 	SetColisonSize(D3DXVECTOR3(50.0f, 50.0f, 50.0f));
+	m_nLife = 5;
+	m_nInvalidLife = 0;
 
 	return E_NOTIMPL;
 }
@@ -497,6 +503,56 @@ void CMotionPlayer3D::MotionSet()
 	else if (!m_bMotionBlend)
 	{// モーションブレンドを使用してない場合
 		m_bMotion = m_pMotion[GetColorType() - 1]->PlayMotion((int)(m_nNumMotion));
+	}
+}
+
+//=============================================================================
+// ヒット
+// Author : 唐﨑結斗
+// 概要 : ダメージを与える
+//=============================================================================
+void CMotionPlayer3D::Hit()
+{
+	if (m_nInvalidLife > 0)
+	{// 追加ライフの消費
+		m_nInvalidLife--;
+		
+		if (m_nInvalidLife <= 0)
+		{
+			m_nInvalidLife = 0;
+		}
+	}
+	else
+	{// ライフの消費
+		m_nLife--;
+
+		if (m_nLife <= 0)
+		{
+			m_nLife = 0;
+		}
+	}
+
+	// ライフの設定
+	CApplication::GetLifeManager()->SetLife();
+
+	if (m_nLife == 0)
+	{// 終了
+		Uninit();
+	}
+}
+
+//=============================================================================
+// チャージ
+// Author : 唐﨑結斗
+// 概要 : エネルギーを吸収する
+//=============================================================================
+void CMotionPlayer3D::Charge()
+{// エネルギーのインクリメント
+	m_nEnergy++;
+
+	if (m_nEnergy > MAX_ENERGY)
+	{
+		m_nEnergy = MAX_ENERGY;
 	}
 }
 

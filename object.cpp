@@ -19,7 +19,7 @@
 //*****************************************************************************
 // 静的メンバ変数宣言
 //*****************************************************************************
-CObject *CObject::m_apObject[MAX_OBJECT] = {};		// 敵インスタンス
+CObject *CObject::m_apObject[MAX_LEVEL][MAX_OBJECT] = {};		// 敵インスタンス
 
 //=============================================================================
 // インスタンスの解放
@@ -28,12 +28,15 @@ CObject *CObject::m_apObject[MAX_OBJECT] = {};		// 敵インスタンス
 //=============================================================================
 void CObject::ReleaseAll(void)
 {
-	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
+	for (int nCntPriority = 0; nCntPriority < MAX_LEVEL; nCntPriority++)
 	{
-		if (m_apObject[nCntObject] != nullptr)
-		{// インスタンスが使用されてる
-			// オブジェクト終了処理
-			m_apObject[nCntObject]->Uninit();
+		for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
+		{
+			if (m_apObject[nCntPriority][nCntObject] != nullptr)
+			{// インスタンスが使用されてる
+				// オブジェクト終了処理
+				m_apObject[nCntPriority][nCntObject]->Uninit();
+			}
 		}
 	}
 }
@@ -45,12 +48,15 @@ void CObject::ReleaseAll(void)
 //=============================================================================
 void CObject::UpdateAll(void)
 {
-	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
+	for (int nCntPriority = 0; nCntPriority < MAX_LEVEL; nCntPriority++)
 	{
-		if (m_apObject[nCntObject] != nullptr)
-		{// インスタンスが使用されてる
-			// オブジェクト更新処理
-			m_apObject[nCntObject]->Update();
+		for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
+		{
+			if (m_apObject[nCntPriority][nCntObject] != nullptr)
+			{// インスタンスが使用されてる
+				// オブジェクト更新処理
+				m_apObject[nCntPriority][nCntObject]->Update();
+			}
 		}
 	}
 }
@@ -62,7 +68,6 @@ void CObject::UpdateAll(void)
 //=============================================================================
 void CObject::DrawAll(EObjectDrowType objectDrowType)
 {
-
 	if (objectDrowType == DROWTYPE_GAME)
 	{
 		CApplication::GetCamera()->Set();
@@ -72,13 +77,16 @@ void CObject::DrawAll(EObjectDrowType objectDrowType)
 		CApplication::GetCameraBG()->Set();
 	}
 
-	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
+	for (int nCntPriority = 0; nCntPriority < MAX_LEVEL; nCntPriority++)
 	{
-		if (m_apObject[nCntObject] != nullptr
-			&& m_apObject[nCntObject]->m_objectDrowType == objectDrowType)
-		{// インスタンスが使用されてる
-			// オブジェクト描画処理
-			m_apObject[nCntObject]->Draw();
+		for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
+		{
+			if (m_apObject[nCntPriority][nCntObject] != nullptr
+				&& m_apObject[nCntPriority][nCntObject]->m_objectDrowType == objectDrowType)
+			{// インスタンスが使用されてる
+				// オブジェクト描画処理
+				m_apObject[nCntPriority][nCntObject]->Draw();
+			}
 		}
 	}
 }
@@ -88,14 +96,15 @@ void CObject::DrawAll(EObjectDrowType objectDrowType)
 // Author : 唐﨑結斗
 // 概要 : インスタンス生成時に行う処理
 //=============================================================================
-CObject::CObject()
+CObject::CObject(int nPriority /*= PRIORITY_LEVEL0*/)
 {
 	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
 	{
-		if (m_apObject[nCntObject] == nullptr)
+		if (m_apObject[nPriority][nCntObject] == nullptr)
 		{// インスタンスが使用されてない
-			m_apObject[nCntObject] = this;
+			m_apObject[nPriority][nCntObject] = this;
 			m_nNumID = nCntObject;
+			m_nLevPriority = nPriority;
 			break;
 		}
 	}
@@ -118,12 +127,13 @@ CObject::~CObject()
 //=============================================================================
 void CObject::Release(void)
 {
-	if (m_apObject[m_nNumID] != nullptr)
+	if (m_apObject[m_nLevPriority][m_nNumID] != nullptr)
 	{// インスタンスが使用されてる
 		// メモリの解放
 		const int nID = m_nNumID;
-		delete m_apObject[nID];
-		m_apObject[nID] = nullptr;
+		const int nLevPriority = m_nLevPriority;
+		delete m_apObject[nLevPriority][nID];
+		m_apObject[nLevPriority][nID] = nullptr;
 	}
 }
 

@@ -126,42 +126,45 @@ void CBullet2D::Update()
 	pos -= m_move;
 	SetPos(pos);
 
-	// オブジェクトインスタンスの取得
-	CObject **apObject = CObject::GetObjectAll();
-
-	for (int nCntObj = 0; nCntObj < MAX_OBJECT; nCntObj++)
+	for (int nCntPriority = 0; nCntPriority < CObject::MAX_LEVEL; nCntPriority++)
 	{
-		if (apObject[nCntObj] != nullptr)
+		for (int nCntObj = 0; nCntObj < MAX_OBJECT; nCntObj++)
 		{
-			if ((apObject[nCntObj]->GetObjType() == CObject::OBJTYPE_2DENEMY
-				|| apObject[nCntObj]->GetObjType() == CObject::OBJTYPE_2DPLAYER)
-				&& ColisonCircle2D(apObject[nCntObj], false))
-			{// タイプが一致した場合
-				//m_nLife = 1;
-				
-				// 対象との距離の算出
-				D3DXVECTOR3 posDiff = apObject[nCntObj]->GetPos() - GetPos();
+			// オブジェクトインスタンスの取得
+			CObject *pObject = CObject::MyGetObject(nCntPriority, nCntObj);
 
-				// 対象までの角度の算出
-				float fRotDest = atan2f(posDiff.x, posDiff.y);
+			if (pObject != nullptr)
+			{
+				if ((pObject->GetObjType() == CObject::OBJTYPE_2DENEMY
+					|| pObject->GetObjType() == CObject::OBJTYPE_2DPLAYER)
+					&& ColisonCircle2D(pObject, false))
+				{// タイプが一致した場合
+					//m_nLife = 1;
 
-				// 角度の反転
-				fRotDest *= 1.0f;
+					// 対象との距離の算出
+					D3DXVECTOR3 posDiff = pObject->GetPos() - GetPos();
 
-				if (fRotDest >= D3DX_PI)
-				{// 移動方向の正規化
-					fRotDest -= D3DX_PI * 2;
+					// 対象までの角度の算出
+					float fRotDest = atan2f(posDiff.x, posDiff.y);
+
+					// 角度の反転
+					fRotDest *= 1.0f;
+
+					if (fRotDest >= D3DX_PI)
+					{// 移動方向の正規化
+						fRotDest -= D3DX_PI * 2;
+					}
+					else if (fRotDest <= -D3DX_PI)
+					{// 移動方向の正規化
+						fRotDest += D3DX_PI * 2;
+					}
+
+					// 移動量(方向と速力)の算出
+					m_move.x = sinf(fRotDest) * 5.0f;
+					m_move.y = cosf(fRotDest) * 5.0f;
+
+					break;
 				}
-				else if (fRotDest <= -D3DX_PI)
-				{// 移動方向の正規化
-					fRotDest += D3DX_PI * 2;
-				}
-
-				// 移動量(方向と速力)の算出
-				m_move.x = sinf(fRotDest) * 5.0f;
-				m_move.y = cosf(fRotDest) * 5.0f;
-
-				break;
 			}
 		}
 	}

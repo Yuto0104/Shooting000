@@ -25,6 +25,7 @@ class CCamera;
 class CPlayer2D;
 class CMotionPlayer3D;
 class CScore;
+class CLifeManager;
 
 //=============================================================================
 // アプリケーションクラス
@@ -47,6 +48,7 @@ public:
 	static CPlayer2D *GetPlayer2D() { return m_pPlayer2D; }								// プレイヤーのゲッター
 	static CMotionPlayer3D *GetMotionPlayer3D() { return m_MotionPlayer3D; }			// モーションプレイヤーのゲッター
 	static CScore *GetScore() { return m_pScore; }										// スコアの取得
+	static CLifeManager *GetLifeManager() { return m_pLifeManager; }						// ライフマネージャーの取得
 
 	//--------------------------------------------------------------------
 	// コンストラクタとデストラクタ
@@ -76,6 +78,7 @@ private:
 	static CPlayer2D *m_pPlayer2D;						// プレイヤークラス
 	static CMotionPlayer3D *m_MotionPlayer3D;			// モーションプレイヤークラス
 	static CScore *m_pScore;							// スコアクラス
+	static CLifeManager *m_pLifeManager;				// ライフマネージャークラス
 };
 
 #endif

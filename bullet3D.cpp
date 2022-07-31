@@ -12,10 +12,11 @@
 #include <assert.h>
 
 #include "bullet3D.h"
-#include "enemy3D.h"
 #include "renderer.h"
 #include "application.h"
 
+#include "motion_player3D.h"
+#include "enemy3D.h"
 #include "score.h"
 
 //=============================================================================
@@ -124,40 +125,61 @@ void CBullet3D::Update()
 	// 更新
 	CObject3D::Update();
 
-	// オブジェクトインスタンスの取得
-	CObject **apObject = CObject::GetObjectAll();
-
-	for (int nCntObj = 0; nCntObj < MAX_OBJECT; nCntObj++)
+	for (int nCntPriority = 0; nCntPriority < CObject::MAX_LEVEL; nCntPriority++)
 	{
-		if (apObject[nCntObj] != nullptr)
+		for (int nCntObj = 0; nCntObj < MAX_OBJECT; nCntObj++)
 		{
-			if ((apObject[nCntObj]->GetObjType() == CObject::OBJTYPE_3DENEMY
-				|| apObject[nCntObj]->GetObjType() == CObject::OBJTYPE_3DPLAYER)
-				&& apObject[nCntObj]->GetObjType() != CObject::OBJTYPE_3DBULLET)
-			{// タイプが一致した場合
-				if (ColisonSphere3D(apObject[nCntObj], D3DXVECTOR3(GetSize().x, GetSize().y, GetSize().x), apObject[nCntObj]->GetColisonSize(), true))
-				{
-					if (apObject[nCntObj]->GetObjType() == CObject::OBJTYPE_3DENEMY
-						&& m_parent != TYPE_ENEMY)
+			// オブジェクトインスタンスの取得
+			CObject *pObject = CObject::MyGetObject(nCntPriority, nCntObj);
+
+			if (pObject != nullptr)
+			{
+				if ((pObject->GetObjType() == CObject::OBJTYPE_3DENEMY
+					|| pObject->GetObjType() == CObject::OBJTYPE_3DPLAYER)
+					&& pObject->GetObjType() != CObject::OBJTYPE_3DBULLET)
+				{// タイプが一致した場合
+					if (pObject->GetObjType() == CObject::OBJTYPE_3DENEMY
+						&& m_parent != TYPE_ENEMY
+						&& ColisonSphere3D(pObject, D3DXVECTOR3(GetSize().x, GetSize().y, GetSize().x), pObject->GetColisonSize(), true))
 					{
-						CEnemy3D *pEnemy3D = (CEnemy3D*)apObject[nCntObj];
+						// 敵オブジェクトにキャスト
+						CEnemy3D *pEnemy3D = (CEnemy3D*)pObject;
+
+						// 与える攻撃力の算出
+						int nAttack = m_nAttack;
 
 						if (pEnemy3D->GetColorType() == GetColorType())
 						{
-							pEnemy3D->Hit(m_nAttack * 2);
-						}
-						else
-						{
-							pEnemy3D->Hit(m_nAttack);
+							nAttack *= 2;
 						}
 
+						// 敵への攻撃処理
+						pEnemy3D->Hit(nAttack);
+
+						// 終了
 						Uninit();
 						break;
 					}
-					else if (apObject[nCntObj]->GetObjType() == CObject::OBJTYPE_3DPLAYER
-						&& m_parent != TYPE_PLAYER)
-					{
 
+					if (pObject->GetObjType() == CObject::OBJTYPE_3DPLAYER
+						&& m_parent != TYPE_PLAYER
+						&& ColisonSphere3D(pObject, D3DXVECTOR3(GetSize().x, GetSize().y, GetSize().x), pObject->GetColisonSize(), true))
+					{
+						// プレイヤーオブジェクトにキャスト
+						CMotionPlayer3D *pPlayer = (CMotionPlayer3D*)pObject;
+
+						if (pPlayer->GetColorType() != GetColorType())
+						{// プレイヤーへの攻撃処理
+							pPlayer->Hit();
+						}
+						else
+						{// プレイヤーのエネルギー吸収
+							pPlayer->Charge();
+						}
+
+						// 終了
+						Uninit();
+						break;
 					}
 				}
 			}

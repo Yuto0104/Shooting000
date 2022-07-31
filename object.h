@@ -72,17 +72,31 @@ public:
 	};
 
 	//--------------------------------------------------------------------
+	// プライオリティのレベル
+	// Author : 唐﨑結斗
+	// 概要 : プライオリティのレベルを設定
+	//--------------------------------------------------------------------
+	enum PRIORITY_LEVEL
+	{
+		PRIORITY_LEVEL0 = 0,	// レベル0
+		PRIORITY_LEVEL1,		// レベル1
+		PRIORITY_LEVEL2,		// レベル2
+		PRIORITY_LEVEL3,		// レベル3
+		MAX_LEVEL				// 最大レベル
+	};
+
+	//--------------------------------------------------------------------
 	// 静的メンバ関数
 	//--------------------------------------------------------------------
-	static void ReleaseAll(void);									// すべてのオブジェクトの解放
-	static void UpdateAll(void);									// すべてのオブジェクトの更新
-	static void DrawAll(EObjectDrowType objectDrowType);			// すべてのオブジェクトの描画
-	static CObject **GetObjectAll() { return &m_apObject[0]; }		// オブジェクト情報のゲッター
+	static void ReleaseAll(void);																						// すべてのオブジェクトの解放
+	static void UpdateAll(void);																						// すべてのオブジェクトの更新
+	static void DrawAll(EObjectDrowType objectDrowType);																// すべてのオブジェクトの描画
+	static CObject *MyGetObject(const int nPriority, const int nNumID) { return m_apObject[nPriority][nNumID]; }		// オブジェクト情報のゲッター
 
 	//--------------------------------------------------------------------
 	// コンストラクタとデストラクタ
 	//--------------------------------------------------------------------
-	CObject();
+	CObject(int nPriority = PRIORITY_LEVEL0);
 	virtual ~CObject();
 
 	//--------------------------------------------------------------------
@@ -123,7 +137,7 @@ private:
 	//--------------------------------------------------------------------
 	// 静的メンバ変数
 	//--------------------------------------------------------------------
-	static CObject *m_apObject[MAX_OBJECT];				// オブジェクト情報
+	static CObject *m_apObject[MAX_LEVEL][MAX_OBJECT];		// オブジェクト情報
 
 	//--------------------------------------------------------------------
 	// メンバ変数
@@ -133,6 +147,7 @@ private:
 	COLOR_TYPE			m_colorType;		// 色の種別
 	D3DXVECTOR3			m_colisonSize;		// あたり判定の大きさ
 	int					m_nNumID;			// 格納先の番号
+	int					m_nLevPriority;		// プライオリティのレベル
 };
 
 #endif
