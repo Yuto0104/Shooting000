@@ -62,7 +62,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpC
 	// ウィンドウクラスの登録
 	RegisterClassEx(&wcex);
 
-	RECT rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+	RECT rect = { 0, 0, CRenderer::SCREEN_WIDTH, CRenderer::SCREEN_HEIGHT };
 	// 指定したクライアント領域を確保するために必要なウィンドウ座標を計算
 	AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
 

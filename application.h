@@ -26,6 +26,7 @@ class CPlayer2D;
 class CMotionPlayer3D;
 class CScore;
 class CLifeManager;
+class CGauge2D;
 
 //=============================================================================
 // アプリケーションクラス
@@ -48,7 +49,10 @@ public:
 	static CPlayer2D *GetPlayer2D() { return m_pPlayer2D; }								// プレイヤーのゲッター
 	static CMotionPlayer3D *GetMotionPlayer3D() { return m_MotionPlayer3D; }			// モーションプレイヤーのゲッター
 	static CScore *GetScore() { return m_pScore; }										// スコアの取得
-	static CLifeManager *GetLifeManager() { return m_pLifeManager; }						// ライフマネージャーの取得
+	static CLifeManager *GetLifeManager() { return m_pLifeManager; }					// ライフマネージャーの取得
+	static CGauge2D *GetGauge2D() { return m_pGauge2D; }								// ゲージの取得
+	static D3DXVECTOR3 ScreenCastWorld(const D3DXVECTOR3 &pos);							// ワールド座標をスクリーン座標にキャストする
+	static D3DXVECTOR3 WorldCastScreen(const D3DXVECTOR3 &pos);							// ワールド座標をスクリーン座標にキャストする
 
 	//--------------------------------------------------------------------
 	// コンストラクタとデストラクタ
@@ -79,6 +83,7 @@ private:
 	static CMotionPlayer3D *m_MotionPlayer3D;			// モーションプレイヤークラス
 	static CScore *m_pScore;							// スコアクラス
 	static CLifeManager *m_pLifeManager;				// ライフマネージャークラス
+	static CGauge2D *m_pGauge2D;						// ゲージマネージャー
 };
 
 #endif

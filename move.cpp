@@ -60,9 +60,9 @@ void CMove::SetMoving(float fSpeed, float fMaxSpeed, float fMinSpeed, float fFri
 // Author : 唐﨑結斗
 // 概要 : 慣性を算出し、移動量に加算する
 //=============================================================================
-void CMove::Moving(const D3DXVECTOR3 & moveDir)
+void CMove::Moving(const D3DXVECTOR3 &moveDir)
 {
-	if (moveDir.x != 0.0f || moveDir.y != 0.0f)
+	if (moveDir.x != 0.0f || moveDir.y != 0.0f || moveDir.z != 0.0f)
 	{// 移動している
 	 // 速度の算出
 		m_move += moveDir * m_fSpeed;

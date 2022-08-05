@@ -33,15 +33,16 @@ public:
 	//--------------------------------------------------------------------
 	enum TEXTURE_TYPE
 	{
-		TYPE_2DPOLYGON,		// 2Dポリゴン
-		TYPE_2DPLAYER,		// 2Dプレイヤー
-		TYPE_2DBULLET,		// 2D弾
-		TYPE_2DEXPLOSION,	// 2D爆発
-		TYPE_2DENEMY_000,	// 2Dエネミー(0)
-		TYPE_SKY_000,		// 空(0)
-		TYPE_NUMBER_000,	// ナンバー(0)
-		TYPE_LIFE_000,		// ハート(0)
-		MAX_TYPE,			// 種別の最大数
+		TYPE_2DPOLYGON = 0,		// 2Dポリゴン
+		TYPE_2DPLAYER,			// 2Dプレイヤー
+		TYPE_2DBULLET,			// 2D弾
+		TYPE_2DEXPLOSION,		// 2D爆発
+		TYPE_2DENEMY_000,		// 2Dエネミー(0)
+		TYPE_SKY_000,			// 空(0)
+		TYPE_NUMBER_000,		// ナンバー(0)
+		TYPE_LIFE_000,			// ハート(0)
+		MAX_TYPE,				// 種別の最大数
+		TYPE_NULL,				// テクスチャ設定なし
 	};
 
 	//--------------------------------------------------------------------
@@ -60,7 +61,7 @@ public:
 	void Uninit(void);		
 
 	// テクスチャのゲッター
-	LPDIRECT3DTEXTURE9 GetTexture(TEXTURE_TYPE type) { return m_pTexture[type]; }
+	LPDIRECT3DTEXTURE9 GetTexture(TEXTURE_TYPE type);
 
 private:
 	//--------------------------------------------------------------------

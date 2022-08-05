@@ -13,6 +13,7 @@
 
 #include "motion_player3D.h"
 #include "motion.h"
+#include "move.h"
 #include "renderer.h"
 #include "application.h"
 #include "keyboard.h"
@@ -22,6 +23,7 @@
 #include "bullet3D.h"
 #include "camera.h"
 #include "life_manager.h"
+#include "gauge2D.h"
 
 //*****************************************************************************
 // 定数定義
@@ -97,6 +99,13 @@ HRESULT CMotionPlayer3D::Init()
 	m_pMotion[1] = new CMotion("data/MOTION/motionShark.txt");
 	assert(m_pMotion[1] != nullptr);
 
+	// 移動
+	m_pMove = new CMove;
+	assert(m_pMove != nullptr);
+
+	// 移動情報の初期化
+	m_pMove->SetMoving(1.0f, 15.0f, 0.0f, 0.1f);
+
 	// メンバ変数の初期化
 	m_nNumMotion = 0;
 	m_nNumMotionOld = m_nNumMotion;
@@ -106,6 +115,9 @@ HRESULT CMotionPlayer3D::Init()
 	SetColisonSize(D3DXVECTOR3(50.0f, 50.0f, 50.0f));
 	m_nLife = 5;
 	m_nInvalidLife = 0;
+	
+	CGauge2D *pGauge2D = CApplication::GetGauge2D();
+	pGauge2D->SetMaxNumber((float)MAX_ENERGY);
 
 	return E_NOTIMPL;
 }
@@ -117,6 +129,13 @@ HRESULT CMotionPlayer3D::Init()
 //=============================================================================
 void CMotionPlayer3D::Uninit()
 {
+	if (m_pMove != nullptr)
+	{// 終了処理
+		// メモリの解放
+		delete m_pMove;
+		m_pMove = nullptr;
+	}
+
 	for (int nCntMotion = 0; nCntMotion < MAX_MOTION; nCntMotion++)
 	{
 		if (m_pMotion[nCntMotion] != nullptr)
@@ -140,11 +159,15 @@ void CMotionPlayer3D::Uninit()
 //=============================================================================
 void CMotionPlayer3D::Update()
 {
+	// 情報の取得
+	D3DXVECTOR3 pos = GetPos();
+	D3DXVECTOR3 rot = GetRot();
+
 	// ニュートラルモーションの入力
 	m_nNumMotion = TYPE_NEUTRAL;
 
 	// 移動
-	Move();
+	pos += Move();
 
 	// 回転
 	Rotate();
@@ -152,14 +175,17 @@ void CMotionPlayer3D::Update()
 	// 弾の発射
 	Shot();
 
-	// スクリーンのあたり判定
-	CollisionScreen();
-
 	// 色の変更
 	ChangeColor();
 
 	// モーションの設定
 	MotionSet();
+
+	// 移動情報の設定
+	SetPos(pos);
+
+	// スクリーンのあたり判定
+	CollisionScreen();
 
 	// 更新
 	CModel3D::Update();
@@ -214,7 +240,7 @@ void CMotionPlayer3D::Rotate()
 // Author : 唐﨑結斗
 // 概要 : 移動を行う
 //=============================================================================
-void CMotionPlayer3D::Move()
+D3DXVECTOR3 CMotionPlayer3D::Move()
 {
 	// 入力情報の取得
 	CKeyboard *pKeyboard = CApplication::GetKeyboard();
@@ -222,6 +248,7 @@ void CMotionPlayer3D::Move()
 	// メンバ変数の取得
 	D3DXVECTOR3 pos = GetPos();
 	D3DXVECTOR3 rot = GetRot();
+	D3DXVECTOR3 move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 	if (pKeyboard->GetPress(DIK_W)
 		|| pKeyboard->GetPress(DIK_A)
@@ -286,10 +313,7 @@ void CMotionPlayer3D::Move()
 		}
 
 		// 移動量の計算
-		D3DXVECTOR3 move = D3DXVECTOR3(sinf(m_rotDest.y), 0.0f, cosf(m_rotDest.y));
-
-		// 移動
-		pos += move * 10.0f;
+		move = D3DXVECTOR3(sinf(m_rotDest.y), 0.0f, cosf(m_rotDest.y));
 
 		// 目的の向きの反転
 		m_rotDest.y -= D3DX_PI;
@@ -305,8 +329,10 @@ void CMotionPlayer3D::Move()
 		m_rotDest.y += D3DX_PI * 2;
 	}
 
-	// 移動情報の設定
-	SetPos(pos);
+	// 摩擦係数を考慮した移動
+	m_pMove->Moving(move);
+
+	return m_pMove->GetMove();
 }
 
 //=============================================================================
@@ -430,25 +456,37 @@ void CMotionPlayer3D::Shot()
 //=============================================================================
 void CMotionPlayer3D::CollisionScreen()
 {
-	// カメラの取得
-	CCamera *pCamera = CApplication::GetCamera();
-
 	// 位置の取得
 	D3DXVECTOR3 pos = GetPos();
+	D3DXVECTOR3 worldPos;
 
-	// スクリーンの座標を取得
-	D3DXVECTOR3 minScreen = WorldCastScreen(&D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1280.0f, 720.0f, 0.0f), &pCamera->GetMtxView(), &pCamera->GetMtxProj());
-	D3DXVECTOR3 maxScreen = WorldCastScreen(&D3DXVECTOR3(1280.0f, 720.0f, 0.0f), D3DXVECTOR3(1280.0f, 720.0f, 0.0f), &pCamera->GetMtxView(), &pCamera->GetMtxProj());
+	// スクリーン座標にキャスト
+	D3DXVECTOR3 screenPos = CApplication::ScreenCastWorld(pos);
 
-	if (pos.x < minScreen.x)
+	if (screenPos.x < 0.0f)
 	{
-		pos.x = minScreen.x;
-		SetPos(pos);
+		worldPos = CApplication::WorldCastScreen(D3DXVECTOR3(0.0f, screenPos.y, screenPos.z));
+		SetPos(D3DXVECTOR3(worldPos.x, pos.y, worldPos.z));
+		screenPos = CApplication::ScreenCastWorld(GetPos());
 	}
-	else if (pos.x > maxScreen.x)
+	else if (screenPos.x > (float)CRenderer::SCREEN_WIDTH)
 	{
-		pos.x = maxScreen.x;
-		SetPos(pos);
+		worldPos = CApplication::WorldCastScreen(D3DXVECTOR3((float)CRenderer::SCREEN_WIDTH, screenPos.y, screenPos.z));
+		SetPos(D3DXVECTOR3(worldPos.x, pos.y, worldPos.z));
+		screenPos = CApplication::ScreenCastWorld(GetPos());
+	}
+
+	if (screenPos.y < 0.0f)
+	{
+		worldPos = CApplication::WorldCastScreen(D3DXVECTOR3(screenPos.x, 0.0f, screenPos.z));
+		SetPos(D3DXVECTOR3(worldPos.x, pos.y, worldPos.z));
+		screenPos = CApplication::ScreenCastWorld(GetPos());
+	}
+	else if (screenPos.y > (float)CRenderer::SCREEN_HEIGHT)
+	{
+		worldPos = CApplication::WorldCastScreen(D3DXVECTOR3(screenPos.x, (float)CRenderer::SCREEN_HEIGHT, screenPos.z));
+		SetPos(D3DXVECTOR3(worldPos.x, pos.y, worldPos.z));
+		screenPos = CApplication::ScreenCastWorld(GetPos());
 	}
 }
 
@@ -461,18 +499,22 @@ void CMotionPlayer3D::ChangeColor()
 {
 	// 入力情報の取得
 	CKeyboard *pKeyboard = CApplication::GetKeyboard();
+	CGauge2D *pGauge2D = CApplication::GetGauge2D();
 
 	if (pKeyboard->GetTrigger(DIK_Q))
 	{
 		if (GetColorType() == CObject::TYPE_WHITE)
 		{
 			SetColorType(CObject::TYPE_BLACK);
+			pGauge2D->SetCol(D3DXCOLOR(1.0f, 0.2f, 0.2f, 1.0f));
 		}
 		else if (GetColorType() == CObject::TYPE_BLACK)
 		{
 			SetColorType(CObject::TYPE_WHITE);
+			pGauge2D->SetCol(D3DXCOLOR(0.2f, 0.9f, 1.0f, 1.0f));
 		}
 	}
+	
 }
 
 //=============================================================================
@@ -554,6 +596,9 @@ void CMotionPlayer3D::Charge()
 	{
 		m_nEnergy = MAX_ENERGY;
 	}
+
+	CGauge2D *pGauge2D = CApplication::GetGauge2D();
+	pGauge2D->SetNumber((float)m_nEnergy);
 }
 
 

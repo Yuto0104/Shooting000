@@ -9,12 +9,13 @@
 //*****************************************************************************
 // インクルード
 //*****************************************************************************
+#include <stdio.h>
 #include <assert.h>
 
 #include "renderer.h"
 #include "object.h"
 #include "application.h"
-#include "camera.h"
+#include "motion_player3D.h"
 
 //=============================================================================
 // コンストラクタ
@@ -197,10 +198,25 @@ void CRenderer::DrawFPS()
 {
 	RECT rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 	TCHAR str[256];
+	TCHAR strCopy[256];
 
 	wsprintf(str, _T("FPS : %d\n"), GetFps());
-	/*D3DXVECTOR3 chacck = CApplication::GetCamera()->GetPosV();
-	wsprintf(str, _T("FPS : %d\n"), chacck.z);*/
+
+	if (CApplication::GetMotionPlayer3D()->GetLife() > 0)
+	{
+		D3DXVECTOR3 pos = CApplication::GetMotionPlayer3D()->GetPos();
+		sprintf(strCopy, _T("プレイヤーの位置 | x : %.3f | y : %.3f | z : %.3f |\n"), pos.x, pos.y, pos.z);
+		strcat(str, strCopy);
+
+		pos = CApplication::ScreenCastWorld(pos);
+		sprintf(strCopy, _T("プレイヤーのスクリーン座標 | x : %.3f | y : %.3f | z : %.3f |\n"), pos.x, pos.y, pos.z);
+		strcat(str, strCopy);
+
+		pos = CApplication::WorldCastScreen(pos);
+		sprintf(strCopy, _T("プレイヤーのスクリーン座標からワールド座標へ | x : %.3f | y : %.3f | z : %.3f |\n"), pos.x, pos.y, pos.z);
+		strcat(str, strCopy);
+	}
+
 
 	// テキスト描画
 	m_pFont->DrawText(NULL, str, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xff, 0xff, 0xff, 0xff));

@@ -55,7 +55,7 @@ void CTexture::Init(void)
 		"data/TEXTURE/ボス.png",					// 2Dエネミー
 		"data/TEXTURE/sky002.jpg",					// 空(0)
 		"data/TEXTURE/number003.png",				// ナンバー(0)
-		"data/TEXTURE/ハート.png",				// ハート(0)
+		"data/TEXTURE/ハート.png",					// ハート(0)
 	};
 
 	for (int nCnt = 0; nCnt < MAX_TYPE; nCnt++)
@@ -82,4 +82,21 @@ void CTexture::Uninit(void)
 			m_pTexture[nCnt] = nullptr;
 		}
 	}
+}
+
+//=============================================================================
+// テクスチャポインタのゲッター	
+// Author : 唐﨑結斗
+// 概要 : テクスチャのゲッター
+//=============================================================================
+LPDIRECT3DTEXTURE9 CTexture::GetTexture(TEXTURE_TYPE type)
+{
+	LPDIRECT3DTEXTURE9 pTexture = nullptr;
+
+	if (type != TYPE_NULL)
+	{// タイプが設定されてる
+		pTexture = m_pTexture[type];
+	}
+
+	return pTexture;
 }

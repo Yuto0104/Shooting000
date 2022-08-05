@@ -137,6 +137,7 @@ public:
 	void SetSplitTex(bool bSplitTex);												// テクスチャ分割するかのセッター
 	bool GetSplitTex() { return m_bSplitTex; }										// テクスチャ分割するかのゲッター
 	void LoadTex(CTexture::TEXTURE_TYPE type) { m_typeTex = type; }					// テクスチャの設定
+	void SetCol(const D3DXCOLOR &col);												// 色の設定
 
 protected:
 	//--------------------------------------------------------------------

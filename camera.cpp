@@ -170,18 +170,18 @@ void CCamera::Set()
 	{
 	case TYPE_CLAIRVOYANCE:
 		// プロジェクションマトリックスの作成(透視投影)
-		D3DXMatrixPerspectiveFovLH(&m_mtxProj,					// プロジェクションマトリックス
-			D3DXToRadian(45.0f),								// 視野角
-			(float)SCREEN_WIDTH / (float)SCREEN_HEIGHT,			// アスペクト比
-			CAMERA_NEAR,										// ニア
-			CAMERA_FUR);										// ファー
+		D3DXMatrixPerspectiveFovLH(&m_mtxProj,											// プロジェクションマトリックス
+			D3DXToRadian(45.0f),														// 視野角
+			(float)CRenderer::SCREEN_WIDTH / (float)CRenderer::SCREEN_HEIGHT,			// アスペクト比
+			CAMERA_NEAR,																// ニア
+			CAMERA_FUR);																// ファー
 		break;
 
 	case TYPE_PARALLEL:
 		// プロジェクションマトリックスの作成(平行投影)
 		D3DXMatrixOrthoLH(&m_mtxProj,							// プロジェクションマトリックス
-			(float)SCREEN_WIDTH,								// 幅
-			(float)SCREEN_HEIGHT,								// 高さ
+			(float)CRenderer::SCREEN_WIDTH,						// 幅
+			(float)CRenderer::SCREEN_HEIGHT,					// 高さ
 			CAMERA_NEAR,										// ニア
 			CAMERA_FUR);										// ファー
 		break;

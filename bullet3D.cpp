@@ -143,7 +143,7 @@ void CBullet3D::Update()
 						&& ColisonSphere3D(pObject, D3DXVECTOR3(GetSize().x, GetSize().y, GetSize().x), pObject->GetColisonSize(), true))
 					{
 						// 敵オブジェクトにキャスト
-						CEnemy3D *pEnemy3D = (CEnemy3D*)pObject;
+						CEnemy3D *pEnemy3D = dynamic_cast<CEnemy3D*>(pObject);
 
 						// 与える攻撃力の算出
 						int nAttack = m_nAttack;

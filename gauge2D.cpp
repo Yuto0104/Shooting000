@@ -1,8 +1,8 @@
 //=============================================================================
 //
-// オブジェクトクラス(object.h)
+// 2Dゲージクラス(gauge2D.cpp)
 // Author : 唐﨑結斗
-// 概要 : オブジェクト生成を行う
+// 概要 : 2Dゲージ生成を行う
 //
 //=============================================================================
 
@@ -11,26 +11,26 @@
 //*****************************************************************************
 #include <assert.h>
 
-#include "object2D.h"
+#include "gauge2D.h"
 #include "renderer.h"
 #include "application.h"
 
 //=============================================================================
 // インスタンス生成
 // Author : 唐﨑結斗
-// 概要 : 2Dオブジェクトを生成する
+// 概要 : 2Dゲージを生成する
 //=============================================================================
-CObject2D * CObject2D::Create(void)
+CGauge2D * CGauge2D::Create(void)
 {
 	// オブジェクトインスタンス
-	CObject2D *pObject2D = nullptr;
+	CGauge2D *pGauge2D = nullptr;
 
 	// メモリの解放
-	pObject2D = new CObject2D;
+	pGauge2D = new CGauge2D;
 
-	if (pObject2D != nullptr)
+	if (pGauge2D != nullptr)
 	{// 数値の初期化
-		pObject2D->Init();
+		pGauge2D->Init();
 	}
 	else
 	{// メモリの確保ができなかった
@@ -38,7 +38,7 @@ CObject2D * CObject2D::Create(void)
 	}
 
 	// インスタンスを返す
-	return pObject2D;
+	return pGauge2D;
 }
 
 //=============================================================================
@@ -46,16 +46,22 @@ CObject2D * CObject2D::Create(void)
 // Author : 唐﨑結斗
 // 概要 : インスタンス生成時に行う処理
 //=============================================================================
-CObject2D::CObject2D(int nPriority) : CObject(nPriority)
+CGauge2D::CGauge2D(int nPriority) : CObject(nPriority)
 {
 	m_pVtxBuff = nullptr;								// 頂点バッファ
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 位置
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 向き
 	m_size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 大きさ
+	m_maxSize = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 大きさ最大値
 	m_col = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);			// カラー
 	m_fAngle = 0.0f;									// 対角線の角度
 	m_fLength = 0.0f;									// 対角線の長さ
+	m_fAngleOrigin = 0.0f;								// もとの対角線の角度
+	m_fLengthOrigin = 0.0f;								// もと対角線の長さ
 	SetObjType(CObject::OBJTYPE_2DPOLYGON);				// オブジェクトの種別設定
+	m_fMaxNumber = 0.0f;								// 数値の最大数
+	m_fNumber = 0.0f;									// 数値
+	m_fDestNumber = 0.0f;								// 目的の数値
 }
 
 //=============================================================================
@@ -63,9 +69,9 @@ CObject2D::CObject2D(int nPriority) : CObject(nPriority)
 // Author : 唐﨑結斗
 // 概要 : インスタンス終了時に行う処理
 //=============================================================================
-CObject2D::~CObject2D()
+CGauge2D::~CGauge2D()
 {
-	
+
 }
 
 //=============================================================================
@@ -73,7 +79,7 @@ CObject2D::~CObject2D()
 // Author : 唐﨑結斗
 // 概要 : 頂点バッファを生成し、メンバ変数の初期値を設定
 //=============================================================================
-HRESULT CObject2D::Init()
+HRESULT CGauge2D::Init()
 {// レンダラーのゲット
 	CRenderer *pRenderer = CApplication::GetRenderer();
 
@@ -89,7 +95,8 @@ HRESULT CObject2D::Init()
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 位置
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 向き
 	m_size = D3DXVECTOR3(100.0f, 100.0f, 0.0f);		// 大きさ
-	m_typeTex = CTexture::TYPE_2DPOLYGON;			// テクスチャタイプ
+	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);		// カラー
+	m_typeTex = CTexture::TYPE_NULL;				// テクスチャタイプ
 
 	// 色の設定
 	SetCol(m_col);
@@ -105,8 +112,8 @@ HRESULT CObject2D::Init()
 // Author : 唐﨑結斗
 // 概要 : テクスチャのポインタと頂点バッファの解放
 //=============================================================================
-void CObject2D::Uninit()
-{ 
+void CGauge2D::Uninit()
+{
 	//頂点バッファを破棄
 	if (m_pVtxBuff != nullptr)
 	{
@@ -124,9 +131,18 @@ void CObject2D::Uninit()
 // Author : 唐﨑結斗
 // 概要 : 2Dポリゴンの更新を行う
 //=============================================================================
-void CObject2D::Update()
+void CGauge2D::Update()
 {
-	
+	// 数値の設定
+	m_fNumber += (m_fDestNumber - m_fNumber) * 0.05f;
+
+	if (m_fNumber >= m_fDestNumber)
+	{
+		m_fNumber = m_fDestNumber;
+	}
+
+	// ゲージの設定
+	SetGauge();
 }
 
 //=============================================================================
@@ -134,10 +150,10 @@ void CObject2D::Update()
 // Author : 唐﨑結斗
 // 概要 : 2Dポリゴンの描画を行う
 //=============================================================================
-void CObject2D::Draw()
+void CGauge2D::Draw()
 {// レンダラーのゲット
 	CRenderer *pRenderer = CApplication::GetRenderer();
-	
+
 	// テクスチャポインタの取得
 	CTexture *pTexture = CApplication::GetTexture();
 
@@ -165,7 +181,7 @@ void CObject2D::Draw()
 // Author : 唐﨑結斗
 // 概要 : 位置のメンバ変数に引数を代入
 //=============================================================================
-void CObject2D::SetPos(const D3DXVECTOR3 &pos)
+void CGauge2D::SetPos(const D3DXVECTOR3 &pos)
 {
 	// 位置の設定
 	m_pos = pos;
@@ -182,7 +198,7 @@ void CObject2D::SetPos(const D3DXVECTOR3 &pos)
 // Author : 唐﨑結斗
 // 概要 : 向きのメンバ変数に引数を代入
 //=============================================================================
-void CObject2D::SetRot(const D3DXVECTOR3 &rot)
+void CGauge2D::SetRot(const D3DXVECTOR3 &rot)
 {
 	// 向きの設定
 	m_rot = rot;
@@ -199,10 +215,10 @@ void CObject2D::SetRot(const D3DXVECTOR3 &rot)
 // Author : 唐﨑結斗
 // 概要 : 大きさのメンバ変数に引数を代入
 //=============================================================================
-void CObject2D::SetSize(const D3DXVECTOR3 & size)
+void CGauge2D::SetSize(const D3DXVECTOR3 & size)
 {
 	// 大きさの設定
-	m_size = size;
+	m_maxSize = D3DXVECTOR3(size.x, size.y * 2.0f, 0.0f);
 
 	// 頂点座標などの設定
 	SetVtx();
@@ -216,7 +232,7 @@ void CObject2D::SetSize(const D3DXVECTOR3 & size)
 // Author : 唐﨑結斗
 // 概要 : 2Dポリゴンの頂点座標、rhw、頂点カラーを設定する
 //=============================================================================
-void CObject2D::SetVtx()
+void CGauge2D::SetVtx()
 {
 	//頂点情報へのポインタを生成
 	VERTEX_2D *pVtx;
@@ -225,10 +241,12 @@ void CObject2D::SetVtx()
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 	//対角線の長さを算出する
-	m_fLength = sqrtf((m_size.x * m_size.x) + (m_size.y * m_size.y)) / 2.0f;
+	m_fLength = sqrtf((m_maxSize.x * m_maxSize.x) + (m_size.y * m_size.y)) / 2.0f;
+	m_fLengthOrigin = sqrtf(m_maxSize.x * m_maxSize.x) / 2.0f;
 
 	//対角線の角度を算出
-	m_fAngle = atan2f(m_size.x, m_size.y);
+	m_fAngle = atan2f(m_maxSize.x, m_size.y);
+	m_fAngleOrigin = atan2f(m_maxSize.x, 0.0f);
 
 	// 頂点情報を設定
 	pVtx[0].pos.x = m_pos.x + sinf(m_rot.z + (D3DX_PI + m_fAngle)) * m_fLength;
@@ -239,12 +257,12 @@ void CObject2D::SetVtx()
 	pVtx[1].pos.y = m_pos.y + cosf(m_rot.z + (D3DX_PI - m_fAngle)) *  m_fLength;
 	pVtx[1].pos.z = 0.0f;
 
-	pVtx[2].pos.x = m_pos.x + sinf(m_rot.z - (0 + m_fAngle)) * m_fLength;
-	pVtx[2].pos.y = m_pos.y + cosf(m_rot.z - (0 + m_fAngle)) * m_fLength;
+	pVtx[2].pos.x = m_pos.x + sinf(m_rot.z - (0 + m_fAngleOrigin)) * m_fLengthOrigin;
+	pVtx[2].pos.y = m_pos.y + cosf(m_rot.z - (0 + m_fAngleOrigin)) * m_fLengthOrigin;
 	pVtx[2].pos.z = 0.0f;
 
-	pVtx[3].pos.x = m_pos.x + sinf(m_rot.z - (0 - m_fAngle)) *  m_fLength;
-	pVtx[3].pos.y = m_pos.y + cosf(m_rot.z - (0 - m_fAngle)) *  m_fLength;
+	pVtx[3].pos.x = m_pos.x + sinf(m_rot.z - (0 - m_fAngleOrigin)) *  m_fLengthOrigin;
+	pVtx[3].pos.y = m_pos.y + cosf(m_rot.z - (0 - m_fAngleOrigin)) *  m_fLengthOrigin;
 	pVtx[3].pos.z = 0.0f;
 
 	// rhwの設定
@@ -262,7 +280,7 @@ void CObject2D::SetVtx()
 // Author : 唐﨑結斗
 // 概要 : 頂点カラーを設定する
 //=============================================================================
-void CObject2D::SetCol(const D3DCOLOR &col)
+void CGauge2D::SetCol(const D3DCOLOR &col)
 {
 	m_col = col;
 
@@ -285,9 +303,9 @@ void CObject2D::SetCol(const D3DCOLOR &col)
 //=============================================================================
 // テクスチャ座標の設定
 // Author : 唐﨑結斗
-// 概要 : 2Dオブジェクトのテクスチャ座標を設定する
+// 概要 : 2Dゲージのテクスチャ座標を設定する
 //=============================================================================
-void CObject2D::SetTex(const D3DXVECTOR2 &minTex, const D3DXVECTOR2 &maxTex)
+void CGauge2D::SetTex(const D3DXVECTOR2 &minTex, const D3DXVECTOR2 &maxTex)
 {
 	//頂点情報へのポインタを生成
 	VERTEX_2D *pVtx;
@@ -304,3 +322,31 @@ void CObject2D::SetTex(const D3DXVECTOR2 &minTex, const D3DXVECTOR2 &maxTex)
 	//頂点バッファをアンロック
 	m_pVtxBuff->Unlock();
 }
+
+//=============================================================================
+// ゲージの設定
+// Author : 唐﨑結斗
+// 概要 : 2Dゲージを設定する
+//=============================================================================
+void CGauge2D::SetGauge()
+{
+	// 大きさに数値を代入
+	m_size.y = (m_maxSize.y / m_fMaxNumber) * m_fNumber;
+
+	// 頂点座標の設定
+	SetVtx();
+}
+
+//=============================================================================
+// 数値の最大値の設定
+// Author : 唐﨑結斗
+// 概要 : 数値の最大値を設定する
+//=============================================================================
+void CGauge2D::SetMaxNumber(const float fMaxNumber)
+{
+	m_fMaxNumber = fMaxNumber;
+
+	// ゲージの設定
+	SetGauge();
+}
+

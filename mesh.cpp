@@ -97,6 +97,9 @@ HRESULT CMesh3D::Init()
 	// 頂点座標などの設定
 	SetVtx();
 
+	// 色の設定
+	SetCol(m_col);
+
 	// テクスチャの設定
 	SetTex(m_bSplitTex);
 
@@ -212,6 +215,9 @@ void CMesh3D::SetPos(const D3DXVECTOR3 &pos)
 	// 頂点座標などの設定
 	SetVtx();
 
+	// 色の設定
+	SetCol(m_col);
+
 	// テクスチャの設定
 	SetTex(m_bSplitTex);
 
@@ -231,6 +237,9 @@ void CMesh3D::SetRot(const D3DXVECTOR3 &rot)
 
 	// 頂点座標などの設定
 	SetVtx();
+
+	// 色の設定
+	SetCol(m_col);
 
 	// テクスチャの設定
 	SetTex(m_bSplitTex);
@@ -255,6 +264,9 @@ void CMesh3D::SetSize(const D3DXVECTOR3 & size)
 	// 頂点座標などの設定
 	SetVtx();
 
+	// 色の設定
+	SetCol(m_col);
+
 	// テクスチャの設定
 	SetTex(m_bSplitTex);
 
@@ -276,6 +288,9 @@ void CMesh3D::SetBlock(DOUBLE_INT block)
 
 	// 頂点座標などの設定
 	SetVtx();
+
+	// 色の設定
+	SetCol(m_col);
 
 	// テクスチャの設定
 	SetTex(m_bSplitTex);
@@ -325,9 +340,6 @@ void CMesh3D::SetVtx()
 			pVtx[nCntVtx].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 			/*D3DXVec3Cross(&pVtx[nCntVtx].nor, &SetVecLine(pVtx[nCntVtx + 1].pos, pVtx[nCntVtx].pos), &SetVecLine(pVtx[nCntVtx + 1 + m_line.x].pos, pVtx[nCntVtx].pos));
 			D3DXVec3Normalize(&pVtx[nCntVtx].nor, &pVtx[nCntVtx].nor);*/
-
-			// 頂点カラーの設定
-			pVtx[nCntVtx].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 		}
 	}
 
@@ -362,6 +374,36 @@ void CMesh3D::SetTex(const bool bSplit)
 			{// テクスチャ座標の設定
 				pVtx[nCntVtx].tex = D3DXVECTOR2(1.0f / m_block.x * nCntX, 1.0f / m_block.y * nCntZ);
 			}	
+		}
+	}
+
+	// 頂点バッファのアンロック
+	m_pVtxBuff->Unlock();
+}
+
+//=============================================================================
+// 色の設定
+// Author : 唐﨑結斗
+// 概要 : 3Dメッシュの色を設定する
+//=============================================================================
+void CMesh3D::SetCol(const D3DXCOLOR &col)
+{
+	m_col = col;
+
+	// 頂点情報の取得
+	VERTEX_3D *pVtx = NULL;
+
+	// 頂点バッファをロック
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	for (int nCntZ = 0; nCntZ < m_line.y; nCntZ++)
+	{
+		for (int nCntX = 0; nCntX < m_line.x; nCntX++)
+		{// 変数宣言
+			int nCntVtx = nCntX + (nCntZ *  m_line.x);
+
+			// 頂点カラーの設定
+			pVtx[nCntVtx].col = m_col;
 		}
 	}
 

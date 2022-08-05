@@ -38,6 +38,7 @@
 #include "score.h"
 #include "life.h"
 #include "life_manager.h"
+#include "gauge2D.h"
 
 //*****************************************************************************
 // 静的メンバ変数宣言
@@ -53,6 +54,93 @@ CPlayer2D *CApplication::m_pPlayer2D = nullptr;					// プレイヤーインタンス
 CMotionPlayer3D *CApplication::m_MotionPlayer3D = nullptr;		// モーションプレイヤーインスタンス
 CScore *CApplication::m_pScore = nullptr;						// スコアインスタンス
 CLifeManager *CApplication::m_pLifeManager = nullptr;			// ライフマネージャーインスタンス
+CGauge2D *CApplication::m_pGauge2D = nullptr;					// ゲージマネージャー
+
+//=============================================================================
+// スクリーン座標をワールド座標にキャストする
+// Author : 唐﨑結斗
+// 概要 : 
+//=============================================================================
+D3DXVECTOR3 CApplication::ScreenCastWorld(const D3DXVECTOR3 &pos)
+{
+	// 計算用マトリックス
+	D3DXMATRIX mtx, mtxTrans, mtxView, mtxPrj, mtxViewPort;
+
+	// 行列移動関数 (第一引数にX,Y,Z方向の移動行列を作成)
+	D3DXMatrixTranslation(&mtxTrans, pos.x, pos.y, pos.z);
+
+	// カメラのビューマトリックスの取得
+	mtxView = m_pCamera->GetMtxView();
+
+	// カメラのプロジェクションマトリックスの取得
+	mtxPrj = m_pCamera->GetMtxProj();
+
+	// マトリックスの乗算
+	mtx = mtxTrans * mtxView * mtxPrj;
+
+	// ビューポート行列（スクリーン行列）の作成
+	float w = (float)CRenderer::SCREEN_WIDTH / 2.0f;
+	float h = (float)CRenderer::SCREEN_HEIGHT / 2.0f;
+
+	mtxViewPort = {
+		w , 0 , 0 , 0 ,
+		0 ,-h , 0 , 0 ,
+		0 , 0 , 1 , 0 ,
+		w , h , 0 , 1
+	};
+
+	// マトリックスのXYZ
+	D3DXVECTOR3 vec = D3DXVECTOR3(mtx._41, mtx._42, mtx._43);
+
+	D3DXVec3TransformCoord(&vec, &vec, &mtxViewPort);
+
+	return vec;
+}
+
+//=============================================================================
+// ワールド座標をスクリーン座標にキャストする
+// Author : 唐﨑結斗
+// 概要 : 
+//=============================================================================
+D3DXVECTOR3 CApplication::WorldCastScreen(const D3DXVECTOR3 &pos)
+{
+	// 計算用ベクトル
+	D3DXVECTOR3 vec = pos;
+
+	// 計算用マトリックス
+	D3DXMATRIX mtx, mtxTrans, mtxView, mtxPrj, mtxViewPort;
+
+	// 行列移動関数 (第一引数にX,Y,Z方向の移動行列を作成)
+	D3DXMatrixTranslation(&mtxTrans, pos.x, pos.y, pos.z);
+
+	// カメラのビューマトリックスの取得
+	mtxView = m_pCamera->GetMtxView();
+
+	// カメラのプロジェクションマトリックスの取得
+	mtxPrj = m_pCamera->GetMtxProj();
+	
+	// ビューポート行列（スクリーン行列）の作成
+	D3DXMatrixIdentity(&mtxViewPort);
+	float w = (float)CRenderer::SCREEN_WIDTH / 2.0f;
+	float h = (float)CRenderer::SCREEN_HEIGHT / 2.0f;
+	mtxViewPort = {
+		w , 0 , 0 , 0 ,
+		0 ,-h , 0 , 0 ,
+		0 , 0 , 1 , 0 ,
+		w , h , 0 , 1
+	};
+
+	// 逆行列の算出
+	D3DXMatrixInverse(&mtxView, NULL, &mtxView);
+	D3DXMatrixInverse(&mtxPrj, NULL, &mtxPrj);
+	D3DXMatrixInverse(&mtxViewPort, NULL, &mtxViewPort);
+
+	// 逆変換
+	mtx = mtxViewPort * mtxPrj * mtxView;
+	D3DXVec3TransformCoord(&vec, &D3DXVECTOR3(vec.x, vec.y, vec.z), &mtx);
+
+	return vec;
+}
 
 //=============================================================================
 // コンストラクタ
@@ -169,13 +257,19 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	pMotionChar3D->SetObjectDrowType(CObject::DROWTYPE_BG);
 
+	m_pGauge2D = CGauge2D::Create();
+	m_pGauge2D->SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	m_pGauge2D->SetSize(D3DXVECTOR3(50.0f, 600.0f, 0.0f));
+	m_pGauge2D->SetPos(D3DXVECTOR3(50.0f, 700, 0.0f));
+	m_pGauge2D->SetCol(D3DXCOLOR(0.2f, 0.9f, 1.0f, 1.0f));
+
 	m_MotionPlayer3D = CMotionPlayer3D::Create();
 	m_MotionPlayer3D->SetPos(D3DXVECTOR3(40.0f, 0.0f, -50.0f));
 	m_MotionPlayer3D->SetRot(D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
 
 	CMesh3D *pMesh3D = CMesh3D::Create();
 	pMesh3D->SetSize(D3DXVECTOR3(2000.0f, 0, 2000.0f));
-	pMesh3D->SetBlock(CMesh3D::DOUBLE_INT(100, 100));
+	pMesh3D->SetBlock(CMesh3D::DOUBLE_INT(10, 10));
 	pMesh3D->SetSplitTex(true);
 	pMesh3D->SetObjectDrowType(CObject::DROWTYPE_BG);
 

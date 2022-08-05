@@ -162,6 +162,7 @@
     <ClInclude Include="enemy2D.h" />
     <ClInclude Include="enemy3D.h" />
     <ClInclude Include="explosion2D.h" />
+    <ClInclude Include="gauge2D.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="keyboard.h" />
     <ClInclude Include="life.h" />
@@ -198,6 +199,7 @@
     <ClCompile Include="enemy2D.cpp" />
     <ClCompile Include="enemy3D.cpp" />
     <ClCompile Include="explosion2D.cpp" />
+    <ClCompile Include="gauge2D.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="keyboard.cpp" />
     <ClCompile Include="life.cpp" />

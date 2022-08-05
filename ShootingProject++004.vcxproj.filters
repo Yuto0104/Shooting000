@@ -153,6 +153,9 @@
     <ClInclude Include="life_manager.h">
       <Filter>ヘッダー ファイル\object</Filter>
     </ClInclude>
+    <ClInclude Include="gauge2D.h">
+      <Filter>ヘッダー ファイル\object\2D</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="texture.cpp">
@@ -256,6 +259,9 @@
     </ClCompile>
     <ClCompile Include="life_manager.cpp">
       <Filter>ソース ファイル\object</Filter>
+    </ClCompile>
+    <ClCompile Include="gauge2D.cpp">
+      <Filter>ソース ファイル\object\2D</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
