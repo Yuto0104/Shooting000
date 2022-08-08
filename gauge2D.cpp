@@ -62,6 +62,7 @@ CGauge2D::CGauge2D(int nPriority) : CObject(nPriority)
 	m_fMaxNumber = 0.0f;								// 数値の最大数
 	m_fNumber = 0.0f;									// 数値
 	m_fDestNumber = 0.0f;								// 目的の数値
+	m_fCoefficient = 0.0f;								// 減衰係数
 }
 
 //=============================================================================
@@ -134,11 +135,23 @@ void CGauge2D::Uninit()
 void CGauge2D::Update()
 {
 	// 数値の設定
-	m_fNumber += (m_fDestNumber - m_fNumber) * 0.05f;
+	float fAdd = (m_fDestNumber - m_fNumber) * m_fCoefficient;
 
-	if (m_fNumber >= m_fDestNumber)
+	m_fNumber += fAdd;
+
+	if (fAdd > 0)
 	{
-		m_fNumber = m_fDestNumber;
+		if (m_fNumber >= m_fDestNumber)
+		{
+			m_fNumber = m_fDestNumber;
+		}
+	}
+	else if (fAdd < 0)
+	{
+		if (m_fNumber <= m_fDestNumber)
+		{
+			m_fNumber = m_fDestNumber;
+		}
 	}
 
 	// ゲージの設定

@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// オブジェクトクラス(object.h)
+// 3Dバレットクラス(bullet3D.cpp)
 // Author : 唐﨑結斗
 // 概要 : オブジェクト生成を行う
 //
@@ -122,9 +122,31 @@ void CBullet3D::Update()
 	// 位置の更新
 	SetPos(pos);
 
+	// 衝突
+	Collision();
+
 	// 更新
 	CObject3D::Update();
+}
 
+//=============================================================================
+// 描画
+// Author : 唐﨑結斗
+// 概要 : 2D描画を行う
+//=============================================================================
+void CBullet3D::Draw()
+{
+	// 描画
+	CObject3D::Draw();
+}
+
+//=============================================================================
+// 衝突判定
+// Author : 唐﨑結斗
+// 概要 : 衝突判定
+//=============================================================================
+void CBullet3D::Collision()
+{
 	for (int nCntPriority = 0; nCntPriority < CObject::MAX_LEVEL; nCntPriority++)
 	{
 		for (int nCntObj = 0; nCntObj < MAX_OBJECT; nCntObj++)
@@ -139,7 +161,7 @@ void CBullet3D::Update()
 					&& pObject->GetObjType() != CObject::OBJTYPE_3DBULLET)
 				{// タイプが一致した場合
 					if (pObject->GetObjType() == CObject::OBJTYPE_3DENEMY
-						&& m_parent != TYPE_ENEMY
+						&& m_parent != CObject::OBJTYPE_3DENEMY
 						&& ColisonSphere3D(pObject, D3DXVECTOR3(GetSize().x, GetSize().y, GetSize().x), pObject->GetColisonSize(), true))
 					{
 						// 敵オブジェクトにキャスト
@@ -148,7 +170,7 @@ void CBullet3D::Update()
 						// 与える攻撃力の算出
 						int nAttack = m_nAttack;
 
-						if (pEnemy3D->GetColorType() == GetColorType())
+						if (pEnemy3D->GetColorType() != GetColorType())
 						{
 							nAttack *= 2;
 						}
@@ -162,7 +184,7 @@ void CBullet3D::Update()
 					}
 
 					if (pObject->GetObjType() == CObject::OBJTYPE_3DPLAYER
-						&& m_parent != TYPE_PLAYER
+						&& m_parent != CObject::OBJTYPE_3DPLAYER
 						&& ColisonSphere3D(pObject, D3DXVECTOR3(GetSize().x, GetSize().y, GetSize().x), pObject->GetColisonSize(), true))
 					{
 						// プレイヤーオブジェクトにキャスト
@@ -185,15 +207,4 @@ void CBullet3D::Update()
 			}
 		}
 	}
-}
-
-//=============================================================================
-// 描画
-// Author : 唐﨑結斗
-// 概要 : 2D描画を行う
-//=============================================================================
-void CBullet3D::Draw()
-{
-	// 描画
-	CObject3D::Draw();
 }

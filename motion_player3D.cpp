@@ -21,6 +21,7 @@
 
 #include "calculation.h"
 #include "bullet3D.h"
+#include "follow_bullet3D.h"
 #include "camera.h"
 #include "life_manager.h"
 #include "gauge2D.h"
@@ -115,9 +116,6 @@ HRESULT CMotionPlayer3D::Init()
 	SetColisonSize(D3DXVECTOR3(50.0f, 50.0f, 50.0f));
 	m_nLife = 5;
 	m_nInvalidLife = 0;
-	
-	CGauge2D *pGauge2D = CApplication::GetGauge2D();
-	pGauge2D->SetMaxNumber((float)MAX_ENERGY);
 
 	return E_NOTIMPL;
 }
@@ -174,6 +172,9 @@ void CMotionPlayer3D::Update()
 
 	// 弾の発射
 	Shot();
+
+	// エネルギー消費
+	Consumption();
 
 	// 色の変更
 	ChangeColor();
@@ -381,6 +382,7 @@ void CMotionPlayer3D::Shot()
 		pBullet3D->SetSpeed(10.0f);
 		pBullet3D->SetColor(bulletColor);
 		pBullet3D->SetColorType(GetColorType());
+		pBullet3D->SetParent(CObject::OBJTYPE_3DPLAYER);
 
 		// カウントの初期化
 		m_nCntShot = 0;
@@ -417,6 +419,7 @@ void CMotionPlayer3D::Shot()
 			pBullet3D->SetSpeed(10.0f);
 			pBullet3D->SetColor(bulletColor);
 			pBullet3D->SetColorType(GetColorType());
+			pBullet3D->SetParent(CObject::OBJTYPE_3DPLAYER);
 
 			// 弾の座標の算出
 			bulletPos = D3DXVECTOR3(-20.0f, 18.0f, -45.0f);
@@ -432,6 +435,7 @@ void CMotionPlayer3D::Shot()
 			pBullet3D->SetSpeed(10.0f);
 			pBullet3D->SetColor(bulletColor);
 			pBullet3D->SetColorType(GetColorType());
+			pBullet3D->SetParent(CObject::OBJTYPE_3DPLAYER);
 
 			// カウントの初期化
 			m_nCntShot = 0;
@@ -514,7 +518,6 @@ void CMotionPlayer3D::ChangeColor()
 			pGauge2D->SetCol(D3DXCOLOR(0.2f, 0.9f, 1.0f, 1.0f));
 		}
 	}
-	
 }
 
 //=============================================================================
@@ -545,6 +548,163 @@ void CMotionPlayer3D::MotionSet()
 	else if (!m_bMotionBlend)
 	{// モーションブレンドを使用してない場合
 		m_bMotion = m_pMotion[GetColorType() - 1]->PlayMotion((int)(m_nNumMotion));
+	}
+}
+
+//=============================================================================
+// 回復
+// Author : 唐﨑結斗
+// 概要 : ライフの回復を行う
+//=============================================================================
+void CMotionPlayer3D::Recovery()
+{
+	if (m_nLife < MAX_LIFE
+		&& m_nEnergy >= ENERGY_RECOVERY)
+	{
+		m_nEnergy -= ENERGY_RECOVERY;
+
+		if (m_nEnergy <= 0)
+		{
+			m_nEnergy = 0;
+		}
+
+		CGauge2D *pGauge2D = CApplication::GetGauge2D();
+		pGauge2D->SetNumber((float)m_nEnergy);
+
+		m_nLife++;
+
+		if (m_nLife >= MAX_LIFE)
+		{
+			m_nLife = MAX_LIFE;
+		}
+
+		// ライフの設定
+		CApplication::GetLifeManager()->SetLife();
+
+		m_bRecovery = true;
+	}
+}
+
+//=============================================================================
+// 追従弾の発射
+// Author : 唐﨑結斗
+// 概要 : 追従弾を発射する
+//=============================================================================
+void CMotionPlayer3D::FollowShot()
+{
+	if (m_nEnergy >= ENERGY_FOLLOW_SHOT)
+	{
+		m_nEnergy -= ENERGY_FOLLOW_SHOT;
+
+		if (m_nEnergy <= 0)
+		{
+			m_nEnergy = 0;
+		}
+
+		CGauge2D *pGauge2D = CApplication::GetGauge2D();
+		pGauge2D->SetNumber((float)m_nEnergy);
+
+		// Object2Dのメンバ変数の取得
+		D3DXVECTOR3 pos = GetPos();
+		D3DXVECTOR3 rot = GetRot();
+
+		// 変数宣言
+		D3DXVECTOR3 bulletPos;					// 弾の発射位置
+		CFollowBullet3D *pFollowBullet3D;		// 追従弾の生成
+		D3DXCOLOR bulletColor;					// 弾の色
+
+		if (GetColorType() == CObject::TYPE_WHITE)
+		{// 弾の色の設定
+			bulletColor = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		}
+		else if (GetColorType() == CObject::TYPE_BLACK)
+		{// 弾の色の設定
+			bulletColor = D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f);
+		}
+
+		// 弾の発射位置
+		bulletPos = D3DXVECTOR3(0.0f, 18.0f, 45.0f);
+
+		// ワールド座標にキャスト
+		bulletPos = WorldCastVtx(bulletPos, pos, rot);
+
+		// 弾の生成
+		for (int nCnt = 0; nCnt < 4; nCnt++)
+		{
+			float fAttRot = 0.5f / 4 * nCnt;
+			pFollowBullet3D = CFollowBullet3D::Create();
+			pFollowBullet3D->SetPos(bulletPos);
+			pFollowBullet3D->SetSize(D3DXVECTOR3(10.0f, 10.0f, 0.0f));
+			pFollowBullet3D->SetMoveVec(D3DXVECTOR3(rot.x + D3DX_PI * -0.5f, rot.y - D3DX_PI * (0.5f + fAttRot), 0.0f));
+			pFollowBullet3D->SetSpeed(30.0f);
+			pFollowBullet3D->SetColor(bulletColor);
+			pFollowBullet3D->SetColorType(GetColorType());
+			pFollowBullet3D->SetCoefficient(0.01f);
+			pFollowBullet3D->SetAddCoefficient(0.01f);
+			pFollowBullet3D->SetParent(CObject::OBJTYPE_3DPLAYER);
+
+			pFollowBullet3D = CFollowBullet3D::Create();
+			pFollowBullet3D->SetPos(bulletPos);
+			pFollowBullet3D->SetSize(D3DXVECTOR3(10.0f, 10.0f, 0.0f));
+			pFollowBullet3D->SetMoveVec(D3DXVECTOR3(rot.x + D3DX_PI * -0.5f, rot.y - D3DX_PI * (-0.5f - fAttRot), 0.0f));
+			pFollowBullet3D->SetSpeed(30.0f);
+			pFollowBullet3D->SetColor(bulletColor);
+			pFollowBullet3D->SetColorType(GetColorType());
+			pFollowBullet3D->SetCoefficient(0.01f);
+			pFollowBullet3D->SetAddCoefficient(0.01f);
+			pFollowBullet3D->SetParent(CObject::OBJTYPE_3DPLAYER);
+		}
+	}
+}
+
+//=============================================================================
+// エネルギー消費
+// Author : 唐﨑結斗
+// 概要 : エネルギーを消費し、処理を行う
+//=============================================================================
+void CMotionPlayer3D::Consumption()
+{
+	// 入力情報の取得
+	CKeyboard *pKeyboard = CApplication::GetKeyboard();
+
+	if (pKeyboard->GetPress(DIK_RETURN)
+		&& !m_bPressConsumption)
+	{// 弾の発射
+		// カウントの初期化
+		m_nCntConsumption = 0;
+
+		// プレスオン
+		m_bPressConsumption = true;
+	}
+
+	if (pKeyboard->GetRelease(DIK_RETURN))
+	{// プレスオフ
+		m_bPressConsumption = false;
+
+		if (m_bRecovery)
+		{
+			m_bRecovery = false;
+		}
+		else
+		{
+			FollowShot();
+		}
+
+		m_nCntConsumption = 0;
+	}
+
+	if (m_bPressConsumption)
+	{// プレスオン
+		m_nCntConsumption++;
+
+		if (m_nCntConsumption >= MAX_CNT_RECOVERY)
+		{// カウントが弾発射までのカウントに達した
+			// カウントの初期化
+			m_nCntConsumption = 0;
+
+			// 回復
+			Recovery();
+		}
 	}
 }
 
@@ -590,7 +750,7 @@ void CMotionPlayer3D::Hit()
 //=============================================================================
 void CMotionPlayer3D::Charge()
 {// エネルギーのインクリメント
-	m_nEnergy++;
+	m_nEnergy += 20;
 
 	if (m_nEnergy > MAX_ENERGY)
 	{

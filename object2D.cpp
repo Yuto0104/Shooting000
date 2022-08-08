@@ -90,6 +90,7 @@ HRESULT CObject2D::Init()
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 向き
 	m_size = D3DXVECTOR3(100.0f, 100.0f, 0.0f);		// 大きさ
 	m_typeTex = CTexture::TYPE_2DPOLYGON;			// テクスチャタイプ
+	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);		// 色の設定
 
 	// 色の設定
 	SetCol(m_col);

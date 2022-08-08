@@ -156,6 +156,9 @@
     <ClInclude Include="gauge2D.h">
       <Filter>ヘッダー ファイル\object\2D</Filter>
     </ClInclude>
+    <ClInclude Include="follow_bullet3D.h">
+      <Filter>ヘッダー ファイル\object\3D</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="texture.cpp">
@@ -262,6 +265,9 @@
     </ClCompile>
     <ClCompile Include="gauge2D.cpp">
       <Filter>ソース ファイル\object\2D</Filter>
+    </ClCompile>
+    <ClCompile Include="follow_bullet3D.cpp">
+      <Filter>ソース ファイル\object\3D</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

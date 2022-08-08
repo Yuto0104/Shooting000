@@ -105,6 +105,16 @@ void CEnemy3D::Uninit()
 void CEnemy3D::Update()
 {
 	D3DXVECTOR3 rot = GetRot();
+	D3DXCOLOR bulletColor;					// 弾の色
+
+	if (GetColorType() == CObject::TYPE_WHITE)
+	{// 弾の色の設定
+		bulletColor = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+	else if (GetColorType() == CObject::TYPE_BLACK)
+	{// 弾の色の設定
+		bulletColor = D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f);
+	}
 
 	m_nCntShot++;
 
@@ -116,9 +126,9 @@ void CEnemy3D::Update()
 		pBullet3D->SetSize(D3DXVECTOR3(10.0f, 10.0f, 0.0f));
 		pBullet3D->SetMoveVec(D3DXVECTOR3(rot.x + D3DX_PI * -0.5f, rot.y, 0.0f));
 		pBullet3D->SetSpeed(10.0f);
-		pBullet3D->SetColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
+		pBullet3D->SetColor(bulletColor);
 		pBullet3D->SetColorType(GetColorType());
-		pBullet3D->SetParent(CBullet3D::TYPE_ENEMY);
+		pBullet3D->SetParent(CObject::OBJTYPE_3DENEMY);
 	}
 
 	// モデルの更新

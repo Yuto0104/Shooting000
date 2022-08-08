@@ -51,21 +51,22 @@ public:
 	//--------------------------------------------------------------------
 	// オーバーライド関数
 	//--------------------------------------------------------------------
-	HRESULT Init() override;														// 初期化
-	void Uninit() override;															// 終了
-	void Update() override;															// 更新
-	void Draw() override;															// 描画
-	void SetPos(const D3DXVECTOR3 &pos) override;									// 位置のセッター
-	void SetPosOld(const D3DXVECTOR3 &posOld) override { m_posOld = posOld; }		// 過去位置のセッター
-	void SetRot(const D3DXVECTOR3 &rot) override;									// 向きのセッター
-	void SetSize(const D3DXVECTOR3 &size) override;									// 大きさのセッター
-	D3DXVECTOR3 GetPos() override { return m_pos; }									// 位置のゲッター
-	D3DXVECTOR3 GetPosOld()  override { return m_posOld; }							// 過去位置のゲッター
-	D3DXVECTOR3 GetRot()  override { return m_rot; }								// 向きのゲッター
-	D3DXVECTOR3 GetSize()  override { return m_size; }								// 大きさのゲッター
-	void SetCol(const D3DCOLOR &col);												// 色のセッター
-	void SetMaxNumber(const float fMaxNumber);										// 数値の最大
-	void SetNumber(const float fNumber) { m_fDestNumber = fNumber; }				// 数値の設定
+	HRESULT Init() override;																// 初期化
+	void Uninit() override;																	// 終了
+	void Update() override;																	// 更新
+	void Draw() override;																	// 描画
+	void SetPos(const D3DXVECTOR3 &pos) override;											// 位置のセッター
+	void SetPosOld(const D3DXVECTOR3 &posOld) override { m_posOld = posOld; }				// 過去位置のセッター
+	void SetRot(const D3DXVECTOR3 &rot) override;											// 向きのセッター
+	void SetSize(const D3DXVECTOR3 &size) override;											// 大きさのセッター
+	D3DXVECTOR3 GetPos() override { return m_pos; }											// 位置のゲッター
+	D3DXVECTOR3 GetPosOld()  override { return m_posOld; }									// 過去位置のゲッター
+	D3DXVECTOR3 GetRot()  override { return m_rot; }										// 向きのゲッター
+	D3DXVECTOR3 GetSize()  override { return m_size; }										// 大きさのゲッター
+	void SetCol(const D3DCOLOR &col);														// 色のセッター
+	void SetMaxNumber(const float fMaxNumber);												// 数値の最大
+	void SetNumber(const float fNumber) { m_fDestNumber = fNumber; }						// 数値の設定
+	void SetCoefficient(const float fCoefficient) { m_fCoefficient = fCoefficient; }		// 減衰係数の設定
 
 protected:
 	//--------------------------------------------------------------------
@@ -99,6 +100,7 @@ private:
 	float							m_fMaxNumber;				// 数値の最大数
 	float							m_fNumber;					// 数値
 	float							m_fDestNumber;				// 目的の数値
+	float							m_fCoefficient;				// 減衰係数
 };
 
 #endif

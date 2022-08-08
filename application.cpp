@@ -143,6 +143,25 @@ D3DXVECTOR3 CApplication::WorldCastScreen(const D3DXVECTOR3 &pos)
 }
 
 //=============================================================================
+// 角度の正規化処理
+// Author : 唐﨑結斗
+// 概要 : 角度が円周率の2倍を超えたときに範囲内に戻す
+//=============================================================================
+float CApplication::RotNormalization(float fRot)
+{
+	if (fRot >= D3DX_PI)
+	{// 移動方向の正規化
+		fRot -= D3DX_PI * 2;
+	}
+	else if (fRot <= -D3DX_PI)
+	{// 移動方向の正規化
+		fRot += D3DX_PI * 2;
+	}
+
+	return fRot;
+}
+
+//=============================================================================
 // コンストラクタ
 // Author : 唐﨑結斗
 // 概要 : インスタンス生成時に行う処理
@@ -243,25 +262,24 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	pModel3D->SetPos(D3DXVECTOR3(100.0f, 0.0f, 0.0f));
 	pModel3D->SetSize(D3DXVECTOR3(5.0f, 5.0f, 5.0f));*/
 
-	CEnemy3D *pEnemy = CEnemy3D::Create("data/MODEL/airplane000.x");
-	pEnemy->SetPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-	pEnemy->SetSize(D3DXVECTOR3(5.0f, 5.0f, 5.0f));
+	CEnemy3D *pEnemy = CEnemy3D::Create("data/MODEL/enemy_white_000.x");
+	pEnemy->SetPos(D3DXVECTOR3(0.0f, 0.0f, 200.0f));
+	pEnemy->SetSize(D3DXVECTOR3(0.2f, 0.2f, 0.2f));
 	pEnemy->SetColorType(CObject::TYPE_WHITE);
 
-	pEnemy = CEnemy3D::Create("data/MODEL/airplane000.x");
-	pEnemy->SetPos(D3DXVECTOR3(-100.0f, 0.0f, 0.0f));
-	pEnemy->SetSize(D3DXVECTOR3(5.0f, 5.0f, 5.0f));
+	pEnemy = CEnemy3D::Create("data/MODEL/enemy_white_000.x");
+	pEnemy->SetPos(D3DXVECTOR3(-100.0f, 0.0f, 200.0f));
+	pEnemy->SetSize(D3DXVECTOR3(0.2f, 0.2f, 0.2f));
+	pEnemy->SetColorType(CObject::TYPE_WHITE);
+
+	pEnemy = CEnemy3D::Create("data/MODEL/enemy_white_000.x");
+	pEnemy->SetPos(D3DXVECTOR3(100.0f, 0.0f, 200.0f));
+	pEnemy->SetSize(D3DXVECTOR3(0.2f, 0.2f, 0.2f));
 	pEnemy->SetColorType(CObject::TYPE_WHITE);
 
 	CMotionChar3D *pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
 	pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	pMotionChar3D->SetObjectDrowType(CObject::DROWTYPE_BG);
-
-	m_pGauge2D = CGauge2D::Create();
-	m_pGauge2D->SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-	m_pGauge2D->SetSize(D3DXVECTOR3(50.0f, 600.0f, 0.0f));
-	m_pGauge2D->SetPos(D3DXVECTOR3(50.0f, 700, 0.0f));
-	m_pGauge2D->SetCol(D3DXCOLOR(0.2f, 0.9f, 1.0f, 1.0f));
 
 	m_MotionPlayer3D = CMotionPlayer3D::Create();
 	m_MotionPlayer3D->SetPos(D3DXVECTOR3(40.0f, 0.0f, -50.0f));
@@ -293,6 +311,14 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	m_pLifeManager = CLifeManager::Create();
 	m_pLifeManager->SetSize(D3DXVECTOR3(50.0f, 50.0f, 0.0f));
 	m_pLifeManager->SetPos(D3DXVECTOR3(0.0f, m_pLifeManager->GetSize().y / 2.0f, 0.0f));
+
+	m_pGauge2D = CGauge2D::Create();
+	m_pGauge2D->SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	m_pGauge2D->SetSize(D3DXVECTOR3(50.0f, 600.0f, 0.0f));
+	m_pGauge2D->SetPos(D3DXVECTOR3(50.0f, 700, 0.0f));
+	m_pGauge2D->SetCol(D3DXCOLOR(0.2f, 0.9f, 1.0f, 1.0f));
+	m_pGauge2D->SetMaxNumber((float)CMotionPlayer3D::MAX_ENERGY);
+	m_pGauge2D->SetCoefficient(0.06f);
 
 	return S_OK;
 }

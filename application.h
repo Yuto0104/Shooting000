@@ -53,6 +53,7 @@ public:
 	static CGauge2D *GetGauge2D() { return m_pGauge2D; }								// ゲージの取得
 	static D3DXVECTOR3 ScreenCastWorld(const D3DXVECTOR3 &pos);							// ワールド座標をスクリーン座標にキャストする
 	static D3DXVECTOR3 WorldCastScreen(const D3DXVECTOR3 &pos);							// ワールド座標をスクリーン座標にキャストする
+	static float RotNormalization(float fRot);											// 角度の設定
 
 	//--------------------------------------------------------------------
 	// コンストラクタとデストラクタ

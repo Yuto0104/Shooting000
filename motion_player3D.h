@@ -36,6 +36,9 @@ public:
 	static const unsigned int		MAX_MOTION = 2;				// モーションのカウント
 	static const unsigned int		MAX_LIFE = 5;				// ライフの最大値
 	static const unsigned int		MAX_ENERGY = 100;			// エネルギーの最大
+	static const unsigned int		MAX_CNT_RECOVERY = 60;		// 回復までのカウント
+	static const unsigned int		ENERGY_RECOVERY = 20;		// 回復に消費するエネルギー
+	static const unsigned int		ENERGY_FOLLOW_SHOT = 10;	// 追従弾発射に消費するエネルギー
 
 	//=============================================================================
 	// モーションのタイプ列挙型
@@ -82,6 +85,9 @@ private:
 	void CollisionScreen();						// スクリーンのあたり判定
 	void ChangeColor();							// 色の変更
 	void MotionSet();							// モーションの設定
+	void Recovery();							// 回復
+	void FollowShot();							// 追従弾の発射
+	void Consumption();							// エネルギー消費
 
 	//--------------------------------------------------------------------
 	// メンバ変数
@@ -95,10 +101,14 @@ private:
 	int				m_nLife;						// 寿命
 	int				m_nInvalidLife;					// 追加ライフ
 	int				m_nEnergy;						// エネルギー
+	int				m_nCntConsumption;				// エネルギー消費カウント
 	bool			m_bMotion;						// モーションの使用状況
 	bool			m_bMotionBlend;					// モーションブレンドの使用状況
 	bool			m_bPressShot;					// 長押し弾を使用してるかどうか
 	bool			m_bLockShot;					// 弾発射が可能かどうか
+	bool			m_bPressConsumption;			// エネルギー消費してるかどうか
+	bool			m_bLockConsumption;				// エネルギー消費が可能かどうか
+	bool			m_bRecovery;					// 回復を行ったかどうか
 };
 
 #endif
