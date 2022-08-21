@@ -10,12 +10,19 @@
 // インクルード
 //*****************************************************************************
 #include <assert.h>
+#include <time.h>
 
 #include "enemy3D.h"
 #include "renderer.h"
 #include "application.h"
 #include "score.h"
 #include "bullet3D.h"
+
+//*****************************************************************************
+// 静的メンバ変数の定義
+//*****************************************************************************
+const float CEnemy3D::LINTERN_BULLET_SPAWN_RANGE = 30.0f;				// 返し弾の生成範囲
+const float CEnemy3D::LINTERN_BULLET_MOVE_VEC = 0.15f;					// 返し弾の移動方向
 
 //=============================================================================
 // インスタンス生成
@@ -52,6 +59,9 @@ CEnemy3D::CEnemy3D()
 	m_nLife = 0;		// 体力
 	m_nScore = 0;		// スコア
 	m_nCntShot = 0;		// 弾発射までのカウント
+
+	// 疑似乱数の初期化
+	srand((unsigned int)time(NULL));
 }
 
 //=============================================================================
@@ -151,15 +161,61 @@ void CEnemy3D::Draw()
 // Author : 唐﨑結斗
 // 概要 : 引数分のダメージを与える
 //=============================================================================
-void CEnemy3D::Hit(int nAttack)
-{
-	m_nLife -= nAttack;
+void CEnemy3D::Hit(COLOR_TYPE colorType, int nAttack)
+{// 変数宣言
+	COLOR_TYPE MyColorType = GetColorType();
+	int nMyAttack = nAttack;
+
+	if (MyColorType == colorType)
+	{// 色のタイプが同一の場合
+		nMyAttack *= 2;
+	}
+
+	// 体力の減算
+	m_nLife -= nMyAttack;
 
 	if (m_nLife <= 0)
-	{
+	{// 体力が0の場合
 		m_nLife = 0;
 		CScore *pScore = CApplication::GetScore();
 		pScore->AddScore(m_nScore);
+
+		// データ格納用変数
+		CBullet3D * pBullet3D;
+		D3DXVECTOR3 pos = GetPos();
+		D3DXVECTOR3 rot = GetRot();
+		D3DXVECTOR3 randLinternBulletSpawnRange = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		float fRandMoveVec = 0.0f;
+
+		// 弾の色
+		D3DXCOLOR bulletColor;
+
+		if (MyColorType == CObject::TYPE_WHITE)
+		{// 弾の色の設定
+			bulletColor = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		}
+		else if (MyColorType == CObject::TYPE_BLACK)
+		{// 弾の色の設定
+			bulletColor = D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f);
+		}
+
+		for (int nCntBullet = 0; nCntBullet < MAX_LINTERN_BULLET; nCntBullet++)
+		{// 乱数の設定
+			randLinternBulletSpawnRange.x = pos.x - LINTERN_BULLET_SPAWN_RANGE + ((float)(rand() % (int)(LINTERN_BULLET_SPAWN_RANGE * 200.0f) / 100));
+			randLinternBulletSpawnRange.z = pos.z - LINTERN_BULLET_SPAWN_RANGE + ((float)(rand() % (int)(LINTERN_BULLET_SPAWN_RANGE * 200.0f) / 100));
+			fRandMoveVec = rot.y - D3DX_PI * LINTERN_BULLET_MOVE_VEC + D3DX_PI * ((float)(rand() % (int)(LINTERN_BULLET_MOVE_VEC * 200.0f)) / 100);
+
+			// 弾の生成
+			pBullet3D = CBullet3D::Create();
+			pBullet3D->SetPos(D3DXVECTOR3(randLinternBulletSpawnRange.x, pos.y, randLinternBulletSpawnRange.z));
+			pBullet3D->SetSize(D3DXVECTOR3(5.0f, 5.0f, 0.0f));
+			pBullet3D->SetMoveVec(D3DXVECTOR3(rot.x + D3DX_PI * -0.5f, fRandMoveVec, 0.0f));
+			pBullet3D->SetSpeed(5.0f);
+			pBullet3D->SetColor(bulletColor);
+			pBullet3D->SetColorType(MyColorType);
+			pBullet3D->SetParent(CObject::OBJTYPE_3DENEMY);
+		}
+
 		Uninit();
 	}
 }

@@ -39,6 +39,7 @@
 #include "life.h"
 #include "life_manager.h"
 #include "gauge2D.h"
+#include "energy_gage.h"
 
 //*****************************************************************************
 // Ã“Iƒƒ“ƒo•Ï”éŒ¾
@@ -55,6 +56,7 @@ CMotionPlayer3D *CApplication::m_MotionPlayer3D = nullptr;		// ƒ‚[ƒVƒ‡ƒ“ƒvƒŒƒCƒ
 CScore *CApplication::m_pScore = nullptr;						// ƒXƒRƒAƒCƒ“ƒXƒ^ƒ“ƒX
 CLifeManager *CApplication::m_pLifeManager = nullptr;			// ƒ‰ƒCƒtƒ}ƒl[ƒWƒƒ[ƒCƒ“ƒXƒ^ƒ“ƒX
 CGauge2D *CApplication::m_pGauge2D = nullptr;					// ƒQ[ƒWƒ}ƒl[ƒWƒƒ[
+CEnergyGage *CApplication::m_pEnergyGage = nullptr;				// ƒGƒlƒ‹ƒM[ƒQ[ƒWƒ}ƒl[ƒWƒƒ[
 
 //=============================================================================
 // ƒXƒNƒŠ[ƒ“À•W‚ğƒ[ƒ‹ƒhÀ•W‚ÉƒLƒƒƒXƒg‚·‚é
@@ -263,19 +265,34 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	pModel3D->SetSize(D3DXVECTOR3(5.0f, 5.0f, 5.0f));*/
 
 	CEnemy3D *pEnemy = CEnemy3D::Create("data/MODEL/enemy_white_000.x");
-	pEnemy->SetPos(D3DXVECTOR3(0.0f, 0.0f, 200.0f));
-	pEnemy->SetSize(D3DXVECTOR3(0.2f, 0.2f, 0.2f));
+	pEnemy->SetPos(D3DXVECTOR3(-200.0f, 0.0f, 200.0f));
+	pEnemy->SetSize(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+	pEnemy->SetColorType(CObject::TYPE_WHITE);
+
+	pEnemy = CEnemy3D::Create("data/MODEL/enemy_white_000.x");
+	pEnemy->SetPos(D3DXVECTOR3(-150.0f, 0.0f, 200.0f));
+	pEnemy->SetSize(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 	pEnemy->SetColorType(CObject::TYPE_WHITE);
 
 	pEnemy = CEnemy3D::Create("data/MODEL/enemy_white_000.x");
 	pEnemy->SetPos(D3DXVECTOR3(-100.0f, 0.0f, 200.0f));
-	pEnemy->SetSize(D3DXVECTOR3(0.2f, 0.2f, 0.2f));
+	pEnemy->SetSize(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 	pEnemy->SetColorType(CObject::TYPE_WHITE);
 
-	pEnemy = CEnemy3D::Create("data/MODEL/enemy_white_000.x");
+	pEnemy = CEnemy3D::Create("data/MODEL/enemy_black_000.x");
+	pEnemy->SetPos(D3DXVECTOR3(200.0f, 0.0f, 200.0f));
+	pEnemy->SetSize(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+	pEnemy->SetColorType(CObject::TYPE_BLACK);
+
+	pEnemy = CEnemy3D::Create("data/MODEL/enemy_black_000.x");
 	pEnemy->SetPos(D3DXVECTOR3(100.0f, 0.0f, 200.0f));
-	pEnemy->SetSize(D3DXVECTOR3(0.2f, 0.2f, 0.2f));
-	pEnemy->SetColorType(CObject::TYPE_WHITE);
+	pEnemy->SetSize(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+	pEnemy->SetColorType(CObject::TYPE_BLACK);
+
+	pEnemy = CEnemy3D::Create("data/MODEL/enemy_black_000.x");
+	pEnemy->SetPos(D3DXVECTOR3(150.0f, 0.0f, 200.0f));
+	pEnemy->SetSize(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+	pEnemy->SetColorType(CObject::TYPE_BLACK);
 
 	CMotionChar3D *pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
 	pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
@@ -304,7 +321,7 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	pCirclePolygon3D->SetPos(D3DXVECTOR3(0.0f, 10.0f, 0.0f));
 	pCirclePolygon3D->SetObjectDrowType(CObject::DROWTYPE_BG);*/
 
-	m_pScore = CScore::Create(10);
+	m_pScore = CScore::Create(10, true);
 	m_pScore->SetScore(0);
 	m_pScore->SetPos(D3DXVECTOR3(1280.0f, m_pScore->GetSize().y / 2.0f, 0.0f));
 
@@ -319,6 +336,8 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	m_pGauge2D->SetCol(D3DXCOLOR(0.2f, 0.9f, 1.0f, 1.0f));
 	m_pGauge2D->SetMaxNumber((float)CMotionPlayer3D::MAX_ENERGY);
 	m_pGauge2D->SetCoefficient(0.06f);
+
+	m_pEnergyGage = CEnergyGage::Create();
 
 	return S_OK;
 }
@@ -391,6 +410,15 @@ void CApplication::Uninit()
 		// ƒƒ‚ƒŠ‚Ì‰ğ•ú
 		delete m_pCameraBG;
 		m_pCameraBG = nullptr;
+	}
+
+	if (m_pEnergyGage != nullptr)
+	{// I—¹ˆ—
+		m_pEnergyGage->Uninit();
+
+		// ƒƒ‚ƒŠ‚Ì‰ğ•ú
+		delete m_pEnergyGage;
+		m_pEnergyGage = nullptr;
 	}
 
 	// ƒ‰ƒCƒg‚Ì‰ğ•ú

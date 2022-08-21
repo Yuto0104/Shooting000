@@ -53,7 +53,7 @@ CMesh3D::CMesh3D()
 	m_size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 大きさ
 	m_blockSize = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// ブロックサイズ
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);			// カラー
-	m_typeTex = CTexture::TYPE_2DPOLYGON;				// テクスチャの種別
+	m_typeTex = CTexture::TYPE_FLOOR_000;				// テクスチャの種別
 	m_block = DOUBLE_INT(0, 0);							// ブロック数
 	m_line = DOUBLE_INT(0, 0);							// 列数
 	m_fAngle = 0.0f;									// 対角線の角度

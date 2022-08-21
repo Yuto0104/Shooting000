@@ -35,7 +35,7 @@ public:
 	//--------------------------------------------------------------------
 	// 静的メンバ関数
 	//--------------------------------------------------------------------
-	static CScore *Create(int nDigit);				// スコアの生成
+	static CScore *Create(int nMaxDigit, bool bAddDigit);		// スコアの生成
 
 	//--------------------------------------------------------------------
 	// コンストラクタとデストラクタ
@@ -47,7 +47,7 @@ public:
 	// メンバ関数
 	//--------------------------------------------------------------------
 	HRESULT Init() override;														// 初期化
-	HRESULT Init(int nDigit);														// 初期化(オーバーロード)
+	HRESULT Init(int nDigit, bool bAddDigit);										// 初期化(オーバーロード)
 	void Uninit() override;															// 終了
 	void Update() override;															// 更新
 	void Draw() override;															// 描画
@@ -55,16 +55,24 @@ public:
 	void SetPosOld(const D3DXVECTOR3 &posOld) override { m_posOld = posOld; }		// 過去位置のセッター
 	void SetRot(const D3DXVECTOR3 &rot) override;									// 向きのセッター
 	void SetSize(const D3DXVECTOR3 &size) override;									// 大きさのセッター
+	void SetWholeSize(const D3DXVECTOR3 &wholeSize);								// 全体の大きさのセッター
 	D3DXVECTOR3 GetPos() override { return m_pos; }									// 位置のゲッター
 	D3DXVECTOR3 GetPosOld()  override { return m_posOld; }							// 過去位置のゲッター
 	D3DXVECTOR3 GetRot()  override { return m_rot; }								// 向きのゲッター
 	D3DXVECTOR3 GetSize()  override { return m_size; }								// 大きさのゲッター
+	D3DXVECTOR3 GetWholeSize() { return m_wholeSize; }								// 全体の大きさのゲッター
 	void SetScore(int nScore);														// スコアのセッター
 	void SetNumber();																// ナンバーの設定
 	void AddScore(int nAdd);														// スコアの加算
 	void CalScore();																// スコアの算出
 
 private:
+	//--------------------------------------------------------------------
+	// メンバ関数
+	//--------------------------------------------------------------------
+	void SetDigitNumbers();
+	void AddDigit();
+
 	//--------------------------------------------------------------------
 	// メンバ変数
 	//--------------------------------------------------------------------
@@ -73,9 +81,12 @@ private:
 	D3DXVECTOR3			m_posOld;			// 過去の位置
 	D3DXVECTOR3			m_rot;				// 向き
 	D3DXVECTOR3			m_size;				// 大きさ
+	D3DXVECTOR3			m_wholeSize;		// 全体の大きさ
+	int					m_nMaxDigit;		// 最大桁数
 	int					m_nDigit;			// 桁数
 	int					m_nScore;			// スコア
 	int					m_nDestScore;		// 目的のスコア
+	bool				m_bAddDigit;		// 桁数が増えるかどうか
 };
 
 #endif

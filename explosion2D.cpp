@@ -88,7 +88,7 @@ HRESULT CExplosion2D::Init()
 	m_nLife = 50;
 
 	// アニメーションの初期化
-	m_pTexAnim->SetAnim(CTexAnim::TEX_PATTERN(8, 1), m_nLife, false);
+	m_pTexAnim->SetAnim(8, 1, m_nLife, false);
 
 	// テクスチャ座標の設定
 	SetTex(D3DXVECTOR2(0.0f, 0.0f), m_pTexAnim->GetAddTex());

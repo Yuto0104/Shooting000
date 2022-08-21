@@ -161,6 +161,7 @@
     <ClInclude Include="circle_polygon3D.h" />
     <ClInclude Include="enemy2D.h" />
     <ClInclude Include="enemy3D.h" />
+    <ClInclude Include="energy_gage.h" />
     <ClInclude Include="explosion2D.h" />
     <ClInclude Include="follow_bullet3D.h" />
     <ClInclude Include="gauge2D.h" />
@@ -199,6 +200,7 @@
     <ClCompile Include="circle_polygon3D.cpp" />
     <ClCompile Include="enemy2D.cpp" />
     <ClCompile Include="enemy3D.cpp" />
+    <ClCompile Include="energy_gage.cpp" />
     <ClCompile Include="explosion2D.cpp" />
     <ClCompile Include="follow_bullet3D.cpp" />
     <ClCompile Include="gauge2D.cpp" />

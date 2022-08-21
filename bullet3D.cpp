@@ -122,11 +122,15 @@ void CBullet3D::Update()
 	// 位置の更新
 	SetPos(pos);
 
-	// 衝突
-	Collision();
-
-	// 更新
-	CObject3D::Update();
+	if (CollisionScreen()
+		|| Collision())
+	{
+		Uninit();
+	}
+	else
+	{// 更新
+		CObject3D::Update();
+	}
 }
 
 //=============================================================================
@@ -145,8 +149,10 @@ void CBullet3D::Draw()
 // Author : 唐﨑結斗
 // 概要 : 衝突判定
 //=============================================================================
-void CBullet3D::Collision()
+bool CBullet3D::Collision()
 {
+	bool bCollision = false;
+
 	for (int nCntPriority = 0; nCntPriority < CObject::MAX_LEVEL; nCntPriority++)
 	{
 		for (int nCntObj = 0; nCntObj < MAX_OBJECT; nCntObj++)
@@ -167,19 +173,10 @@ void CBullet3D::Collision()
 						// 敵オブジェクトにキャスト
 						CEnemy3D *pEnemy3D = dynamic_cast<CEnemy3D*>(pObject);
 
-						// 与える攻撃力の算出
-						int nAttack = m_nAttack;
-
-						if (pEnemy3D->GetColorType() != GetColorType())
-						{
-							nAttack *= 2;
-						}
-
 						// 敵への攻撃処理
-						pEnemy3D->Hit(nAttack);
+						pEnemy3D->Hit(GetColorType(), m_nAttack);
 
-						// 終了
-						Uninit();
+						bCollision = true;
 						break;
 					}
 
@@ -199,12 +196,51 @@ void CBullet3D::Collision()
 							pPlayer->Charge();
 						}
 
-						// 終了
-						Uninit();
+						bCollision = true;
 						break;
 					}
 				}
 			}
 		}
 	}
+
+	return bCollision;
+}
+
+//=============================================================================
+// スクリーン衝突判定
+// Author : 唐﨑結斗
+// 概要 : スクリーン外にでたらture
+//=============================================================================
+bool CBullet3D::CollisionScreen()
+{
+	bool bCollision = false;
+
+	// 位置の取得
+	D3DXVECTOR3 pos = GetPos();
+	D3DXVECTOR3 size = GetSize();
+	D3DXVECTOR3 worldPos;
+
+	// スクリーン座標にキャスト
+	D3DXVECTOR3 screenPos = CApplication::ScreenCastWorld(pos);
+
+	if (screenPos.x + size.x < 0.0f)
+	{// 終了
+		bCollision = true;
+	}
+	else if (screenPos.x - size.x >(float)CRenderer::SCREEN_WIDTH)
+	{// 終了
+		bCollision = true;
+	}
+
+	if (screenPos.y + size.y < 0.0f)
+	{// 終了
+		bCollision = true;
+	}
+	else if (screenPos.y - size.y >(float)CRenderer::SCREEN_HEIGHT)
+	{// 終了
+		bCollision = true;
+	}
+
+	return bCollision;
 }

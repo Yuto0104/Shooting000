@@ -27,7 +27,7 @@ const float CScore::ADD_COEFFICIENT = 0.15f;
 // Author : 唐﨑結斗
 // 概要 : スコアを生成する
 //=============================================================================
-CScore *CScore::Create(int nDigit)
+CScore *CScore::Create(int nMaxDigit, bool bAddDigit)
 {
 	// オブジェクトインスタンス
 	CScore *pScore = nullptr;
@@ -38,7 +38,7 @@ CScore *CScore::Create(int nDigit)
 	assert(pScore != nullptr);
 
 	// 数値の初期化
-	pScore->Init(nDigit);
+	pScore->Init(nMaxDigit, bAddDigit);
 
 	// インスタンスを返す
 	return pScore;
@@ -56,9 +56,11 @@ CScore::CScore(int nPriority /*= CObject::PRIORITY_LEVEL3*/) : CObject(nPriority
 	m_posOld = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 過去の位置
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 向き
 	m_size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 大きさ
+	m_wholeSize = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 全体の大きさ
 	m_nDigit = 0;										// 桁数
 	m_nScore = 0;										// スコア
 	m_nDestScore = 0;									// 目的のスコア
+	m_bAddDigit = false;								// 桁数が増えるかどうか
 }
 
 //=============================================================================
@@ -86,10 +88,22 @@ HRESULT CScore::Init()
 // Author : 唐﨑結斗
 // 概要 : 頂点バッファを生成し、メンバ変数の初期値を設定
 //=============================================================================
-HRESULT CScore::Init(int nDigit)
+HRESULT CScore::Init(int nDigit, bool bAddDigit)
 {
+	// 桁数が増えるかどうか
+	m_bAddDigit = bAddDigit;
+
 	// 桁数の設定
-	m_nDigit = nDigit;
+	m_nMaxDigit = nDigit;
+
+	if (m_bAddDigit)
+	{
+		m_nDigit = 1;
+	}
+	else
+	{
+		m_nDigit = m_nMaxDigit;
+	}
 
 	// スコアの設定
 	m_nScore = 0;
@@ -101,16 +115,13 @@ HRESULT CScore::Init(int nDigit)
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 	// 大きさの設定
-	m_size = D3DXVECTOR3(300.0f, 50.0f, 0.0f);
+	m_size = D3DXVECTOR3(30.0f, 50.0f, 0.0f);
 
-	// ナンバーのメモリ確保
-	m_pNumber = new CNumber*[nDigit];
-	assert(m_pNumber != nullptr);
+	// 全体の大きさの設定
+	m_wholeSize = D3DXVECTOR3(300.0f, 50.0f, 0.0f);
 
-	for (int nCntDigit = 0; nCntDigit < m_nDigit; nCntDigit++)
-	{// ナンバーの設定
-		m_pNumber[nCntDigit] = CNumber::Create();
-	}
+	// ナンバーの生成
+	SetDigitNumbers();
 
 	// ナンバーの設定
 	SetNumber();
@@ -202,6 +213,19 @@ void CScore::SetSize(const D3DXVECTOR3 & size)
 }
 
 //=============================================================================
+// 全体の大きさのセッター
+// Author : 唐﨑結斗
+// 概要 : 全体の大きさのメンバ変数に引数を代入
+//=============================================================================
+void CScore::SetWholeSize(const D3DXVECTOR3 & wholeSize)
+{
+	m_wholeSize = wholeSize;
+
+	// ナンバーの設定
+	SetNumber();
+}
+
+//=============================================================================
 // スコアのセッター
 // Author : 唐﨑結斗
 // 概要 : スコアに数値を代入して、ナンバーの設定
@@ -226,21 +250,28 @@ void CScore::SetScore(int nScore)
 //=============================================================================
 void CScore::SetNumber()
 {
-	// ナンバーの大きさの設定
-	D3DXVECTOR3 nomberSize = D3DXVECTOR3(m_size.x / m_nDigit, m_size.y, 0.0f);
+	// サイズの算出結果を代入
+	D3DXVECTOR3 size = m_size;
+	float fFullSize = m_size.x * m_nDigit;
+
+	if (m_wholeSize.x <= (m_size.x * m_nDigit))
+	{
+		size = D3DXVECTOR3(m_wholeSize.x / m_nDigit, m_size.y, 0.0f);
+		fFullSize = m_wholeSize.x;
+	}
 
 	for (int nCntDigit = 0; nCntDigit < m_nDigit; nCntDigit++)
 	{
 		int nNumDigit = (m_nDigit - 1) - nCntDigit;
 
 		// 位置の設定
-		m_pNumber[nNumDigit]->SetPos(D3DXVECTOR3(m_pos.x - m_size.x + (nomberSize.x * nCntDigit), m_pos.y, 0.0f));
+		m_pNumber[nNumDigit]->SetPos(D3DXVECTOR3(m_pos.x - fFullSize + (size.x * nCntDigit), m_pos.y, 0.0f));
 
 		// 向きの設定
 		m_pNumber[nNumDigit]->SetRot(m_rot);
 
 		// 大きさの設定
-		m_pNumber[nNumDigit]->SetSize(nomberSize);
+		m_pNumber[nNumDigit]->SetSize(size);
 	}
 }
 
@@ -271,6 +302,8 @@ void CScore::CalScore()
 		}
 
 		m_nScore += add;
+
+		AddDigit();
 	}
 
 	if (m_nDestScore <= m_nScore)
@@ -279,4 +312,58 @@ void CScore::CalScore()
 	}
 
 	SetScore(m_nScore);
+}
+
+//=============================================================================
+// 数字の生成
+// Author : 唐﨑結斗
+// 概要 : 数字を生成する
+//=============================================================================
+void CScore::SetDigitNumbers()
+{
+	// ナンバーのメモリ確保
+	m_pNumber = new CNumber*[m_nDigit];
+	assert(m_pNumber != nullptr);
+
+	for (int nCntDigit = 0; nCntDigit < m_nDigit; nCntDigit++)
+	{// ナンバーの設定
+		m_pNumber[nCntDigit] = CNumber::Create();
+	}
+}
+
+//=============================================================================
+// 桁数を増やす
+// Author : 唐﨑結斗
+// 概要 : 桁数を増やす
+//=============================================================================
+void CScore::AddDigit()
+{
+	if (m_nScore >= (int)pow(10, m_nDigit))
+	{
+		if (m_pNumber != nullptr)
+		{// 終了処理
+			for (int nCntDigit = 0; nCntDigit < m_nDigit; nCntDigit++)
+			{
+				m_pNumber[nCntDigit]->Uninit();
+			}
+
+			// メモリの解放
+			delete[] m_pNumber;
+			m_pNumber = nullptr;
+		}
+
+		// 桁数の加算
+		m_nDigit += 1;
+
+		if (m_nMaxDigit <= m_nDigit)
+		{
+			m_nDigit = m_nMaxDigit;
+		}
+
+		// ナンバーの生成
+		SetDigitNumbers();
+
+		// ナンバーの設定
+		SetNumber();
+	}
 }

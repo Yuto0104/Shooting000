@@ -41,6 +41,7 @@ public:
 		TYPE_SKY_000,			// 空(0)
 		TYPE_NUMBER_000,		// ナンバー(0)
 		TYPE_LIFE_000,			// ハート(0)
+		TYPE_FLOOR_000,			// 床(0)
 		MAX_TYPE,				// 種別の最大数
 		TYPE_NULL,				// テクスチャ設定なし
 	};

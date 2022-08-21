@@ -27,6 +27,7 @@ class CMotionPlayer3D;
 class CScore;
 class CLifeManager;
 class CGauge2D;
+class CEnergyGage;
 
 //=============================================================================
 // アプリケーションクラス
@@ -51,6 +52,7 @@ public:
 	static CScore *GetScore() { return m_pScore; }										// スコアの取得
 	static CLifeManager *GetLifeManager() { return m_pLifeManager; }					// ライフマネージャーの取得
 	static CGauge2D *GetGauge2D() { return m_pGauge2D; }								// ゲージの取得
+	static CEnergyGage *GetEnergyGage() { return m_pEnergyGage; }						// エネルギーゲージの取得
 	static D3DXVECTOR3 ScreenCastWorld(const D3DXVECTOR3 &pos);							// ワールド座標をスクリーン座標にキャストする
 	static D3DXVECTOR3 WorldCastScreen(const D3DXVECTOR3 &pos);							// ワールド座標をスクリーン座標にキャストする
 	static float RotNormalization(float fRot);											// 角度の設定
@@ -85,6 +87,7 @@ private:
 	static CScore *m_pScore;							// スコアクラス
 	static CLifeManager *m_pLifeManager;				// ライフマネージャークラス
 	static CGauge2D *m_pGauge2D;						// ゲージマネージャー
+	static CEnergyGage *m_pEnergyGage;					// エネルギーゲージ
 };
 
 #endif

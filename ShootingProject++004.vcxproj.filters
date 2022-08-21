@@ -159,6 +159,9 @@
     <ClInclude Include="follow_bullet3D.h">
       <Filter>ヘッダー ファイル\object\3D</Filter>
     </ClInclude>
+    <ClInclude Include="energy_gage.h">
+      <Filter>ヘッダー ファイル\object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="texture.cpp">
@@ -268,6 +271,9 @@
     </ClCompile>
     <ClCompile Include="follow_bullet3D.cpp">
       <Filter>ソース ファイル\object\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="energy_gage.cpp">
+      <Filter>ソース ファイル\object</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

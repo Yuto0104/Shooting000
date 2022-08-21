@@ -18,8 +18,10 @@
 //=============================================================================
 CTexAnim::CTexAnim()
 {
-	m_patternAnim = TEX_PATTERN(0, 0);				// アニメーションのパターン
-	m_numAnim = TEX_PATTERN(0, 0);					// アニメーションのパターンNo.
+	m_patternAnim.x = 0;							// アニメーションのパターン(X座標)
+	m_patternAnim.y = 0;							// アニメーションのパターン(Y座標)
+	m_numAnim.x = 0;								// アニメーションのパターンNo.(X座標)
+	m_numAnim.y = 0;								// アニメーションのパターンNo.(y座標)
 	m_addTex = D3DXVECTOR2(0.0f, 0.0f);				// テクスチャ座標の増加量
 	m_nMaxCntAnim = 0;								// アニメーションの切り替え
 	m_nCntAnim = 0;									// アニメーションカウント
@@ -41,13 +43,15 @@ CTexAnim::~CTexAnim()
 // Author : 唐﨑結斗
 // 概要 : アニメーション構造体の設定を行い数値を返す
 //=============================================================================
-void CTexAnim::SetAnim(TEX_PATTERN patternAnim, int nLife, bool bLoop)
+void CTexAnim::SetAnim(int nPatternAnimX, int nPatternAnimY, int nLife, bool bLoop)
 {
 	// アニメーションのパターン
-	m_patternAnim = patternAnim;
+	m_patternAnim.x = nPatternAnimX;
+	m_patternAnim.y = nPatternAnimY;
 
 	// アニメーションのパターンNo.
-	m_numAnim = TEX_PATTERN(0, 0);
+	m_numAnim.x = 0;	// アニメーションのパターンNo.(X座標)
+	m_numAnim.y = 0;	// アニメーションのパターンNo.(y座標)
 
 	// ループを使用するか
 	m_bLoop = bLoop;

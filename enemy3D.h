@@ -11,6 +11,7 @@
 //*****************************************************************************
 // インクルード
 //*****************************************************************************
+#include "object.h"
 #include "model3D.h"
 #include "main.h"
 
@@ -22,6 +23,13 @@
 class CEnemy3D : public CModel3D
 {
 public:
+	//--------------------------------------------------------------------
+	// 定数定義
+	//--------------------------------------------------------------------
+	static const unsigned int MAX_LINTERN_BULLET = 5;			// 返し弾の最大数
+	static const float LINTERN_BULLET_SPAWN_RANGE;				// 返し弾の生成範囲
+	static const float LINTERN_BULLET_MOVE_VEC;					// 返し弾の移動方向
+
 	//--------------------------------------------------------------------
 	// 静的メンバ関数
 	//--------------------------------------------------------------------
@@ -40,7 +48,7 @@ public:
 	void Uninit() override;								// 終了
 	void Update() override;								// 更新
 	void Draw() override;								// 描画
-	void Hit(int nAttack);								// ヒット
+	void Hit(COLOR_TYPE colorType, int nAttack);		// ヒット
 	void SetLife(int nLife) { m_nLife = nLife; }		// 体力のセッター
 	void SetScore(int nScore) { m_nScore = nScore; }	// スコアのセッター
 

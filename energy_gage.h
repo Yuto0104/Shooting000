@@ -1,55 +1,46 @@
 //=============================================================================
 //
-// 2Dオブジェクトクラス(object2D.h)
+// エネルギーゲージクラス(energy_gage.h)
 // Author : 唐﨑結斗
-// 概要 : オブジェクト生成を行う
+// 概要 : エネルギーゲージの設定を行う
 //
 //=============================================================================
-#ifndef _OBJECT2D_H_		// このマクロ定義がされてなかったら
-#define _OBJECT2D_H_		// 二重インクルード防止のマクロ定義
+#ifndef _ENERGY_GAGE_H_		// このマクロ定義がされてなかったら
+#define _ENERGY_GAGE_H_		// 二重インクルード防止のマクロ定義
 
 //*****************************************************************************
 // インクルード
 //*****************************************************************************
 #include "object.h"
-#include "texture.h"
+
+//*****************************************************************************
+// 前方宣言
+//*****************************************************************************
+class CObject2D;
+class CScore;
+class CGauge2D;
 
 //=============================================================================
-// 2Dオブジェクトクラス
+// エネルギーゲージクラス
 // Author : 唐﨑結斗
-// 概要 : 2Dオブジェクト生成を行うクラス
+// 概要 : エネルギーゲージ生成を行うクラス
 //=============================================================================
-class CObject2D : public CObject
+class CEnergyGage : public CObject
 {
 public:
-	// 頂点フォーマット
-	const unsigned int	FVF_VERTEX_2D = (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1);
-
-	//*****************************************************************************
-	// 構造体定義
-	//*****************************************************************************
-	// 頂点データ
-	struct VERTEX_2D
-	{
-		D3DXVECTOR3		pos;		// 位置
-		float			rhw;		// rhw
-		D3DCOLOR		col;		// カラー
-		D3DXVECTOR2		tex;		// テクスチャ座標
-	};
-
 	//--------------------------------------------------------------------
 	// 静的メンバ関数
 	//--------------------------------------------------------------------
-	static CObject2D *Create(void);				// 2Dオブジェクトの生成
+	static CEnergyGage *Create();			// エネルギーゲージの生成
 
 	//--------------------------------------------------------------------
 	// コンストラクタとデストラクタ
 	//--------------------------------------------------------------------
-	explicit CObject2D(int nPriority = CObject::PRIORITY_LEVEL0);
-	~CObject2D() override;
+	CEnergyGage(int nPriority = CObject::PRIORITY_LEVEL3);
+	~CEnergyGage() override;
 
 	//--------------------------------------------------------------------
-	// オーバーライド関数
+	// メンバ関数
 	//--------------------------------------------------------------------
 	HRESULT Init() override;														// 初期化
 	void Uninit() override;															// 終了
@@ -63,31 +54,24 @@ public:
 	D3DXVECTOR3 GetPosOld()  override { return m_posOld; }							// 過去位置のゲッター
 	D3DXVECTOR3 GetRot()  override { return m_rot; }								// 向きのゲッター
 	D3DXVECTOR3 GetSize()  override { return m_size; }								// 大きさのゲッター
-	void LoadTex(CTexture::TEXTURE_TYPE type) { m_typeTex = type; }					// テクスチャの設定
-	void SetCol(const D3DCOLOR &col);												// 色のセッター
-
-protected:
-	//--------------------------------------------------------------------
-	// メンバ関数
-	//--------------------------------------------------------------------
-	void SetVtx();															// 頂点座標などの設定
-	void SetTex(const D3DXVECTOR2 &minTex, const D3DXVECTOR2 &maxTex);		// テクスチャ座標の設定
 
 private:
 	//--------------------------------------------------------------------
 	// メンバ変数
 	//--------------------------------------------------------------------
-	LPDIRECT3DVERTEXBUFFER9			m_pVtxBuff;			// 頂点バッファ
-	D3DXVECTOR3						m_pos;				// 位置
-	D3DXVECTOR3						m_posOld;			// 過去の位置
-	D3DXVECTOR3						m_rot;				// 向き
-	D3DXVECTOR3						m_size;				// 大きさ
-	D3DCOLOR						m_col;				// カラー
-	CTexture::TEXTURE_TYPE			m_typeTex;			// テクスチャの種別
-	float							m_fAngle;			// 対角線の角度
-	float							m_fLength;			// 対角線の長さ
+	CObject2D			*m_pObject2D;		// 2Dオブジェクト
+	CScore				*m_pScore;			// スコア
+	CGauge2D			*m_pGauge2D;		// ゲージ
+	D3DXVECTOR3			m_pos;				// 位置
+	D3DXVECTOR3			m_posOld;			// 過去の位置
+	D3DXVECTOR3			m_rot;				// 向き
+	D3DXVECTOR3			m_size;				// 大きさ
+	int					m_nLife;			// ライフ
+	int					m_nAddLife;			// 追加ライフ
+	int					m_nMaxLife;			// 最大ライフ
 };
 
 #endif
+
 
 
