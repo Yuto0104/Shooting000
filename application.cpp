@@ -21,42 +21,27 @@
 #include "sound.h"
 #include "camera.h"
 #include "light.h"
-
 #include "object.h"
-#include "object2D.h"
-#include "player2D.h"
-#include "enemy2D.h"
-#include "object3D.h"
-#include "model3D.h"
-#include "enemy3D.h"
-#include "motion_char3D.h"
-#include "motion_player3D.h"
-#include "mesh.h"
-#include "sphere.h"
-#include "circle_polygon3D.h"
-#include "number.h"
-#include "score.h"
-#include "life.h"
-#include "life_manager.h"
-#include "gauge2D.h"
-#include "energy_gage.h"
+#include "scene_mode.h"
+#include "title.h"
+#include "game.h"
+#include "result.h"
+#include "fade.h"
 
 //*****************************************************************************
 // 静的メンバ変数宣言
 //*****************************************************************************
-CRenderer *CApplication::m_pRenderer = nullptr;					// レンダラーインスタンス
-CKeyboard *CApplication::m_pKeyboard = {};						// キーボードインスタンス
-CMouse *CApplication::m_pMouse = {};							// マウスインスタンス
-CTexture *CApplication::m_pTexture = nullptr;					// テクスチャインスタンス
-CSound *CApplication::m_pSound = nullptr;						// サウンドインスタンス
-CCamera *CApplication::m_pCamera = nullptr;						// カメラインスタンス
-CCamera *CApplication::m_pCameraBG = nullptr;					// カメラインスタンス
-CPlayer2D *CApplication::m_pPlayer2D = nullptr;					// プレイヤーインタンス
-CMotionPlayer3D *CApplication::m_MotionPlayer3D = nullptr;		// モーションプレイヤーインスタンス
-CScore *CApplication::m_pScore = nullptr;						// スコアインスタンス
-CLifeManager *CApplication::m_pLifeManager = nullptr;			// ライフマネージャーインスタンス
-CGauge2D *CApplication::m_pGauge2D = nullptr;					// ゲージマネージャー
-CEnergyGage *CApplication::m_pEnergyGage = nullptr;				// エネルギーゲージマネージャー
+CRenderer *CApplication::m_pRenderer = nullptr;						// レンダラーインスタンス
+CKeyboard *CApplication::m_pKeyboard = {};							// キーボードインスタンス
+CMouse *CApplication::m_pMouse = {};								// マウスインスタンス
+CTexture *CApplication::m_pTexture = nullptr;						// テクスチャインスタンス
+CSound *CApplication::m_pSound = nullptr;							// サウンドインスタンス
+CCamera *CApplication::m_pCamera = nullptr;							// カメラインスタンス
+CCamera *CApplication::m_pCameraBG = nullptr;						// カメラインスタンス
+CApplication::SCENE_MODE CApplication::m_mode = MODE_TITLE;			// 現在のモードの格納
+CApplication::SCENE_MODE CApplication::m_nextMode = MODE_GAME;		// 次のモードの格納
+CSceneMode *CApplication::pSceneMode = nullptr;						// シーンモードを格納
+CFade *CApplication::pFade = nullptr;										// フェードクラス
 
 //=============================================================================
 // スクリーン座標をワールド座標にキャストする
@@ -164,6 +149,48 @@ float CApplication::RotNormalization(float fRot)
 }
 
 //=============================================================================
+// シーンの設定
+// Author : 唐﨑結斗
+// 概要 : 現在のシーンを終了し、新しいシーンを設定する
+//=============================================================================
+void CApplication::SetMode(SCENE_MODE mode)
+{	
+	if (pSceneMode != nullptr)
+	{
+		pSceneMode->Uninit();
+		pSceneMode = nullptr;
+	}
+
+	// オブジェクトの解放
+	CObject::ReleaseScene();
+
+	m_mode = mode;
+
+	switch (m_mode)
+	{
+	case CApplication::MODE_TITLE:
+		pSceneMode = new CTitle;
+		break;
+
+	case CApplication::MODE_GAME:
+		pSceneMode = new CGame;
+		break;
+
+	case CApplication::MODE_RESULT:
+		pSceneMode = new CResult;
+		break;
+
+	default:
+		break;
+	}
+
+	if (pSceneMode != nullptr)
+	{
+		pSceneMode->Init();
+	}
+}
+
+//=============================================================================
 // コンストラクタ
 // Author : 唐﨑結斗
 // 概要 : インスタンス生成時に行う処理
@@ -180,7 +207,13 @@ CApplication::CApplication()
 //=============================================================================
 CApplication::~CApplication()
 {
-
+	assert(m_pRenderer == nullptr);
+	assert(m_pKeyboard == nullptr);
+	assert(m_pMouse == nullptr);
+	assert(m_pTexture == nullptr);
+	assert(m_pSound == nullptr);
+	assert(m_pCamera == nullptr);
+	assert(m_pCameraBG == nullptr);
 }
 
 //=============================================================================
@@ -196,6 +229,7 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	m_pSound = new CSound;
 	m_pCamera = new CCamera;
 	m_pCameraBG = new CCamera;
+
 	// 入力デバイスのメモリ確保
 	m_pKeyboard = new CKeyboard;
 	m_pMouse = new CMouse;
@@ -243,101 +277,11 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	CLight::Create(D3DXVECTOR3(0.2f, 0.8f, -0.4f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 	CLight::Create(D3DXVECTOR3(-0.2f, -0.5f, 0.7f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 
-	// オブジェクトの生成
-	//CObject2D::Create()->SetPos(D3DXVECTOR3(50.0f, 90.0f, 0.0f));
-	//CObject2D::Create()->SetPos(D3DXVECTOR3(700.0f, 600.0f, 0.0f));
-	//CEnemy2D::Create(D3DXVECTOR3(800.0f, 100.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 0.0f);
-	//CEnemy2D::Create(D3DXVECTOR3(700.0f, 200.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 0.0f);
-	//CEnemy2D::Create(D3DXVECTOR3(640.0f, 360.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 0.0f);
+	// シーンモードの設定
+	SetMode(CApplication::MODE_TITLE);
 
-	/*CObject3D *pObject3D = CObject3D::Create();
-	pObject3D->SetPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-	pObject3D->SetSize(D3DXVECTOR3(100.0f, 100.0f, 0.0f));
-
-	pObject3D = CObject3D::Create();
-	pObject3D->SetPos(D3DXVECTOR3(-500.0f, 0.0f, 0.0f));
-	pObject3D->SetRot(D3DXVECTOR3(0.0f, D3DX_PI * 0.5f, 0.0f));
-	pObject3D->SetSize(D3DXVECTOR3(100.0f, 100.0f, 0.0f));
-	pObject3D->SetBillboard(true);*/
-
-	/*CModel3D *pModel3D = CModel3D::Create("data/MODEL/airplane000.x");
-	pModel3D->SetPos(D3DXVECTOR3(100.0f, 0.0f, 0.0f));
-	pModel3D->SetSize(D3DXVECTOR3(5.0f, 5.0f, 5.0f));*/
-
-	CEnemy3D *pEnemy = CEnemy3D::Create("data/MODEL/enemy_white_000.x");
-	pEnemy->SetPos(D3DXVECTOR3(-200.0f, 0.0f, 200.0f));
-	pEnemy->SetSize(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
-	pEnemy->SetColorType(CObject::TYPE_WHITE);
-
-	pEnemy = CEnemy3D::Create("data/MODEL/enemy_white_000.x");
-	pEnemy->SetPos(D3DXVECTOR3(-150.0f, 0.0f, 200.0f));
-	pEnemy->SetSize(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
-	pEnemy->SetColorType(CObject::TYPE_WHITE);
-
-	pEnemy = CEnemy3D::Create("data/MODEL/enemy_white_000.x");
-	pEnemy->SetPos(D3DXVECTOR3(-100.0f, 0.0f, 200.0f));
-	pEnemy->SetSize(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
-	pEnemy->SetColorType(CObject::TYPE_WHITE);
-
-	pEnemy = CEnemy3D::Create("data/MODEL/enemy_black_000.x");
-	pEnemy->SetPos(D3DXVECTOR3(200.0f, 0.0f, 200.0f));
-	pEnemy->SetSize(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
-	pEnemy->SetColorType(CObject::TYPE_BLACK);
-
-	pEnemy = CEnemy3D::Create("data/MODEL/enemy_black_000.x");
-	pEnemy->SetPos(D3DXVECTOR3(100.0f, 0.0f, 200.0f));
-	pEnemy->SetSize(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
-	pEnemy->SetColorType(CObject::TYPE_BLACK);
-
-	pEnemy = CEnemy3D::Create("data/MODEL/enemy_black_000.x");
-	pEnemy->SetPos(D3DXVECTOR3(150.0f, 0.0f, 200.0f));
-	pEnemy->SetSize(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
-	pEnemy->SetColorType(CObject::TYPE_BLACK);
-
-	CMotionChar3D *pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
-	pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-	pMotionChar3D->SetObjectDrowType(CObject::DROWTYPE_BG);
-
-	m_MotionPlayer3D = CMotionPlayer3D::Create();
-	m_MotionPlayer3D->SetPos(D3DXVECTOR3(40.0f, 0.0f, -50.0f));
-	m_MotionPlayer3D->SetRot(D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
-
-	CMesh3D *pMesh3D = CMesh3D::Create();
-	pMesh3D->SetSize(D3DXVECTOR3(2000.0f, 0, 2000.0f));
-	pMesh3D->SetBlock(CMesh3D::DOUBLE_INT(10, 10));
-	pMesh3D->SetSplitTex(true);
-	pMesh3D->SetObjectDrowType(CObject::DROWTYPE_BG);
-
-	CSphere *pSphere = CSphere::Create();
-	pSphere->SetRot(D3DXVECTOR3(D3DX_PI, 0.0f, 0.0f));
-	pSphere->SetSize(D3DXVECTOR3(100.0f, 0, 100.0f));
-	pSphere->SetBlock(CMesh3D::DOUBLE_INT(100, 100));
-	//pSphere->SetSplitTex(true);
-	pSphere->SetRadius(1000.0f);
-	pSphere->SetSphereRange(D3DXVECTOR2(D3DX_PI * 2.0f, D3DX_PI * -0.35f));
-	pSphere->SetObjectDrowType(CObject::DROWTYPE_BG);
-
-	/*CCirclePolygon3D *pCirclePolygon3D = CCirclePolygon3D::Create();
-	pCirclePolygon3D->SetPos(D3DXVECTOR3(0.0f, 10.0f, 0.0f));
-	pCirclePolygon3D->SetObjectDrowType(CObject::DROWTYPE_BG);*/
-
-	m_pScore = CScore::Create(10, true);
-	m_pScore->SetScore(0);
-	m_pScore->SetPos(D3DXVECTOR3(1280.0f, m_pScore->GetSize().y / 2.0f, 0.0f));
-
-	m_pLifeManager = CLifeManager::Create();
-	m_pLifeManager->SetSize(D3DXVECTOR3(50.0f, 50.0f, 0.0f));
-	m_pLifeManager->SetPos(D3DXVECTOR3(0.0f, m_pLifeManager->GetSize().y / 2.0f, 0.0f));
-
-	m_pGauge2D = CGauge2D::Create();
-	m_pGauge2D->SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-	m_pGauge2D->SetSize(D3DXVECTOR3(50.0f, 600.0f, 0.0f));
-	m_pGauge2D->SetPos(D3DXVECTOR3(50.0f, 700, 0.0f));
-	m_pGauge2D->SetCol(D3DXCOLOR(0.2f, 0.9f, 1.0f, 1.0f));
-	m_pGauge2D->SetMaxNumber((float)CMotionPlayer3D::MAX_ENERGY);
-	m_pGauge2D->SetCoefficient(0.06f);
-
-	m_pEnergyGage = CEnergyGage::Create();
+	// フェードの設定
+	pFade = CFade::Create();
 
 	return S_OK;
 }
@@ -412,15 +356,6 @@ void CApplication::Uninit()
 		m_pCameraBG = nullptr;
 	}
 
-	if (m_pEnergyGage != nullptr)
-	{// 終了処理
-		m_pEnergyGage->Uninit();
-
-		// メモリの解放
-		delete m_pEnergyGage;
-		m_pEnergyGage = nullptr;
-	}
-
 	// ライトの解放
 	CLight::ReleaseAll();
 
@@ -435,6 +370,11 @@ void CApplication::Uninit()
 //=============================================================================
 void CApplication::Update()
 {
+	if (m_mode != m_nextMode)
+	{
+		pFade->SetFade(m_nextMode);
+	}
+
 	m_pKeyboard->Update();
 	m_pMouse->Update();
 	m_pCamera->Update();

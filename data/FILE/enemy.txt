@@ -1,0 +1,85 @@
+// 敵の種別の最大数
+MAX_TYPE = 2
+
+// 敵の配置数
+MAX_INSTALL = 2
+
+// 敵の移動数
+MAX_MOVE = 1
+
+//***************************************
+// ステータスの設定
+//***************************************
+STATUS_SET
+	COLOR = BLACK
+	FALE_NAME = data/MODEL/enemy_black_000.x
+	LIFE = 100
+	SCORE = 100
+STATUS_END
+
+STATUS_SET
+	COLOR = WHITE
+	FALE_NAME = data/MODEL/enemy_white_000.x
+	LIFE = 100
+	SCORE = 100
+STATUS_END
+
+//***************************************
+// 敵の設置
+//***************************************
+ARRANGEMENT_SET
+	POS = 0.0 0.0 0.0
+	FRAME =  180
+	MOVE_ID = 0
+	ID = 1
+ARRANGEMENT_END
+
+ARRANGEMENT_SET
+	POS = 0.0 0.0 150.0
+	FRAME =  180
+	MOVE_ID = 0
+	ID = 0
+ARRANGEMENT_END
+
+//***************************************
+// 敵の移動
+//***************************************
+MOVE_SET
+	MAX_KEY = 4
+	LOOP = 1
+	
+	KEY_SET
+		FRAME = 60
+		MOVE_MODE = 0
+		MOVE_VEC = 0.0
+		SPEED = 0.1
+	KEY_END
+	
+	KEY_SET
+		FRAME = 60
+		MOVE_MODE = 1
+		MOVE_VEC = 1.57
+		SPEED = 5.0
+		WAVE_LENGTH = 0.25
+		WAVE_SIZE = 5.0
+	KEY_END
+	
+	KEY_SET
+		FRAME = 60
+		MOVE_MODE = 2
+		MOVE_VEC = 3.14
+		SPEED = 5.0
+		WAVE_LENGTH = 1.0
+		WAVE_SIZE = 5.0
+	KEY_END
+	
+	KEY_SET
+		FRAME = 60
+		MOVE_MODE = 3
+		MOVE_VEC = 0.0
+		SPEED = 5.0
+		ADD_MOVE_VEC = 0.5
+	KEY_END
+	
+MOVE_END
+

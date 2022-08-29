@@ -22,12 +22,8 @@ class CMouse;
 class CTexture;
 class CSound;
 class CCamera;
-class CPlayer2D;
-class CMotionPlayer3D;
-class CScore;
-class CLifeManager;
-class CGauge2D;
-class CEnergyGage;
+class CSceneMode;
+class CFade;
 
 //=============================================================================
 // アプリケーションクラス
@@ -38,6 +34,20 @@ class CApplication
 {
 public:
 	//--------------------------------------------------------------------
+	// シーンモードの列挙型
+	// Author : 唐﨑結斗
+	// 概要 : シーンモードを識別する
+	//--------------------------------------------------------------------
+	enum SCENE_MODE
+	{
+		MODE_TITLE = 0,			// タイトル
+		MODE_GAME,				// ゲーム
+		MODE_RESULT,			// リザルト
+		MAX_MODE,				// シーンの最大数
+		MODE_NONE,				// シーン無し
+	};
+
+	//--------------------------------------------------------------------
 	// 静的メンバ関数
 	//--------------------------------------------------------------------
 	static CRenderer *GetRenderer() { return m_pRenderer; }								// レンダラーのゲッター
@@ -47,15 +57,12 @@ public:
 	static CSound *GetSound() { return m_pSound; }										// サウンドのゲッター
 	static CCamera *GetCamera() { return m_pCamera; }									// カメラのゲッター
 	static CCamera *GetCameraBG() { return m_pCameraBG; }								// 背景カメラのゲッター
-	static CPlayer2D *GetPlayer2D() { return m_pPlayer2D; }								// プレイヤーのゲッター
-	static CMotionPlayer3D *GetMotionPlayer3D() { return m_MotionPlayer3D; }			// モーションプレイヤーのゲッター
-	static CScore *GetScore() { return m_pScore; }										// スコアの取得
-	static CLifeManager *GetLifeManager() { return m_pLifeManager; }					// ライフマネージャーの取得
-	static CGauge2D *GetGauge2D() { return m_pGauge2D; }								// ゲージの取得
-	static CEnergyGage *GetEnergyGage() { return m_pEnergyGage; }						// エネルギーゲージの取得
 	static D3DXVECTOR3 ScreenCastWorld(const D3DXVECTOR3 &pos);							// ワールド座標をスクリーン座標にキャストする
 	static D3DXVECTOR3 WorldCastScreen(const D3DXVECTOR3 &pos);							// ワールド座標をスクリーン座標にキャストする
 	static float RotNormalization(float fRot);											// 角度の設定
+	static void SetNextMode(SCENE_MODE mode) { m_nextMode = mode; }						// 次のモードの設定
+	static void SetMode(SCENE_MODE mode);												// モードの設定
+	static SCENE_MODE GetMode() { return m_mode; }										// モードの取得
 
 	//--------------------------------------------------------------------
 	// コンストラクタとデストラクタ
@@ -73,21 +80,24 @@ public:
 
 private:
 	//--------------------------------------------------------------------
+	// 静的メンバ関数
+	//--------------------------------------------------------------------
+	
+
+	//--------------------------------------------------------------------
 	// 静的メンバ変数
 	//--------------------------------------------------------------------
-	static CRenderer *m_pRenderer;						// rendererクラス
-	static CKeyboard *m_pKeyboard;						// キーボードクラス
-	static CMouse *m_pMouse;							// マウスクラス
-	static CTexture *m_pTexture;						// テクスチャクラス
-	static CSound *m_pSound;							// サウンドクラス
-	static CCamera *m_pCamera;							// ゲームカメラクラス
-	static CCamera *m_pCameraBG;						// 背景カメラクラス
-	static CPlayer2D *m_pPlayer2D;						// プレイヤークラス
-	static CMotionPlayer3D *m_MotionPlayer3D;			// モーションプレイヤークラス
-	static CScore *m_pScore;							// スコアクラス
-	static CLifeManager *m_pLifeManager;				// ライフマネージャークラス
-	static CGauge2D *m_pGauge2D;						// ゲージマネージャー
-	static CEnergyGage *m_pEnergyGage;					// エネルギーゲージ
+	static CRenderer *m_pRenderer;				// rendererクラス
+	static CKeyboard *m_pKeyboard;				// キーボードクラス
+	static CMouse *m_pMouse;					// マウスクラス
+	static CTexture *m_pTexture;				// テクスチャクラス
+	static CSound *m_pSound;					// サウンドクラス
+	static CCamera *m_pCamera;					// ゲームカメラクラス
+	static CCamera *m_pCameraBG;				// 背景カメラクラス
+	static SCENE_MODE m_mode;					// 現在のモードの格納
+	static SCENE_MODE m_nextMode;				// 次に設定するモード
+	static CSceneMode *pSceneMode;				// シーンモードを格納
+	static CFade *pFade;						// フェードクラス
 };
 
 #endif

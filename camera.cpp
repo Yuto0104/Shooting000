@@ -20,6 +20,7 @@
 #include "move.h"
 #include "calculation.h"
 #include "motion_player3D.h"
+#include "game.h"
 
 //*****************************************************************************
 // 定数定義
@@ -386,7 +387,7 @@ void CCamera::Move(void)
 //=============================================================================
 void CCamera::FollowCamera(void)
 {// プレイヤー情報の取得
-	CMotionPlayer3D *pMotionPlayer3D = CApplication::GetMotionPlayer3D();
+	CMotionPlayer3D *pMotionPlayer3D = CGame::GetMotionPlayer3D();
 	D3DXVECTOR3 posPlayer = pMotionPlayer3D->GetPos();
 	D3DXVECTOR3 rotPlayer = pMotionPlayer3D->GetRot();
 

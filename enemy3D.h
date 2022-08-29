@@ -31,6 +31,49 @@ public:
 	static const float LINTERN_BULLET_MOVE_VEC;					// 返し弾の移動方向
 
 	//--------------------------------------------------------------------
+	// 移動方法の種別
+	// Author : 唐﨑結斗
+	// 概要 : 移動方法の種別分けを行う
+	//--------------------------------------------------------------------
+	enum MOVE_MODE
+	{
+		MODE_NORMAL = 0,		// 通常移動
+		MODE_SIN,				// サインカーブ
+		MODE_COS,				// コサインカーブ
+		MODE_CIRCLE,			// 円移動
+		MODE_NONE,				// 移動しない
+		MAX_MODE,				// 移動方法の最大数
+	};
+
+	//--------------------------------------------------------------------
+	// 敵の移動キー
+	// Author : 唐﨑結斗
+	// 概要 : 敵の移動キー設定
+	//--------------------------------------------------------------------
+	struct ENEMY_MOVE_KEY
+	{
+		MOVE_MODE		moveMode;			// 移動方法
+		float			fSpeed;				// 移動速度
+		float			fMoveVec;			// 移動方向
+		float			fAddMoveVec;		// 移動方向の加算値
+		float			fWaveLength;		// 波長
+		float			fWaveSize;			// 波の大きさ
+		int				nFrame;				// 移動を行う時間
+	};
+
+	//--------------------------------------------------------------------
+	// 敵の移動
+	// Author : 唐﨑結斗
+	// 概要 : 敵の移動設定
+	//--------------------------------------------------------------------
+	struct ENEMY_MOVE
+	{
+		ENEMY_MOVE_KEY		*moveKey;		// 移動キー
+		int					nMaxKey;		// 最大キー数
+		bool				bLoop;			// ループするかどうか
+	};
+
+	//--------------------------------------------------------------------
 	// 静的メンバ関数
 	//--------------------------------------------------------------------
 	static CEnemy3D *Create(const char *pName);			// 3Dエネミーの生成
@@ -42,7 +85,7 @@ public:
 	~CEnemy3D();
 
 	//--------------------------------------------------------------------
-	// メンバ変数
+	// メンバ関数
 	//--------------------------------------------------------------------
 	HRESULT Init(const char *pName);					// 初期化
 	void Uninit() override;								// 終了
@@ -51,14 +94,35 @@ public:
 	void Hit(COLOR_TYPE colorType, int nAttack);		// ヒット
 	void SetLife(int nLife) { m_nLife = nLife; }		// 体力のセッター
 	void SetScore(int nScore) { m_nScore = nScore; }	// スコアのセッター
+	void SetMoveData(ENEMY_MOVE moveData);				// 移動情報のセッター
 
 private:
 	//--------------------------------------------------------------------
+	// メンバ関数
+	//--------------------------------------------------------------------
+	void Shot();			// 弾の発射
+	void SetMove();			// 移動量の設定
+	void Move();			// 移動情報の管理
+	void SetMoveCopy();		// 移動情報の代入
+
+	//--------------------------------------------------------------------
 	// メンバ変数
 	//--------------------------------------------------------------------
-	int m_nLife;		// 体力
-	int m_nScore;		// スコア
-	int m_nCntShot;		// 弾発射までのカウント
+	D3DXVECTOR3		m_move;				// 移動量
+	ENEMY_MOVE		m_moveData;			// 移動情報
+	MOVE_MODE		m_moveMode;			// 移動方法
+	float			m_fSpeed;			// 移動速度
+	float			m_fMoveVec;			// 移動方向
+	float			m_fAddMoveVec;		// 移動方向の加算値
+	float			m_fWave;			// 波
+	float			m_fWaveLength;		// 波長
+	float			m_fWaveSize;		// 波の大きさ
+	int				m_CntKey;			// キーカウント
+	int				m_nCntFrame;		// フレームカウント
+	int				m_nLife;			// 体力
+	int				m_nScore;			// スコア
+	int				m_nCntShot;			// 弾発射までのカウント
+	bool			m_bMove;			// 移動を行っている
 };
 
 #endif

@@ -13,12 +13,6 @@
 //*****************************************************************************
 #include "main.h"
 
-//*****************************************************************************
-// マクロ定義
-//*****************************************************************************
-// オブジェクトの最大生成可能数
-#define MAX_OBJECT (0x1000)
-
 //=============================================================================
 // オブジェクトクラス
 // Author : 唐﨑結斗
@@ -56,6 +50,7 @@ public:
 		OBJTYPE_3DPLAYER,			// 3Dプレイヤー
 		OBJTYPE_3DENEMY,			// 3Dエネミー
 		OBJTYPE_3DBULLET,			// 3Dバレット
+		OBJTYPE_FADE,				// フェード
 		MAX_OBJTYPE,				// 種別の最大数
 	};
 
@@ -82,13 +77,34 @@ public:
 		PRIORITY_LEVEL1,		// レベル1
 		PRIORITY_LEVEL2,		// レベル2
 		PRIORITY_LEVEL3,		// レベル3
+		PRIORITY_LEVEL4,		// レベル4
 		MAX_LEVEL				// 最大レベル
 	};
+
+	//--------------------------------------------------------------------
+	// オブジェクトの使用シーン
+	// Author : 唐﨑結斗
+	// 概要 : オブジェクトの使用シーンの列挙
+	//--------------------------------------------------------------------
+	enum SCENE_OBJECT
+	{
+		SCENE_TITLE = 0,		// タイトル
+		SCENE_GAME,				// ゲーム
+		SCENE_RESULT,			// リザルト
+		MAX_SCENE,				// 種別の最大
+		SCENE_NONE,				// 種別無し
+	};
+
+	//--------------------------------------------------------------------
+	// 定数定義
+	//--------------------------------------------------------------------
+	static const unsigned int MAX_OBJECT = (0x1000) / MAX_LEVEL;
 
 	//--------------------------------------------------------------------
 	// 静的メンバ関数
 	//--------------------------------------------------------------------
 	static void ReleaseAll(void);																						// すべてのオブジェクトの解放
+	static void ReleaseScene(void);																						// 遷移のオブジェクトの解放
 	static void UpdateAll(void);																						// すべてのオブジェクトの更新
 	static void DrawAll(EObjectDrowType objectDrowType);																// すべてのオブジェクトの描画
 	static CObject *MyGetObject(const int nPriority, const int nNumID) { return m_apObject[nPriority][nNumID]; }		// オブジェクト情報のゲッター
@@ -123,6 +139,7 @@ public:
 	void SetColisonSize(const D3DXVECTOR3 &colisonSize) { m_colisonSize = colisonSize; }				// あたり判定の大きさのセッター
 	D3DXVECTOR3 GetColisonSize() { return m_colisonSize; }												// あたり判定の大きさの取得
 
+
 protected:
 	//--------------------------------------------------------------------
 	// メンバ関数
@@ -146,6 +163,7 @@ private:
 	EObjectDrowType		m_objectDrowType;	// オブジェクトの描画方法
 	COLOR_TYPE			m_colorType;		// 色の種別
 	D3DXVECTOR3			m_colisonSize;		// あたり判定の大きさ
+	SCENE_OBJECT		m_sceneObject;		// オブジェクトの使用シーン
 	int					m_nNumID;			// 格納先の番号
 	int					m_nLevPriority;		// プライオリティのレベル
 };

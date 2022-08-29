@@ -102,6 +102,7 @@ private:
 	int				m_nInvalidLife;					// 追加ライフ
 	int				m_nEnergy;						// エネルギー
 	int				m_nCntConsumption;				// エネルギー消費カウント
+	int				m_nCombo;						// コンボ
 	bool			m_bMotion;						// モーションの使用状況
 	bool			m_bMotionBlend;					// モーションブレンドの使用状況
 	bool			m_bPressShot;					// 長押し弾を使用してるかどうか

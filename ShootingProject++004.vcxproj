@@ -161,9 +161,12 @@
     <ClInclude Include="circle_polygon3D.h" />
     <ClInclude Include="enemy2D.h" />
     <ClInclude Include="enemy3D.h" />
+    <ClInclude Include="enemy_manager.h" />
     <ClInclude Include="energy_gage.h" />
     <ClInclude Include="explosion2D.h" />
+    <ClInclude Include="fade.h" />
     <ClInclude Include="follow_bullet3D.h" />
+    <ClInclude Include="game.h" />
     <ClInclude Include="gauge2D.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="keyboard.h" />
@@ -184,11 +187,14 @@
     <ClInclude Include="player2D.h" />
     <ClInclude Include="motion_char3D.h" />
     <ClInclude Include="renderer.h" />
+    <ClInclude Include="result.h" />
+    <ClInclude Include="scene_mode.h" />
     <ClInclude Include="score.h" />
     <ClInclude Include="sound.h" />
     <ClInclude Include="sphere.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="tex_anim.h" />
+    <ClInclude Include="title.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="application.cpp" />
@@ -200,9 +206,12 @@
     <ClCompile Include="circle_polygon3D.cpp" />
     <ClCompile Include="enemy2D.cpp" />
     <ClCompile Include="enemy3D.cpp" />
+    <ClCompile Include="enemy_manager.cpp" />
     <ClCompile Include="energy_gage.cpp" />
     <ClCompile Include="explosion2D.cpp" />
+    <ClCompile Include="fade.cpp" />
     <ClCompile Include="follow_bullet3D.cpp" />
+    <ClCompile Include="game.cpp" />
     <ClCompile Include="gauge2D.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="keyboard.cpp" />
@@ -223,11 +232,14 @@
     <ClCompile Include="object3D.cpp" />
     <ClCompile Include="player2D.cpp" />
     <ClCompile Include="renderer.cpp" />
+    <ClCompile Include="result.cpp" />
+    <ClCompile Include="scene_mode.cpp" />
     <ClCompile Include="score.cpp" />
     <ClCompile Include="sound.cpp" />
     <ClCompile Include="sphere.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="tex_anim.cpp" />
+    <ClCompile Include="title.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

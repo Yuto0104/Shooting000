@@ -49,6 +49,12 @@
     <Filter Include="ヘッダー ファイル\object\3D\mesh">
       <UniqueIdentifier>{a6fe3cae-f577-4cc3-bb21-254dc003c098}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\object\scene">
+      <UniqueIdentifier>{0157aa27-3fba-416f-9581-93f96bbd2530}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\object\scene">
+      <UniqueIdentifier>{106d8ac0-e290-4d76-9572-6b534a72967d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="texture.h">
@@ -162,6 +168,24 @@
     <ClInclude Include="energy_gage.h">
       <Filter>ヘッダー ファイル\object</Filter>
     </ClInclude>
+    <ClInclude Include="scene_mode.h">
+      <Filter>ヘッダー ファイル\object\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>ヘッダー ファイル\object\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="result.h">
+      <Filter>ヘッダー ファイル\object\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="title.h">
+      <Filter>ヘッダー ファイル\object\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="fade.h">
+      <Filter>ヘッダー ファイル\object\2D</Filter>
+    </ClInclude>
+    <ClInclude Include="enemy_manager.h">
+      <Filter>ヘッダー ファイル\object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="texture.cpp">
@@ -273,6 +297,24 @@
       <Filter>ソース ファイル\object\3D</Filter>
     </ClCompile>
     <ClCompile Include="energy_gage.cpp">
+      <Filter>ソース ファイル\object</Filter>
+    </ClCompile>
+    <ClCompile Include="scene_mode.cpp">
+      <Filter>ソース ファイル\object\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="title.cpp">
+      <Filter>ソース ファイル\object\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>ソース ファイル\object\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="result.cpp">
+      <Filter>ソース ファイル\object\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="fade.cpp">
+      <Filter>ソース ファイル\object\2D</Filter>
+    </ClCompile>
+    <ClCompile Include="enemy_manager.cpp">
       <Filter>ソース ファイル\object</Filter>
     </ClCompile>
   </ItemGroup>

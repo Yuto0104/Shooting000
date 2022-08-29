@@ -260,12 +260,20 @@ void CScore::SetNumber()
 		fFullSize = m_wholeSize.x;
 	}
 
+	float fSpX = m_pos.x - (m_nDigit - 1) * 0.5f * size.x;
+
 	for (int nCntDigit = 0; nCntDigit < m_nDigit; nCntDigit++)
 	{
 		int nNumDigit = (m_nDigit - 1) - nCntDigit;
 
-		// 位置の設定
-		m_pNumber[nNumDigit]->SetPos(D3DXVECTOR3(m_pos.x - fFullSize + (size.x * nCntDigit), m_pos.y, 0.0f));
+		if (m_bAddDigit)
+		{// 位置の設定
+			m_pNumber[nNumDigit]->SetPos(D3DXVECTOR3(fSpX + size.x * nCntDigit, m_pos.y, 0.0f));
+		}
+		else
+		{// 位置の設定
+			m_pNumber[nNumDigit]->SetPos(D3DXVECTOR3(m_pos.x - fFullSize + (size.x * nCntDigit), m_pos.y, 0.0f));
+		}
 
 		// 向きの設定
 		m_pNumber[nNumDigit]->SetRot(m_rot);
@@ -292,7 +300,7 @@ void CScore::AddScore(int nAdd)
 //=============================================================================
 void CScore::CalScore()
 {
-	if (m_nDestScore > m_nScore)
+	if (m_nDestScore != m_nScore)
 	{
 		int add = (m_nDestScore - m_nScore) * 0.15f;
 
@@ -303,12 +311,18 @@ void CScore::CalScore()
 
 		m_nScore += add;
 
-		AddDigit();
-	}
+		if (add > 0
+			&& m_nDestScore <= m_nScore)
+		{
+			m_nScore = m_nDestScore;
+		}
+		else if (add < 0
+			&& m_nDestScore >= m_nScore)
+		{
+			m_nScore = m_nDestScore;
+		}
 
-	if (m_nDestScore <= m_nScore)
-	{
-		m_nScore = m_nDestScore;
+		AddDigit();
 	}
 
 	SetScore(m_nScore);
@@ -358,6 +372,34 @@ void CScore::AddDigit()
 		if (m_nMaxDigit <= m_nDigit)
 		{
 			m_nDigit = m_nMaxDigit;
+		}
+
+		// ナンバーの生成
+		SetDigitNumbers();
+
+		// ナンバーの設定
+		SetNumber();
+	}
+	else if (m_nScore <= (int)pow(10, m_nDigit - 1))
+	{
+		if (m_pNumber != nullptr)
+		{// 終了処理
+			for (int nCntDigit = 0; nCntDigit < m_nDigit; nCntDigit++)
+			{
+				m_pNumber[nCntDigit]->Uninit();
+			}
+
+			// メモリの解放
+			delete[] m_pNumber;
+			m_pNumber = nullptr;
+		}
+
+		// 桁数の加算
+		m_nDigit -= 1;
+
+		if (1 >= m_nDigit)
+		{
+			m_nDigit = 1;
 		}
 
 		// ナンバーの生成

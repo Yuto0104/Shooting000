@@ -18,6 +18,7 @@
 #include "application.h"
 #include "keyboard.h"
 #include "mouse.h"
+#include "game.h"
 
 #include "calculation.h"
 #include "bullet3D.h"
@@ -25,6 +26,8 @@
 #include "camera.h"
 #include "life_manager.h"
 #include "gauge2D.h"
+#include "score.h"
+#include "energy_gage.h"
 
 //*****************************************************************************
 // 定数定義
@@ -503,19 +506,16 @@ void CMotionPlayer3D::ChangeColor()
 {
 	// 入力情報の取得
 	CKeyboard *pKeyboard = CApplication::GetKeyboard();
-	CGauge2D *pGauge2D = CApplication::GetGauge2D();
 
 	if (pKeyboard->GetTrigger(DIK_Q))
 	{
 		if (GetColorType() == CObject::TYPE_WHITE)
 		{
 			SetColorType(CObject::TYPE_BLACK);
-			pGauge2D->SetCol(D3DXCOLOR(1.0f, 0.2f, 0.2f, 1.0f));
 		}
 		else if (GetColorType() == CObject::TYPE_BLACK)
 		{
 			SetColorType(CObject::TYPE_WHITE);
-			pGauge2D->SetCol(D3DXCOLOR(0.2f, 0.9f, 1.0f, 1.0f));
 		}
 	}
 }
@@ -561,15 +561,21 @@ void CMotionPlayer3D::Recovery()
 	if (m_nLife < MAX_LIFE
 		&& m_nEnergy >= ENERGY_RECOVERY)
 	{
-		m_nEnergy -= ENERGY_RECOVERY;
+		CEnergyGage *pEnergyGage = CGame::GetEnergyGage();
+		CGauge2D *pEnergyGauge2D = pEnergyGage->GetGauge2D();
+		CScore *pEnergy = pEnergyGage->GetScore();
+
+		int nEnergy = ENERGY_RECOVERY;
+		nEnergy *= -1;
+		m_nEnergy += nEnergy;
+		pEnergy->AddScore(nEnergy);
 
 		if (m_nEnergy <= 0)
 		{
 			m_nEnergy = 0;
 		}
 
-		CGauge2D *pGauge2D = CApplication::GetGauge2D();
-		pGauge2D->SetNumber((float)m_nEnergy);
+		pEnergyGauge2D->SetNumber((float)m_nEnergy);
 
 		m_nLife++;
 
@@ -579,7 +585,7 @@ void CMotionPlayer3D::Recovery()
 		}
 
 		// ライフの設定
-		CApplication::GetLifeManager()->SetLife();
+		CGame::GetLifeManager()->SetLife();
 
 		m_bRecovery = true;
 	}
@@ -594,15 +600,21 @@ void CMotionPlayer3D::FollowShot()
 {
 	if (m_nEnergy >= ENERGY_FOLLOW_SHOT)
 	{
-		m_nEnergy -= ENERGY_FOLLOW_SHOT;
+		CEnergyGage *pEnergyGage = CGame::GetEnergyGage();
+		CGauge2D *pEnergyGauge2D = pEnergyGage->GetGauge2D();
+		CScore *pEnergy = pEnergyGage->GetScore();
+
+		int nEnergy = ENERGY_RECOVERY;
+		nEnergy *= -1;
+		m_nEnergy += nEnergy;
+		pEnergy->AddScore(nEnergy);
 
 		if (m_nEnergy <= 0)
 		{
 			m_nEnergy = 0;
 		}
 
-		CGauge2D *pGauge2D = CApplication::GetGauge2D();
-		pGauge2D->SetNumber((float)m_nEnergy);
+		pEnergyGauge2D->SetNumber((float)m_nEnergy);
 
 		// Object2Dのメンバ変数の取得
 		D3DXVECTOR3 pos = GetPos();
@@ -735,11 +747,12 @@ void CMotionPlayer3D::Hit()
 	}
 
 	// ライフの設定
-	CApplication::GetLifeManager()->SetLife();
+	CGame::GetLifeManager()->SetLife();
 
 	if (m_nLife == 0)
 	{// 終了
 		Uninit();
+		CApplication::SetNextMode(CApplication::MODE_RESULT);
 	}
 }
 
@@ -749,16 +762,24 @@ void CMotionPlayer3D::Hit()
 // 概要 : エネルギーを吸収する
 //=============================================================================
 void CMotionPlayer3D::Charge()
-{// エネルギーのインクリメント
-	m_nEnergy += 20;
+{
+	CEnergyGage *pEnergyGage = CGame::GetEnergyGage();
+	CGauge2D *pEnergyGauge2D = pEnergyGage->GetGauge2D();
+	CScore *pEnergy = pEnergyGage->GetScore();
+
+	// エネルギーのインクリメント
+	m_nEnergy++;
+	pEnergy->AddScore(1);
 
 	if (m_nEnergy > MAX_ENERGY)
 	{
+		int nEnergy = MAX_ENERGY - m_nEnergy;
 		m_nEnergy = MAX_ENERGY;
+		pEnergy->AddScore(nEnergy);
 	}
+	pEnergy->AddScore(0);
 
-	CGauge2D *pGauge2D = CApplication::GetGauge2D();
-	pGauge2D->SetNumber((float)m_nEnergy);
+	pEnergyGauge2D->SetNumber((float)m_nEnergy);
 }
 
 

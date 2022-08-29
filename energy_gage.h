@@ -54,6 +54,8 @@ public:
 	D3DXVECTOR3 GetPosOld()  override { return m_posOld; }							// 過去位置のゲッター
 	D3DXVECTOR3 GetRot()  override { return m_rot; }								// 向きのゲッター
 	D3DXVECTOR3 GetSize()  override { return m_size; }								// 大きさのゲッター
+	CScore *GetScore() { return m_pScore; }											// スコアのゲッター
+	CGauge2D *GetGauge2D() { return m_pGauge2D; }									// ゲージのゲッター
 
 private:
 	//--------------------------------------------------------------------

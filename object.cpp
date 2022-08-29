@@ -42,6 +42,27 @@ void CObject::ReleaseAll(void)
 }
 
 //=============================================================================
+// 遷移時のインスタンスの解放
+// Author : 唐﨑結斗
+// 概要 : 遷移時のインスタンスを解放する処理
+//=============================================================================
+void CObject::ReleaseScene(void)
+{
+	for (int nCntPriority = 0; nCntPriority < MAX_LEVEL; nCntPriority++)
+	{
+		for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
+		{
+			if (m_apObject[nCntPriority][nCntObject] != nullptr
+				&& m_apObject[nCntPriority][nCntObject]->GetObjType() != OBJTYPE_FADE)
+			{// インスタンスが使用されてる
+				// オブジェクト終了処理
+				m_apObject[nCntPriority][nCntObject]->Uninit();
+			}
+		}
+	}
+}
+
+//=============================================================================
 // すべてのインスタンスの更新
 // Author : 唐﨑結斗
 // 概要 : 使用されてるインスタンスの更新処理を呼び出す

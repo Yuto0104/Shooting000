@@ -13,6 +13,7 @@
 #include <math.h>
 
 #include "energy_gage.h"
+#include "object.h"
 #include "object2D.h"
 #include "score.h"
 #include "gauge2D.h"
@@ -20,6 +21,7 @@
 #include "renderer.h"
 #include "application.h"
 #include "texture.h"
+#include "game.h"
 
 //=============================================================================
 // インスタンス生成
@@ -83,21 +85,25 @@ HRESULT CEnergyGage::Init()
 	m_pObject2D->SetCol(D3DXCOLOR(0.7f, 0.7f, 0.7f, 1.0f));
 
 	// スコアの生成
-	m_pScore = CScore::Create(3, true);
+	m_pScore = CScore::Create(6, true);
 	assert(m_pScore != nullptr);
+	m_pScore->SetScore(0);
 
-	//// ゲージの生成
-	//m_pGauge2D = CGauge2D::Create();
-	//assert(m_pGauge2D != nullptr);
+	// ゲージの生成
+	m_pGauge2D = CGauge2D::Create();
+	assert(m_pGauge2D != nullptr);
+	m_pGauge2D->SetCol(D3DXCOLOR(0.2f, 0.9f, 1.0f, 1.0f));
+	m_pGauge2D->SetMaxNumber((float)CMotionPlayer3D::MAX_ENERGY);
+	m_pGauge2D->SetCoefficient(0.06f);
+
+	// 大きさの設定
+	SetSize(D3DXVECTOR3(70.0f, 500.0f, 0.0f));
 
 	// 位置の設定
 	SetPos(D3DXVECTOR3(640.0f, 360.0f, 0.0f));
 
 	// 向きの設定
 	SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-	
-	// 大きさの設定
-	SetSize(D3DXVECTOR3(70.0f, 500.0f, 0.0f));
 
 	return S_OK;
 }
@@ -109,33 +115,6 @@ HRESULT CEnergyGage::Init()
 //=============================================================================
 void CEnergyGage::Uninit()
 {
-	if (m_pObject2D != nullptr)
-	{// 終了処理
-		m_pObject2D->Uninit();
-
-		// メモリの解放
-		delete m_pObject2D;
-		m_pObject2D = nullptr;
-	}
-
-	if (m_pScore != nullptr)
-	{// 終了処理
-		m_pScore->Uninit();
-
-		// メモリの解放
-		delete m_pScore;
-		m_pScore = nullptr;
-	}
-
-	if (m_pGauge2D != nullptr)
-	{// 終了処理
-		m_pGauge2D->Uninit();
-
-		// メモリの解放
-		delete m_pGauge2D;
-		m_pGauge2D = nullptr;
-	}
-
 	// インスタンスの解放
 	Release();
 }
@@ -147,7 +126,21 @@ void CEnergyGage::Uninit()
 //=============================================================================
 void CEnergyGage::Update()
 {
+	CMotionPlayer3D *pPlayer = CGame::GetMotionPlayer3D();
 
+	if (pPlayer != nullptr)
+	{
+		CObject::COLOR_TYPE colorType = pPlayer->GetColorType();
+
+		if (colorType == CObject::TYPE_WHITE)
+		{
+			m_pGauge2D->SetCol(D3DXCOLOR(0.2f, 0.9f, 1.0f, 1.0f));
+		}
+		else if (colorType == CObject::TYPE_BLACK)
+		{
+			m_pGauge2D->SetCol(D3DXCOLOR(1.0f, 0.2f, 0.2f, 1.0f));
+		}
+	}
 }
 
 //=============================================================================
@@ -157,7 +150,7 @@ void CEnergyGage::Update()
 //=============================================================================
 void CEnergyGage::Draw()
 {
-
+	
 }
 
 //=============================================================================
@@ -170,6 +163,8 @@ void CEnergyGage::SetPos(const D3DXVECTOR3 &pos)
 	m_pos = pos;
 
 	m_pObject2D->SetPos(m_pos);
+	m_pScore->SetPos(D3DXVECTOR3(m_pos.x, (m_pos.y - m_size.y / 2.0f) + m_pScore->GetSize().y / 2.0f, m_pos.z));
+	m_pGauge2D->SetPos(D3DXVECTOR3(m_pos.x, (m_pos.y + m_size.y / 2.0f - 7.0f), m_pos.z));
 }
 
 //=============================================================================
@@ -182,6 +177,8 @@ void CEnergyGage::SetRot(const D3DXVECTOR3 &rot)
 	m_rot = rot;
 
 	m_pObject2D->SetRot(m_rot);
+	m_pScore->SetRot(m_rot);
+	m_pGauge2D->SetRot(m_rot);
 }
 
 //=============================================================================
@@ -194,4 +191,7 @@ void CEnergyGage::SetSize(const D3DXVECTOR3 & size)
 	m_size = size;
 
 	m_pObject2D->SetSize(m_size);
+	m_pScore->SetWholeSize(D3DXVECTOR3(m_size.x, size.y / 10.0f, size.z));
+	m_pScore->SetSize(D3DXVECTOR3(m_size.x / 3.0f, size.y / 10.0f, size.z));
+	m_pGauge2D->SetSize(D3DXVECTOR3(m_size.x / 10.0f * 8.0f, size.y / 10.0f * 9.0f, size.z));
 }

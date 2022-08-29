@@ -15,6 +15,7 @@
 #include "renderer.h"
 #include "object.h"
 #include "application.h"
+#include "game.h"
 #include "motion_player3D.h"
 
 //=============================================================================
@@ -202,9 +203,11 @@ void CRenderer::DrawFPS()
 
 	wsprintf(str, _T("FPS : %d\n"), GetFps());
 
-	if (CApplication::GetMotionPlayer3D()->GetLife() > 0)
+	if (CApplication::GetMode() == CApplication::MODE_GAME
+		&& CGame::GetMotionPlayer3D() != nullptr
+		&& CGame::GetMotionPlayer3D()->GetLife() > 0)
 	{
-		D3DXVECTOR3 pos = CApplication::GetMotionPlayer3D()->GetPos();
+		D3DXVECTOR3 pos = CGame::GetMotionPlayer3D()->GetPos();
 		sprintf(strCopy, _T("プレイヤーの位置 | x : %.3f | y : %.3f | z : %.3f |\n"), pos.x, pos.y, pos.z);
 		strcat(str, strCopy);
 
