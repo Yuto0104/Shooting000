@@ -16,15 +16,38 @@
 #include "application.h"
 
 //=============================================================================
+// インスタンス生成
+// Author : 唐﨑結斗
+// 概要 : 3Dモデルを生成する
+//=============================================================================
+CBG * CBG::Create(void)
+{
+	// オブジェクトインスタンス
+	CBG *pBG = nullptr;
+
+	// メモリの解放
+	pBG = new CBG;
+
+	// メモリの確保ができなかった
+	assert(pBG != nullptr);
+
+	// 数値の初期化
+	pBG->Init();
+
+	// インスタンスを返す
+	return pBG;
+}
+
+//=============================================================================
 // コンストラクタ
 // Author : 唐﨑結斗
 // 概要 : インスタンス生成時に行う処理
 //=============================================================================
-CBG::CBG()
+CBG::CBG(int nPriority/* = PRIORITY_LEVEL0*/) : CObject(nPriority)
 {
 	m_pVtxBuff = nullptr;								// 頂点バッファ
 	m_col = D3DXCOLOR(1.0f,1.0f,1.0f,1.0f);				// カラー
-	m_typeTex = CTexture::TYPE_2DPLAYER;				// テクスチャの種別
+	m_typeTex = CTexture::TYPE_NULL;					// テクスチャの種別
 }
 
 //=============================================================================
@@ -56,7 +79,13 @@ HRESULT CBG::Init()
 
 	// ポリゴン情報の設定
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);		// カラー
-	m_typeTex = CTexture::TYPE_2DPOLYGON;			// テクスチャタイプ
+	m_typeTex = CTexture::TYPE_BG_000;				// テクスチャタイプ
+
+	// 頂点座標の設定
+	SetVtx();
+
+	// 頂点カラーの設定
+	SetCol(m_col);
 
 	// テクスチャ座標の設定
 	SetTex(D3DXVECTOR2(0.0f, 0.0f), D3DXVECTOR2(1.0f, 1.0f));
@@ -99,8 +128,55 @@ void CBG::Update()
 // 概要 : 2D描画を行う
 //=============================================================================
 void CBG::Draw()
-{
+{// レンダラーのゲット
+	CRenderer *pRenderer = CApplication::GetRenderer();
 
+	// テクスチャポインタの取得
+	CTexture *pTexture = CApplication::GetTexture();
+
+	//テクスチャの設定
+	pRenderer->GetDevice()->SetTexture(0, nullptr);
+
+	//テクスチャの設定
+	pRenderer->GetDevice()->SetTexture(0, pTexture->GetTexture(m_typeTex));
+
+	//頂点バッファをデータストリームに設定
+	pRenderer->GetDevice()->SetStreamSource(0, m_pVtxBuff, 0, sizeof(VERTEX_2D));
+
+	// 頂点フォーマットの設定
+	pRenderer->GetDevice()->SetFVF(FVF_VERTEX_2D);
+
+	//ポリゴン描画
+	pRenderer->GetDevice()->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+
+	//テクスチャの設定
+	pRenderer->GetDevice()->SetTexture(0, nullptr);
+}
+
+//=============================================================================
+// 頂点カラーの設定
+// Author : 唐﨑結斗
+// 概要 : 2Dポリゴンの頂点カラーを設定する
+//=============================================================================
+void CBG::SetCol(const D3DXCOLOR color)
+{
+	// カラーの設定
+	m_col = color;
+
+	//頂点情報へのポインタを生成
+	VERTEX_2D *pVtx;
+
+	//頂点バッファをロックし、頂点情報へのポインタを取得
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	// 頂点カラーの設定
+	pVtx[0].col = m_col;
+	pVtx[1].col = m_col;
+	pVtx[2].col = m_col;
+	pVtx[3].col = m_col;
+
+	//頂点バッファをアンロック
+	m_pVtxBuff->Unlock();
 }
 
 //=============================================================================
@@ -117,22 +193,16 @@ void CBG::SetVtx()
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 	// 頂点情報を設定
-	pVtx[0].pos = D3DXVECTOR3();
-	pVtx[1].pos = D3DXVECTOR3();
-	pVtx[2].pos = D3DXVECTOR3();
-	pVtx[3].pos = D3DXVECTOR3();
+	pVtx[0].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	pVtx[1].pos = D3DXVECTOR3((float)CRenderer::SCREEN_WIDTH, 0.0f, 0.0f);
+	pVtx[2].pos = D3DXVECTOR3(0.0f, (float)CRenderer::SCREEN_HEIGHT, 0.0f);
+	pVtx[3].pos = D3DXVECTOR3((float)CRenderer::SCREEN_WIDTH, (float)CRenderer::SCREEN_HEIGHT, 0.0f);
 
 	// rhwの設定
 	pVtx[0].rhw = 1.0f;
 	pVtx[1].rhw = 1.0f;
 	pVtx[2].rhw = 1.0f;
 	pVtx[3].rhw = 1.0f;
-
-	// 頂点カラーの設定
-	pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 	//頂点バッファをアンロック
 	m_pVtxBuff->Unlock();

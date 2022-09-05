@@ -56,6 +56,7 @@ CEnemyManager::CEnemyManager()
 	m_nMaxInstall = 0;									// 最大設置数
 	m_nMaxMove = 0;										// 移動情報数
 	m_nCntFrame = 0;									// フレームカウント
+	m_nGameEndFrame = 0;								// ゲームの終了時間
 	m_nCntSetEnemy = 0;									// 敵の設置カウント
 }
 
@@ -77,7 +78,7 @@ CEnemyManager::~CEnemyManager()
 HRESULT CEnemyManager::Init()
 {
 	// ファイルの読み込み
-	LoadFile();
+	LoadFile("data/FILE/enemy.txt");
 
 	return S_OK;
 }
@@ -103,6 +104,13 @@ void CEnemyManager::Uninit()
 		m_arrangement = nullptr;
 	}
 
+	if (m_move != nullptr)
+	{// 終了処理
+	 // メモリの解放
+		delete m_move;
+		m_move = nullptr;
+	}
+
 	// スコアの解放
 	Release();
 }
@@ -114,11 +122,19 @@ void CEnemyManager::Uninit()
 //=============================================================================
 void CEnemyManager::Update()
 {
-	// フレームカウントのインクリメント
-	m_nCntFrame++;
+	if (m_arrangement != nullptr)
+	{// フレームカウントのインクリメント
+		m_nCntFrame++;
 
-	// 敵の配置
-	SetEnemy();
+		// 敵の配置
+		SetEnemy();
+
+		// ゲーム終了
+		if (m_nCntFrame >= m_nGameEndFrame)
+		{
+			CApplication::SetNextMode(CApplication::MODE_RESULT);
+		}
+	}	
 }
 
 //=============================================================================
@@ -136,7 +152,7 @@ void CEnemyManager::Draw()
 // Author : 唐﨑結斗
 // 概要 : ファイルを読み込む
 //=============================================================================
-void CEnemyManager::LoadFile()
+void CEnemyManager::LoadFile(char *pFileName)
 {
 	// 変数宣言
 	char aStr[128];
@@ -146,7 +162,7 @@ void CEnemyManager::LoadFile()
 	int nCntMoveKey = 0;
 
 	// ファイルの読み込み
-	FILE *pFile = fopen("data/FILE/enemy.txt", "r");
+	FILE *pFile = fopen(pFileName, "r");
 
 	if (pFile != nullptr)
 	{
@@ -162,10 +178,24 @@ void CEnemyManager::LoadFile()
 				memset(&m_status[0], 0, sizeof(m_status));
 			}
 
+			if (strstr(&aStr[0], "GAME_END_FRAME") != NULL)
+			{
+				fscanf(pFile, "%s", &aStr[0]);
+				fscanf(pFile, "%d", &m_nGameEndFrame);
+			}
+
 			if (strstr(&aStr[0], "MAX_INSTALL") != NULL)
 			{
 				fscanf(pFile, "%s", &aStr[0]);
 				fscanf(pFile, "%d", &m_nMaxInstall);
+
+				if (m_arrangement != nullptr)
+				{// 終了処理
+				 // メモリの解放
+					delete m_arrangement;
+					m_arrangement = nullptr;
+				}
+
 				m_arrangement = new ENEMY_ARRANGEMENT[m_nMaxInstall];
 				assert(m_arrangement != nullptr);
 				memset(&m_arrangement[0], 0, sizeof(m_arrangement));
@@ -186,6 +216,20 @@ void CEnemyManager::LoadFile()
 				{
 					fscanf(pFile, "%s", &aStr[0]);
 
+					if (strstr(&aStr[0], "SCORE") != NULL)
+					{// モデルのファイル名の設定
+						fscanf(pFile, "%s", &aStr[0]);
+						fscanf(pFile, "%d", &m_status[nCntStatus].nScore);
+					}
+
+					if (strstr(&aStr[0], "COLLISION_SIZE") != NULL)
+					{// モデルのファイル名の設定
+						fscanf(pFile, "%s", &aStr[0]);
+						fscanf(pFile, "%f", &m_status[nCntStatus].collisionSize.x);
+						fscanf(pFile, "%f", &m_status[nCntStatus].collisionSize.y);
+						fscanf(pFile, "%f", &m_status[nCntStatus].collisionSize.z);
+					}
+
 					if (strstr(&aStr[0], "COLOR") != NULL)
 					{// カラータイプの設定
 						fscanf(pFile, "%s", &aStr[0]);
@@ -201,10 +245,10 @@ void CEnemyManager::LoadFile()
 						}
 					}
 
-					if (strstr(&aStr[0], "FALE_NAME") != NULL)
+					if (strstr(&aStr[0], "MODEL_ID") != NULL)
 					{// モデルのファイル名の設定
 						fscanf(pFile, "%s", &aStr[0]);
-						fscanf(pFile, "%s", &m_status[nCntStatus].aFileName[0]);
+						fscanf(pFile, "%d", &m_status[nCntStatus].nModelID);
 					}
 
 					if (strstr(&aStr[0], "LIFE") != NULL)
@@ -253,6 +297,12 @@ void CEnemyManager::LoadFile()
 					{// モデルのファイル名の設定
 						fscanf(pFile, "%s", &aStr[0]);
 						fscanf(pFile, "%d", &m_arrangement[nCntArrangement].nID);
+					}
+
+					if (strstr(&aStr[0], "DRAW_TYPE") != NULL)
+					{// モデルのファイル名の設定
+						fscanf(pFile, "%s", &aStr[0]);
+						fscanf(pFile, "%d", &m_arrangement[nCntArrangement].nDrawType);
 					}
 				}
 
@@ -345,12 +395,13 @@ void CEnemyManager::LoadFile()
 				}
 
 				nCntMove++;
+				nCntMoveKey = 0;
 			}
 		}
 	}
 	else
 	{
-		printf("ファイル読み込み失敗\n");
+		assert(false);
 	}
 }
 
@@ -369,11 +420,13 @@ void CEnemyManager::SetEnemy()
 		{
 			int nID = m_arrangement[nCntEnemy].nID;
 
-			pEnemy = CEnemy3D::Create(&m_status[nID].aFileName[0]);
+			pEnemy = CEnemy3D::Create(m_status[nID].nModelID);
+			pEnemy->SetColisonSize(m_status[nID].collisionSize);
 			pEnemy->SetColorType(m_status[nID].colorType);
 			pEnemy->SetLife(m_status[nID].nLife);
 			pEnemy->SetScore(m_status[nID].nScore);
 			pEnemy->SetPos(m_arrangement[nCntEnemy].pos);
+			pEnemy->SetObjectDrowType((EObjectDrowType)m_arrangement[nCntEnemy].nDrawType);
 			pEnemy->SetMoveData(m_move[m_arrangement[nCntEnemy].nMoveID]);
 			m_nCntSetEnemy++;
 		}

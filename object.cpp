@@ -117,7 +117,10 @@ void CObject::DrawAll(EObjectDrowType objectDrowType)
 // Author : 唐﨑結斗
 // 概要 : インスタンス生成時に行う処理
 //=============================================================================
-CObject::CObject(int nPriority /*= PRIORITY_LEVEL0*/)
+CObject::CObject(int nPriority /*= PRIORITY_LEVEL0*/) :
+m_objectType(OBJTYPE_NONE),
+m_objectDrowType(DROWTYPE_GAME),
+m_colorType(TYPE_NONE)
 {
 	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
 	{

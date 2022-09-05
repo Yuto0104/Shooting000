@@ -13,7 +13,10 @@
 
 #include "game.h"
 
+#include "application.h"
+#include "model_manager.h"
 #include "enemy_manager.h"
+#include "camera_manager.h"
 #include "renderer.h"
 #include "object.h"
 #include "object3D.h"
@@ -65,38 +68,15 @@ CGame::~CGame()
 //=============================================================================
 HRESULT CGame::Init()
 {
-	
+	// 背景モデルの設置
+	CApplication::GetModelManager()->SetModelBG();
+
+	// カメラマネージャーのインスタンス取得
+	CCameraManager *pCameraManager = CApplication::GetCameraManager();
+	CApplication::GetCameraBG()->Set(pCameraManager->GetPosV(), pCameraManager->GetPosR(), pCameraManager->GetRot());
+
 	CEnemyManager *pEnemyManager = CEnemyManager::Create();
-
-	CEnemy3D *pEnemy = CEnemy3D::Create("data/MODEL/enemy_white_000.x");
-	pEnemy->SetPos(D3DXVECTOR3(-200.0f, 0.0f, 200.0f));
-	pEnemy->SetSize(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
-	pEnemy->SetColorType(CObject::TYPE_WHITE);
-
-	pEnemy = CEnemy3D::Create("data/MODEL/enemy_white_000.x");
-	pEnemy->SetPos(D3DXVECTOR3(-150.0f, 0.0f, 200.0f));
-	pEnemy->SetSize(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
-	pEnemy->SetColorType(CObject::TYPE_WHITE);
-
-	pEnemy = CEnemy3D::Create("data/MODEL/enemy_white_000.x");
-	pEnemy->SetPos(D3DXVECTOR3(-100.0f, 0.0f, 200.0f));
-	pEnemy->SetSize(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
-	pEnemy->SetColorType(CObject::TYPE_WHITE);
-
-	pEnemy = CEnemy3D::Create("data/MODEL/enemy_black_000.x");
-	pEnemy->SetPos(D3DXVECTOR3(200.0f, 0.0f, 200.0f));
-	pEnemy->SetSize(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
-	pEnemy->SetColorType(CObject::TYPE_BLACK);
-
-	pEnemy = CEnemy3D::Create("data/MODEL/enemy_black_000.x");
-	pEnemy->SetPos(D3DXVECTOR3(100.0f, 0.0f, 200.0f));
-	pEnemy->SetSize(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
-	pEnemy->SetColorType(CObject::TYPE_BLACK);
-
-	pEnemy = CEnemy3D::Create("data/MODEL/enemy_black_000.x");
-	pEnemy->SetPos(D3DXVECTOR3(150.0f, 0.0f, 200.0f));
-	pEnemy->SetSize(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
-	pEnemy->SetColorType(CObject::TYPE_BLACK);
+	pEnemyManager->LoadFile("data/FILE/stage000.txt");
 
 	CMotionChar3D *pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
 	pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f));

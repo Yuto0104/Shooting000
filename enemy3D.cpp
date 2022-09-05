@@ -24,13 +24,14 @@
 //*****************************************************************************
 const float CEnemy3D::LINTERN_BULLET_SPAWN_RANGE = 30.0f;				// 返し弾の生成範囲
 const float CEnemy3D::LINTERN_BULLET_MOVE_VEC = 0.15f;					// 返し弾の移動方向
+int CEnemy3D::s_nCntSetEnemy = 0;										// 敵のカウント
 
 //=============================================================================
 // インスタンス生成
 // Author : 唐﨑結斗
 // 概要 : 3Dエネミーを生成する
 //=============================================================================
-CEnemy3D * CEnemy3D::Create(const char *pName)
+CEnemy3D * CEnemy3D::Create(const int nNumModel)
 {
 	// オブジェクトインスタンス
 	CEnemy3D *pEnemy3D = nullptr;
@@ -42,7 +43,7 @@ CEnemy3D * CEnemy3D::Create(const char *pName)
 	assert(pEnemy3D != nullptr);
 
 	// 数値の初期化
-	pEnemy3D->Init(pName);
+	pEnemy3D->Init(nNumModel);
 
 	// インスタンスを返す
 	return pEnemy3D;
@@ -72,9 +73,13 @@ CEnemy3D::CEnemy3D()
 	m_nScore = 0;										// スコア
 	m_nCntShot = 0;										// 弾発射までのカウント
 	m_bMove = false;									// 移動を行っている
+	m_bUse = false;										// 使用されているかどうか
 
 	// 疑似乱数の初期化
 	srand((unsigned int)time(NULL));
+
+	// 設置した敵の数をインクリメント
+	s_nCntSetEnemy++;
 }
 
 //=============================================================================
@@ -84,7 +89,8 @@ CEnemy3D::CEnemy3D()
 //=============================================================================
 CEnemy3D::~CEnemy3D()
 {
-
+	// 設置した敵の数をデクリメント
+	s_nCntSetEnemy--;
 }
 
 //=============================================================================
@@ -92,10 +98,10 @@ CEnemy3D::~CEnemy3D()
 // Author : 唐﨑結斗
 // 概要 : 頂点バッファを生成し、メンバ変数の初期値を設定
 //=============================================================================
-HRESULT CEnemy3D::Init(const char * pName)
+HRESULT CEnemy3D::Init(const int nNumModel)
 {
 	// モデルの初期化
-	CModel3D::Init(pName);
+	CModel3D::Init(nNumModel);
 
 	// あたり判定の設定
 	SetColisonSize(D3DXVECTOR3(50.0f, 50.0f, 50.0f));
@@ -137,14 +143,14 @@ void CEnemy3D::Update()
 
 		// 移動情報のコピー
 		SetMoveCopy();
-
-		// 移動量の設定
-		SetMove();
 	}
 	else
 	{
 		m_moveMode = MODE_NONE;
 	}
+
+	// 移動量の設定
+	SetMove();
 
 	// 弾の発射
 	Shot();
@@ -154,6 +160,9 @@ void CEnemy3D::Update()
 
 	// 位置の設定
 	SetPos(pos);
+
+	// スクリーン内の判定
+	ScreenIn();
 
 	// モデルの更新
 	CModel3D::Update();
@@ -176,61 +185,64 @@ void CEnemy3D::Draw()
 // 概要 : 引数分のダメージを与える
 //=============================================================================
 void CEnemy3D::Hit(COLOR_TYPE colorType, int nAttack)
-{// 変数宣言
-	COLOR_TYPE MyColorType = GetColorType();
-	int nMyAttack = nAttack;
+{
+	if (m_bUse)
+	{// 変数宣言
+		COLOR_TYPE MyColorType = GetColorType();
+		int nMyAttack = nAttack;
 
-	if (MyColorType == colorType)
-	{// 色のタイプが同一の場合
-		nMyAttack *= 2;
-	}
-
-	// 体力の減算
-	m_nLife -= nMyAttack;
-
-	if (m_nLife <= 0)
-	{// 体力が0の場合
-		m_nLife = 0;
-		CScore *pScore = CGame::GetScore();
-		pScore->AddScore(m_nScore);
-
-		// データ格納用変数
-		CBullet3D * pBullet3D;
-		D3DXVECTOR3 pos = GetPos();
-		D3DXVECTOR3 rot = GetRot();
-		D3DXVECTOR3 randLinternBulletSpawnRange = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		float fRandMoveVec = 0.0f;
-
-		// 弾の色
-		D3DXCOLOR bulletColor;
-
-		if (MyColorType == CObject::TYPE_WHITE)
-		{// 弾の色の設定
-			bulletColor = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-		}
-		else if (MyColorType == CObject::TYPE_BLACK)
-		{// 弾の色の設定
-			bulletColor = D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f);
+		if (MyColorType == colorType)
+		{// 色のタイプが同一の場合
+			nMyAttack *= 2;
 		}
 
-		for (int nCntBullet = 0; nCntBullet < MAX_LINTERN_BULLET; nCntBullet++)
-		{// 乱数の設定
-			randLinternBulletSpawnRange.x = pos.x - LINTERN_BULLET_SPAWN_RANGE + ((float)(rand() % (int)(LINTERN_BULLET_SPAWN_RANGE * 200.0f) / 100));
-			randLinternBulletSpawnRange.z = pos.z - LINTERN_BULLET_SPAWN_RANGE + ((float)(rand() % (int)(LINTERN_BULLET_SPAWN_RANGE * 200.0f) / 100));
-			fRandMoveVec = rot.y - D3DX_PI * LINTERN_BULLET_MOVE_VEC + D3DX_PI * ((float)(rand() % (int)(LINTERN_BULLET_MOVE_VEC * 200.0f)) / 100);
+		// 体力の減算
+		m_nLife -= nMyAttack;
 
-			// 弾の生成
-			pBullet3D = CBullet3D::Create();
-			pBullet3D->SetPos(D3DXVECTOR3(randLinternBulletSpawnRange.x, pos.y, randLinternBulletSpawnRange.z));
-			pBullet3D->SetSize(D3DXVECTOR3(5.0f, 5.0f, 0.0f));
-			pBullet3D->SetMoveVec(D3DXVECTOR3(rot.x + D3DX_PI * -0.5f, fRandMoveVec, 0.0f));
-			pBullet3D->SetSpeed(5.0f);
-			pBullet3D->SetColor(bulletColor);
-			pBullet3D->SetColorType(MyColorType);
-			pBullet3D->SetParent(CObject::OBJTYPE_3DENEMY);
+		if (m_nLife <= 0)
+		{// 体力が0の場合
+			m_nLife = 0;
+			CScore *pScore = CGame::GetScore();
+			pScore->AddScore(m_nScore);
+
+			// データ格納用変数
+			CBullet3D * pBullet3D;
+			D3DXVECTOR3 pos = GetPos();
+			D3DXVECTOR3 rot = GetRot();
+			D3DXVECTOR3 randLinternBulletSpawnRange = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			float fRandMoveVec = 0.0f;
+
+			// 弾の色
+			D3DXCOLOR bulletColor;
+
+			if (MyColorType == CObject::TYPE_WHITE)
+			{// 弾の色の設定
+				bulletColor = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			}
+			else if (MyColorType == CObject::TYPE_BLACK)
+			{// 弾の色の設定
+				bulletColor = D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f);
+			}
+
+			for (int nCntBullet = 0; nCntBullet < MAX_LINTERN_BULLET; nCntBullet++)
+			{// 乱数の設定
+				randLinternBulletSpawnRange.x = pos.x - LINTERN_BULLET_SPAWN_RANGE + ((float)(rand() % (int)(LINTERN_BULLET_SPAWN_RANGE * 200.0f) / 100));
+				randLinternBulletSpawnRange.z = pos.z - LINTERN_BULLET_SPAWN_RANGE + ((float)(rand() % (int)(LINTERN_BULLET_SPAWN_RANGE * 200.0f) / 100));
+				fRandMoveVec = rot.y - D3DX_PI * LINTERN_BULLET_MOVE_VEC + D3DX_PI * ((float)(rand() % (int)(LINTERN_BULLET_MOVE_VEC * 200.0f)) / 100);
+
+				// 弾の生成
+				pBullet3D = CBullet3D::Create();
+				pBullet3D->SetPos(D3DXVECTOR3(randLinternBulletSpawnRange.x, pos.y, randLinternBulletSpawnRange.z));
+				pBullet3D->SetSize(D3DXVECTOR3(5.0f, 5.0f, 0.0f));
+				pBullet3D->SetMoveVec(D3DXVECTOR3(rot.x + D3DX_PI * -0.5f, fRandMoveVec, 0.0f));
+				pBullet3D->SetSpeed(5.0f);
+				pBullet3D->SetColor(bulletColor);
+				pBullet3D->SetColorType(MyColorType);
+				pBullet3D->SetParent(CObject::OBJTYPE_3DENEMY);
+			}
+
+			Uninit();
 		}
-
-		Uninit();
 	}
 }
 
@@ -364,4 +376,35 @@ void CEnemy3D::SetMoveCopy()
 	m_fWaveLength = m_moveData.moveKey[m_CntKey].fWaveLength;		// 波長
 	m_fWaveSize = m_moveData.moveKey[m_CntKey].fWaveSize;			// 波の大きさ
 	m_fSpeed = m_moveData.moveKey[m_CntKey].fSpeed;					// 移動速度
+}
+
+//=============================================================================
+// スクリーンの判定
+// Author : 唐﨑結斗
+// 概要 : スクリーン内にいるとき、敵を使用可能にする
+//=============================================================================
+void CEnemy3D::ScreenIn()
+{
+	// 位置の取得
+	D3DXVECTOR3 pos = GetPos();
+
+	// スクリーン座標にキャスト
+	D3DXVECTOR3 screenPos = CApplication::ScreenCastWorld(pos);
+
+	if (screenPos.x >= 0.0f
+		&& screenPos.x <= (float)CRenderer::SCREEN_WIDTH
+		&& screenPos.y >= 0.0f
+		&& screenPos.y <= (float)CRenderer::SCREEN_HEIGHT
+		&& !m_bUse)
+	{
+		m_bUse = true;
+	}
+	else if ((screenPos.x <= 0.0f
+		|| screenPos.x >= (float)CRenderer::SCREEN_WIDTH
+		|| screenPos.y <= 0.0f
+		|| screenPos.y >= (float)CRenderer::SCREEN_HEIGHT)
+		&& m_bUse)
+	{
+		Uninit();
+	}
 }

@@ -25,7 +25,7 @@ public:
 	//--------------------------------------------------------------------
 	// 静的メンバ関数
 	//--------------------------------------------------------------------
-	static CModel3D *Create(const char *pName);			// 3Dモデルの生成
+	static CModel3D *Create(const int nModelNam);			// 3Dモデルの生成
 
 	//--------------------------------------------------------------------
 	// コンストラクタとデストラクタ
@@ -37,7 +37,7 @@ public:
 	// メンバ変数
 	//--------------------------------------------------------------------
 	HRESULT Init() override;																		// 初期化
-	HRESULT Init(const char *pName);																// 初期化
+	HRESULT Init(const int nModelNam);																// 初期化
 	void Uninit() override;																			// 終了
 	void Update() override;																			// 更新
 	void Draw() override;																			// 描画
@@ -57,14 +57,14 @@ private:
 	//--------------------------------------------------------------------
 	// メンバ変数
 	//--------------------------------------------------------------------
-	LPD3DXMESH		m_pMesh;			// メッシュ情報へのポインタ
-	LPD3DXBUFFER	m_pBuffer;			// マテリアル情報へのポインタ
-	DWORD			m_nNumMat;			// マテリアル情報の数
-	D3DXMATRIX		m_mtxWorld;			// ワールドマトリックス
-	D3DXVECTOR3		m_pos;				// 位置
-	D3DXVECTOR3		m_posOld;			// 過去位置
-	D3DXVECTOR3		m_rot;				// 向き
-	D3DXVECTOR3		m_size;				// 大きさ
+	LPD3DXMESH			m_pMesh;			// メッシュ情報へのポインタ
+	LPD3DXBUFFER		m_pBuffer;			// マテリアル情報へのポインタ
+	DWORD				m_nNumMat;			// マテリアル情報の数
+	D3DXMATRIX			m_mtxWorld;			// ワールドマトリックス
+	D3DXVECTOR3			m_pos;				// 位置
+	D3DXVECTOR3			m_posOld;			// 過去位置
+	D3DXVECTOR3			m_rot;				// 向き
+	D3DXVECTOR3			m_size;				// 大きさ
 };
 
 #endif

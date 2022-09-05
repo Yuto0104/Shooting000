@@ -41,7 +41,8 @@ public:
 	struct ENEMY_STATUS
 	{
 		COLOR_TYPE		colorType;			// カラータイプ
-		char			aFileName[128];		// ファイル名
+		D3DXVECTOR3		collisionSize;		// あたり判定の大きさ
+		int				nModelID;			// モデルID
 		int				nLife;				// 体力
 		int				nScore;				// スコア
 	};
@@ -57,6 +58,7 @@ public:
 		int					nMoveID;		// 移動情報を格納
 		int					nFrame;			// エネミーの発生フレーム数
 		int					nID;			// 識別番号
+		int					nDrawType;		// 描画タイプ
 		EENEMY_MOVE_TYPE	type;			// 種別
 	};
 
@@ -86,12 +88,12 @@ public:
 	D3DXVECTOR3 GetPosOld()  override { return D3DXVECTOR3(0.0f, 0.0f, 0.0f); }		// 過去位置のゲッター
 	D3DXVECTOR3 GetRot()  override { return D3DXVECTOR3(0.0f, 0.0f, 0.0f); }		// 向きのゲッター
 	D3DXVECTOR3 GetSize()  override { return D3DXVECTOR3(0.0f, 0.0f, 0.0f); }		// 大きさのゲッター
+	void LoadFile(char *pFileName);
 
 private:
 	//--------------------------------------------------------------------
 	// メンバ関数
 	//--------------------------------------------------------------------
-	void LoadFile();
 	void SetEnemy();
 
 	//--------------------------------------------------------------------
@@ -107,6 +109,7 @@ private:
 	int						m_nMaxType;				// 種類の最大数
 	int						m_nMaxInstall;			// 最大設置数
 	int						m_nMaxMove;				// 移動情報数
+	int						m_nGameEndFrame;		// ゲームの終了時間
 	int						m_nCntFrame;			// フレームカウント
 	int						m_nCntSetEnemy;			// 敵の設置カウント
 };

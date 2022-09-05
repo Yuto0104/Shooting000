@@ -15,16 +15,16 @@ NUM_MODEL = 11
 # モデルファイル名
 #------------------------------------------------------------------------------
 MODEL_FILENAME = data/MODEL/shark/00_サメ(頭).x			# [0]頭
-MODEL_FILENAME = data/MODEL/shark/01_サメ(胴体).x			# [1]胴体
-MODEL_FILENAME = data/MODEL/shark/02_サメ(右腕).x			# [2]右腕
-MODEL_FILENAME = data/MODEL/shark/03_サメ(左腕).x			# [3]左腕
+MODEL_FILENAME = data/MODEL/shark/01_サメ(胴体).x		# [1]胴体
+MODEL_FILENAME = data/MODEL/shark/02_サメ(右腕).x		# [2]右腕
+MODEL_FILENAME = data/MODEL/shark/03_サメ(左腕).x		# [3]左腕
 MODEL_FILENAME = data/MODEL/shark/04_サメ(腰).x			# [4]腰
 MODEL_FILENAME = data/MODEL/shark/05_サメ(腿).x			# [5]腿
 MODEL_FILENAME = data/MODEL/shark/06_サメ(膝).x			# [6]膝
-MODEL_FILENAME = data/MODEL/shark/07_サメ(右足).x			# [7]右足
-MODEL_FILENAME = data/MODEL/shark/08_サメ(左足).x			# [8]左足
+MODEL_FILENAME = data/MODEL/shark/07_サメ(右足).x		# [7]右足
+MODEL_FILENAME = data/MODEL/shark/08_サメ(左足).x		# [8]左足
 MODEL_FILENAME = data/MODEL/shark/09_サメ(尾ひれ).x		# [9]尾ひれ
-MODEL_FILENAME = data/MODEL/shark/10_サメ(下顎).x			# [10]下顎
+MODEL_FILENAME = data/MODEL/shark/10_サメ(下顎).x		# [10]下顎
 
 #------------------------------------------------------------------------------
 # キャラクター情報

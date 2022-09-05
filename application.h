@@ -20,6 +20,8 @@ class CRenderer;
 class CKeyboard;
 class CMouse;
 class CTexture;
+class CModelManager;
+class CCameraManager;
 class CSound;
 class CCamera;
 class CSceneMode;
@@ -54,6 +56,8 @@ public:
 	static CKeyboard *GetKeyboard() { return m_pKeyboard; }								// キーボードのゲッター
 	static CMouse *GetMouse() { return m_pMouse; }										// マウスのゲッター
 	static CTexture *GetTexture() { return m_pTexture; }								// テクスチャのゲッター
+	static CModelManager *GetModelManager() { return m_pModelManager; }					// モデルマネージャーのゲッター
+	static CCameraManager *GetCameraManager() { return m_pCameraManager; }				// カメラマネージャーのゲッター
 	static CSound *GetSound() { return m_pSound; }										// サウンドのゲッター
 	static CCamera *GetCamera() { return m_pCamera; }									// カメラのゲッター
 	static CCamera *GetCameraBG() { return m_pCameraBG; }								// 背景カメラのゲッター
@@ -80,17 +84,14 @@ public:
 
 private:
 	//--------------------------------------------------------------------
-	// 静的メンバ関数
-	//--------------------------------------------------------------------
-	
-
-	//--------------------------------------------------------------------
 	// 静的メンバ変数
 	//--------------------------------------------------------------------
 	static CRenderer *m_pRenderer;				// rendererクラス
 	static CKeyboard *m_pKeyboard;				// キーボードクラス
 	static CMouse *m_pMouse;					// マウスクラス
 	static CTexture *m_pTexture;				// テクスチャクラス
+	static CModelManager *m_pModelManager;		// モデルマネージャークラス
+	static CCameraManager *m_pCameraManager;	// カメラマネージャークラス
 	static CSound *m_pSound;					// サウンドクラス
 	static CCamera *m_pCamera;					// ゲームカメラクラス
 	static CCamera *m_pCameraBG;				// 背景カメラクラス

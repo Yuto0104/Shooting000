@@ -57,6 +57,7 @@ void CTexture::Init(void)
 		"data/TEXTURE/number003.png",				// ナンバー(0)
 		"data/TEXTURE/ハート.png",					// ハート(0)
 		"data/TEXTURE/field005.jpg",				// 床(0)
+		"data/TEXTURE/砂漠.jpg",					// 背景(0)
 	};
 
 	for (int nCnt = 0; nCnt < MAX_TYPE; nCnt++)

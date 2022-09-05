@@ -11,7 +11,8 @@
 //***************************************************************************
 // インクルード
 //***************************************************************************
-#include"main.h"
+#include "main.h"
+#include "model3D.h"
 #include "renderer.h"
 
 //=============================================================================
@@ -74,18 +75,18 @@ public:
 	//***************************************************************
 	typedef struct
 	{
-		LPD3DXMESH		pMesh;					// メッシュ情報へのポインタ
-		LPD3DXBUFFER	pBuffer;				// マテリアル情報へのポインタ
-		DWORD			nNumMat;				// マテリアル情報の数
-		D3DXMATRIX		mtxWorld;				// ワールドマトリックス
-		D3DXVECTOR3		posOrigin;				// 元の位置
-		D3DXVECTOR3		rotOrigin;				// 元の向き
-		D3DXVECTOR3		pos;					// 現在の位置
-		D3DXVECTOR3		rot;					// 現在の向き
-		D3DXVECTOR3		posDest;				// 目的の位置
-		D3DXVECTOR3		rotDest;				// 目的の向き
-		int				nIdxModelParent;		// 親モデルのインデックス数
-		int				nType;					// パーツのタイプ
+		LPD3DXMESH					pMesh;					// メッシュ情報へのポインタ
+		LPD3DXBUFFER				pBuffer;				// マテリアル情報へのポインタ
+		DWORD						nNumMat;				// マテリアル情報の数
+		D3DXMATRIX					mtxWorld;				// ワールドマトリックス
+		D3DXVECTOR3					posOrigin;				// 元の位置
+		D3DXVECTOR3					rotOrigin;				// 元の向き
+		D3DXVECTOR3					pos;					// 現在の位置
+		D3DXVECTOR3					rot;					// 現在の向き
+		D3DXVECTOR3					posDest;				// 目的の位置
+		D3DXVECTOR3					rotDest;				// 目的の向き
+		int							nIdxModelParent;		// 親モデルのインデックス数
+		int							nType;					// パーツのタイプ
 	}Parts;
 
 	//--------------------------------------------------------------------
@@ -102,6 +103,9 @@ public:
 
 	// パーツの設定
 	void SetParts(D3DXMATRIX mtxWorld);
+
+	// パーツの色設定
+	void SetParts(D3DXMATRIX mtxWorld, const D3DXCOLOR col);
 
 	// モーションの再生
 	bool PlayMotion(const int nCntMotionSet);

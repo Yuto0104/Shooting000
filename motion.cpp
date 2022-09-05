@@ -13,6 +13,7 @@
 
 #include "application.h"
 #include "motion.h"	
+#include "model_manager.h"
 #include "calculation.h"
 
 //=============================================================================
@@ -54,6 +55,9 @@ CMotion::~CMotion()
 //=============================================================================
 void CMotion::Init(void)
 {
+	// モデルマネージャークラスの設定
+	CModelManager *pModelManager = CApplication::GetModelManager();
+
 	for (int nCntMotion = 0; nCntMotion < MAX_MOTION; nCntMotion++)
 	{// カウントのリセット
 		CntReset(nCntMotion);
@@ -70,15 +74,8 @@ void CMotion::Init(void)
 		// パーツ情報の初期化
 		parts->mtxWorld = {};		// ワールドマトリックス
 
-		// Xファイルの読み込み
-		D3DXLoadMeshFromX(m_partsFile[parts->nType].aName,
-			D3DXMESH_SYSTEMMEM,
-			CApplication::GetRenderer()->GetDevice(),
-			NULL,
-			&parts->pBuffer,
-			NULL,
-			&parts->nNumMat,
-			&parts->pMesh);
+		// マテリアル情報の代入
+		pModelManager->GetModelMateria(parts->nType, parts->pMesh, parts->pBuffer, parts->nNumMat);
 	}
 }
 
@@ -139,9 +136,6 @@ void CMotion::SetParts(D3DXMATRIX mtxWorld)
 		// 自分の親マトリックスとの掛け算
 		D3DXMatrixMultiply(&parts->mtxWorld, &parts->mtxWorld, &mtxParent);
 
-		//// サイズの反映
-		//D3DXMatrixScaling()
-
 		// ワールドマトリックスの設定
 		pDevice->SetTransform(D3DTS_WORLD, &parts->mtxWorld);
 
@@ -155,6 +149,93 @@ void CMotion::SetParts(D3DXMATRIX mtxWorld)
 		{
 			// マテリアルの設定
 			pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+
+			// プレイヤーパーツの描画
+			parts->pMesh->DrawSubset(nCntMat);
+		}
+
+		// 保していたマテリアルを戻す
+		pDevice->SetMaterial(&matDef);
+	}
+
+	// 新規深度値とZバッファの深度値が同じ値ならテスト成功にする
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+}
+
+//=============================================================================
+// パーツの設定
+// Author : 唐﨑結斗
+// 概要 : 行列を利用して、パーツの親子関係と描画設定、色設定を行う
+//=============================================================================
+void CMotion::SetParts(D3DXMATRIX mtxWorld, const D3DXCOLOR col)
+{// デバイスの取得
+	LPDIRECT3DDEVICE9 pDevice = CApplication::GetRenderer()->GetDevice();
+
+	// 計算用マトリックス
+	D3DXMATRIX mtxRot, mtxTrans;
+	D3DMATERIAL9 matDef;
+	D3DXMATERIAL *pMat = {};
+
+	for (int nCntParts = 0; nCntParts < m_nMaxParts; nCntParts++)
+	{// ワールドマトリックスの初期化
+		CMotion::Parts* parts = (m_parts + nCntParts);
+
+		D3DXMatrixIdentity(&parts->mtxWorld);			// 行列初期化関数
+
+		// 向きの反映
+		D3DXMatrixRotationYawPitchRoll(&mtxRot,
+			parts->rot.y,
+			parts->rot.x,
+			parts->rot.z);								// 行列回転関数
+
+		D3DXMatrixMultiply(&parts->mtxWorld,
+			&parts->mtxWorld,
+			&mtxRot);									// 行列掛け算関数 
+
+		// 位置を反映
+		D3DXMatrixTranslation(&mtxTrans,
+			parts->pos.x,
+			parts->pos.y,
+			parts->pos.z);								// 行列移動関数
+
+		D3DXMatrixMultiply(&parts->mtxWorld,
+			&parts->mtxWorld,
+			&mtxTrans);									// 行列掛け算関数
+
+		// 親パーツのワールドマトリックスを保持
+		D3DXMATRIX mtxParent;
+
+		if (parts->nIdxModelParent == -1)
+		{// 親モデルのインデックス数が-1の時
+		 // 新規深度値とZバッファの深度値が同じ値ならテスト成功にする
+			mtxParent = mtxWorld;
+		}
+		else
+		{// 新規深度値とZバッファの深度値が同じ値ならテスト成功にする
+			mtxParent = (m_parts + parts->nIdxModelParent)->mtxWorld;
+		}
+
+		// 自分の親マトリックスとの掛け算
+		D3DXMatrixMultiply(&parts->mtxWorld, &parts->mtxWorld, &mtxParent);
+
+		// ワールドマトリックスの設定
+		pDevice->SetTransform(D3DTS_WORLD, &parts->mtxWorld);
+
+		// 現在のマテリアルを保持
+		pDevice->GetMaterial(&matDef);
+
+		// マテリアルデータへのポインタを取得
+		pMat = (D3DXMATERIAL*)parts->pBuffer->GetBufferPointer();
+
+		for (int nCntMat = 0; nCntMat < (int)parts->nNumMat; nCntMat++)
+		{// マテリアル情報の設定
+			D3DMATERIAL9  matD3D = pMat[nCntMat].MatD3D;
+
+			// 引数を色に設定
+			matD3D.Diffuse = col;
+
+			// マテリアルの設定
+			pDevice->SetMaterial(&matD3D);
 
 			// プレイヤーパーツの描画
 			parts->pMesh->DrawSubset(nCntMat);
@@ -301,6 +382,9 @@ bool CMotion::MotionBlend(const int nCntMotionSet)
 //=============================================================================
 void CMotion::LoodSetMotion(const char * pFileName)
 {
+	// モデルマネージャークラスの設定
+	CModelManager *pModelManager = CApplication::GetModelManager();
+
 	// 変数宣言
 	char aString[128] = {};			// 文字列比較用の変数
 	char g_aEqual[128] = {};		// ＝読み込み用変数
@@ -379,6 +463,15 @@ void CMotion::LoodSetMotion(const char * pFileName)
 							{// タイプの読み込み
 								fscanf(pFile, "%s", &g_aEqual[0]);
 								fscanf(pFile, "%d", &m_parts[nCntParts].nType);
+
+								for (int nCntModel = 0; nCntModel < pModelManager->GetMaxModelMaterial(); nCntModel++)
+								{
+									if (strcmp(&m_partsFile[m_parts[nCntParts].nType].aName[0], pModelManager->GetFileName(nCntModel)) == 0)
+									{
+										m_parts[nCntParts].nType = nCntModel;
+										break;
+									}
+								}
 							}
 							if (strcmp(&aString[0], "PARENT") == 0)
 							{// 親の読み込み
@@ -509,21 +602,6 @@ void CMotion::LoodSetMotion(const char * pFileName)
 //=============================================================================
 void CMotion::Uninit(void)
 {
-	for (int i = 0; i < m_nMaxParts; i++)
-	{
-		if (m_parts[i].pBuffer != NULL)
-		{// 頂点バッファーの解放
-			m_parts[i].pBuffer->Release();
-			m_parts[i].pBuffer = NULL;
-		}
-
-		if (m_parts[i].pMesh != NULL)
-		{// メッシュの解放
-			m_parts[i].pMesh->Release();
-			m_parts[i].pMesh = NULL;
-		}
-	}
-
 	if (m_parts != nullptr
 		&& m_motion != nullptr)
 	{// メモリの解放

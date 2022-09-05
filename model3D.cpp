@@ -14,13 +14,14 @@
 #include "model3D.h"
 #include "renderer.h"
 #include "application.h"
+#include "model_manager.h"
 
 //=============================================================================
 // インスタンス生成
 // Author : 唐﨑結斗
 // 概要 : 3Dモデルを生成する
 //=============================================================================
-CModel3D * CModel3D::Create(const char *pName)
+CModel3D * CModel3D::Create(const int nModelNam)
 {
 	// オブジェクトインスタンス
 	CModel3D *pModel3D = nullptr;
@@ -32,7 +33,7 @@ CModel3D * CModel3D::Create(const char *pName)
 	assert(pModel3D != nullptr);
 
 	// 数値の初期化
-	pModel3D->Init(pName);
+	pModel3D->Init(nModelNam);
 
 	// インスタンスを返す
 	return pModel3D;
@@ -45,14 +46,14 @@ CModel3D * CModel3D::Create(const char *pName)
 //=============================================================================
 CModel3D::CModel3D()
 {
-	m_pMesh = nullptr;									// メッシュ情報へのポインタ
-	m_pBuffer = nullptr;								// マテリアル情報へのポインタ
-	m_nNumMat = NULL;									// マテリアル情報の数
-	m_mtxWorld = {};									// ワールドマトリックス
-	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 位置
-	m_posOld = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 過去位置
-	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 向き
-	m_size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 大きさ
+	m_pMesh = nullptr;											// メッシュ情報へのポインタ
+	m_pBuffer = nullptr;										// マテリアル情報へのポインタ
+	m_nNumMat = 0;												// マテリアル情報の数
+	m_mtxWorld = {};											// ワールドマトリックス
+	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);						// 位置
+	m_posOld = D3DXVECTOR3(0.0f, 0.0f, 0.0f);					// 過去位置
+	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);						// 向き
+	m_size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);						// 大きさ
 }
 
 //=============================================================================
@@ -73,14 +74,14 @@ CModel3D::~CModel3D()
 HRESULT CModel3D::Init()
 {
 	// メンバ変数の初期化
-	m_pMesh = nullptr;									// メッシュ情報へのポインタ
-	m_pBuffer = nullptr;								// マテリアル情報へのポインタ
-	m_nNumMat = NULL;									// マテリアル情報の数
-	m_mtxWorld = {};									// ワールドマトリックス
-	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 位置
-	m_posOld = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 過去位置
-	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 向き
-	m_size = D3DXVECTOR3(1.0f, 1.0f, 1.0f);				// 大きさ
+	m_pMesh = nullptr;											// メッシュ情報へのポインタ
+	m_pBuffer = nullptr;										// マテリアル情報へのポインタ
+	m_nNumMat = 0;												// マテリアル情報の数
+	m_mtxWorld = {};											// ワールドマトリックス
+	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);						// 位置
+	m_posOld = D3DXVECTOR3(0.0f, 0.0f, 0.0f);					// 過去位置
+	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);						// 向き
+	m_size = D3DXVECTOR3(1.0f, 1.0f, 1.0f);						// 大きさ
 
 	return S_OK;
 }
@@ -90,30 +91,20 @@ HRESULT CModel3D::Init()
 // Author : 唐﨑結斗
 // 概要 : 頂点バッファを生成し、メンバ変数の初期値を設定
 //=============================================================================
-HRESULT CModel3D::Init(const char * pName)
+HRESULT CModel3D::Init(const int nModelNam)
 {
+	// モデルマネージャークラスの設定
+	CModelManager *pModelManager = CApplication::GetModelManager();
+
 	// メンバ変数の初期化
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);					// 位置
 	m_posOld = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 過去位置
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);					// 向き
 	m_size = D3DXVECTOR3(1.0f, 1.0f, 1.0f);					// 大きさ
 
-	// レンダラーのゲット
-	CRenderer *pRenderer = CApplication::GetRenderer();
-
-	// デバイスの取得
-	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
-
-	// Xファイルの読み込み
-	D3DXLoadMeshFromX(pName,
-		D3DXMESH_SYSTEMMEM,
-		pDevice,
-		NULL,
-		&m_pBuffer,
-		NULL,
-		&m_nNumMat,
-		&m_pMesh);
-
+	// モデルのマテリアル情報の設定
+	pModelManager->GetModelMateria(nModelNam, m_pMesh, m_pBuffer, m_nNumMat);
+	
 	return S_OK;
 }
 
@@ -124,20 +115,6 @@ HRESULT CModel3D::Init(const char * pName)
 //=============================================================================
 void CModel3D::Uninit()
 {
-	// メッシュの破棄
-	if (m_pMesh != NULL)
-	{
-		m_pMesh->Release();
-		m_pMesh = NULL;
-	}
-
-	// マテリアルの破棄
-	if (m_pBuffer != NULL)
-	{
-		m_pBuffer->Release();
-		m_pBuffer = NULL;
-	}
-
 	// オブジェクト3Dの解放
 	Release();
 }
@@ -272,7 +249,7 @@ D3DXVECTOR3 CModel3D::WorldCastVtx(D3DXVECTOR3 vtx, D3DXVECTOR3 FormerPos, D3DXV
 	// 位置を反映
 	// 行列移動関数 (第一引数にX,Y,Z方向の移動行列を作成)
 	D3DXMatrixTranslation(&mtxTrans, FormerPos.x, FormerPos.y, FormerPos.z);
-	D3DXMatrixMultiply(&mtxWorldVtx, &mtxWorldVtx, &mtxTrans);		// 行列掛け算関数
+	D3DXMatrixMultiply(&mtxWorldVtx, &mtxWorldVtx, &mtxTrans);					// 行列掛け算関数
 
 	return D3DXVECTOR3(mtxWorldVtx._41, mtxWorldVtx._42, mtxWorldVtx._43);
 }

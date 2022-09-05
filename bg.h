@@ -45,30 +45,37 @@ public:
 	//--------------------------------------------------------------------
 	// コンストラクタとデストラクタ
 	//--------------------------------------------------------------------
-	CBG();
+	CBG(int nPriority = PRIORITY_LEVEL0);
 	~CBG() override;
 
 	//--------------------------------------------------------------------
-	// オーバーライド関数
+	// メンバ関数
 	//--------------------------------------------------------------------
-	HRESULT Init() override;			// 初期化
-	void Uninit() override;				// 終了
-	void Update() override;				// 更新
-	void Draw() override;				// 描画
+	HRESULT Init() override;														// 初期化
+	void Uninit() override;															// 終了
+	void Update() override;															// 更新
+	void Draw() override;															// 描画
+	void SetPos(const D3DXVECTOR3 &pos) override { pos; }							// 位置のセッター
+	void SetPosOld(const D3DXVECTOR3 &posOld) override { posOld; }					// 過去位置のセッター
+	void SetRot(const D3DXVECTOR3 &rot) override { rot; }							// 向きのセッター
+	void SetSize(const D3DXVECTOR3 &size) override { size; }						// 大きさのセッター
+	D3DXVECTOR3 GetPos() override { return D3DXVECTOR3(0.0f, 0.0f, 0.0f); }			// 位置のゲッター
+	D3DXVECTOR3 GetPosOld()  override { return D3DXVECTOR3(0.0f, 0.0f, 0.0f); }		// 過去位置のゲッター
+	D3DXVECTOR3 GetRot()  override { return D3DXVECTOR3(0.0f, 0.0f, 0.0f); }		// 向きのゲッター
+	D3DXVECTOR3 GetSize()  override { return D3DXVECTOR3(0.0f, 0.0f, 0.0f); }		// 大きさのゲッター
+	void SetCol(const D3DXCOLOR color);												// 頂点カラーの設定
+	void LoadTex(CTexture::TEXTURE_TYPE type) { m_typeTex = type; }					// テクスチャの設定
 
-protected:
+private:
 	//--------------------------------------------------------------------
 	// メンバ関数
 	//--------------------------------------------------------------------
 	void SetVtx();															// 頂点座標などの設定
 	void SetTex(const D3DXVECTOR2 &minTex, const D3DXVECTOR2 &maxTex);		// テクスチャ座標の設定
-	void LoadTex(CTexture::TEXTURE_TYPE type) { m_typeTex = type; }			// テクスチャの設定
 
-private:
 	//--------------------------------------------------------------------
 	// メンバ変数
 	//--------------------------------------------------------------------
-	LPDIRECT3DTEXTURE9			 m_pTexture;		// テクスチャ
 	LPDIRECT3DVERTEXBUFFER9		 m_pVtxBuff;		// 頂点バッファ
 	D3DCOLOR					 m_col;				// カラー
 	CTexture::TEXTURE_TYPE		 m_typeTex;			// テクスチャの種別

@@ -18,6 +18,8 @@
 #include "keyboard.h"
 #include "mouse.h"
 #include "texture.h"
+#include "model_manager.h"
+#include "camera_manager.h"
 #include "sound.h"
 #include "camera.h"
 #include "light.h"
@@ -35,6 +37,8 @@ CRenderer *CApplication::m_pRenderer = nullptr;						// レンダラーインスタンス
 CKeyboard *CApplication::m_pKeyboard = {};							// キーボードインスタンス
 CMouse *CApplication::m_pMouse = {};								// マウスインスタンス
 CTexture *CApplication::m_pTexture = nullptr;						// テクスチャインスタンス
+CModelManager *CApplication::m_pModelManager = nullptr;				// モデルマネージャークラス
+CCameraManager *CApplication::m_pCameraManager = nullptr;			// カメラマネージャークラス
 CSound *CApplication::m_pSound = nullptr;							// サウンドインスタンス
 CCamera *CApplication::m_pCamera = nullptr;							// カメラインスタンス
 CCamera *CApplication::m_pCameraBG = nullptr;						// カメラインスタンス
@@ -211,6 +215,8 @@ CApplication::~CApplication()
 	assert(m_pKeyboard == nullptr);
 	assert(m_pMouse == nullptr);
 	assert(m_pTexture == nullptr);
+	assert(m_pModelManager == nullptr);
+	assert(m_pCameraManager == nullptr);
 	assert(m_pSound == nullptr);
 	assert(m_pCamera == nullptr);
 	assert(m_pCameraBG == nullptr);
@@ -226,6 +232,8 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	// メモリの確保	
 	m_pRenderer = new CRenderer;
 	m_pTexture = new CTexture;
+	m_pModelManager = new CModelManager;
+	m_pCameraManager = new CCameraManager;
 	m_pSound = new CSound;
 	m_pCamera = new CCamera;
 	m_pCameraBG = new CCamera;
@@ -244,6 +252,14 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	// 初期化処理
 	assert(m_pTexture != nullptr);
 	m_pTexture->Init();
+
+	// 初期化処理
+	assert(m_pModelManager != nullptr);
+	m_pModelManager->Init();
+
+	// 初期化処理
+	assert(m_pCameraManager != nullptr);
+	m_pCameraManager->Init();
 
 	// 初期化処理
 	assert(m_pSound != nullptr);
@@ -327,6 +343,24 @@ void CApplication::Uninit()
 		// メモリの解放
 		delete m_pTexture;
 		m_pTexture = nullptr;
+	}
+
+	if (m_pModelManager != nullptr)
+	{// 終了処理
+		m_pModelManager->Uninit();
+
+		// メモリの解放
+		delete m_pModelManager;
+		m_pModelManager = nullptr;
+	}
+
+	if (m_pCameraManager != nullptr)
+	{// 終了処理
+		m_pCameraManager->Uninit();
+
+		// メモリの解放
+		delete m_pCameraManager;
+		m_pCameraManager = nullptr;
 	}
 
 	if (m_pSound != nullptr)

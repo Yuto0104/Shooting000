@@ -17,6 +17,8 @@
 #include "application.h"
 #include "game.h"
 #include "motion_player3D.h"
+#include "camera.h"
+#include "enemy3D.h"
 
 //=============================================================================
 // コンストラクタ
@@ -198,7 +200,7 @@ void CRenderer::Draw()
 void CRenderer::DrawFPS()
 {
 	RECT rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
-	TCHAR str[256];
+	TCHAR str[0xfff];
 	TCHAR strCopy[256];
 
 	wsprintf(str, _T("FPS : %d\n"), GetFps());
@@ -217,6 +219,22 @@ void CRenderer::DrawFPS()
 
 		pos = CApplication::WorldCastScreen(pos);
 		sprintf(strCopy, _T("プレイヤーのスクリーン座標からワールド座標へ | x : %.3f | y : %.3f | z : %.3f |\n"), pos.x, pos.y, pos.z);
+		strcat(str, strCopy);
+
+		CCamera *pCamera = CApplication::GetCameraBG();
+		D3DXVECTOR3 posV = pCamera->GetPosV();
+		D3DXVECTOR3 posR = pCamera->GetPosR();
+		D3DXVECTOR3 rot = pCamera->GetRot();
+
+		sprintf(strCopy, _T("カメラの視点の位置 | x : %.3f | y : %.3f | z : %.3f |\n"), posV.x, posV.y, posV.z);
+		strcat(str, strCopy);
+		sprintf(strCopy, _T("カメラの注視点の位置 | x : %.3f | y : %.3f | z : %.3f |\n"), posR.x, posR.y, posR.z);
+		strcat(str, strCopy);
+		sprintf(strCopy, _T("カメラの向き | x : %.3f | y : %.3f | z : %.3f |\n"), rot.x, rot.y, rot.z);
+		strcat(str, strCopy);
+
+		int nCntSetEnemy = CEnemy3D::GetCntSetEnemy();
+		sprintf(strCopy, _T("敵の設置数 : %d \n"), nCntSetEnemy);
 		strcat(str, strCopy);
 	}
 

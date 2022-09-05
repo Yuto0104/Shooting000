@@ -12,6 +12,7 @@
 #include <assert.h>
 
 #include "camera.h"
+#include "camera_manager.h"
 #include "application.h"
 #include "renderer.h"
 #include "input.h"
@@ -35,16 +36,25 @@ const float CCamera::CAMERA_FUR = (10000.0f);			// ファー
 //=============================================================================
 CCamera::CCamera()
 {
-	m_posV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 視点
-	m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 注視点
-	m_vecU = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 上方向ベクトル
-	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 向き
-	m_rotMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 移動方向
-	m_mtxProj = {};										// プロジェクションマトリックス
-	m_mtxView = {};										// ビューマトリックス
-	m_viewType = TYPE_CLAIRVOYANCE;						// 投影方法の種別
-	m_fDistance = 0.0f;									// 視点から注視点までの距離
-	m_fRotMove = 0.0f;									// 移動方向
+	m_pCameraAction = nullptr;						// カメラのアクション情報
+	m_pRoll = nullptr;								// 移動クラスのインスタンス(角度)
+	m_mtxWorld = {};								// ワールドマトリックス
+	m_mtxProj = {};									// プロジェクションマトリックス
+	m_mtxView = {};									// ビューマトリックス
+	m_posV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 視点
+	m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 注視点
+	m_vecU = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 上方向ベクトル
+	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 向き
+	m_rotMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 移動方向
+	m_posVDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 視点の目的の位置
+	m_posRDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 注視点の目的の位置
+	m_viewType = TYPE_CLAIRVOYANCE;					// 投影の種別
+	m_fDistance = 0.0f;								// 視点から注視点までの距離
+	m_fRotMove = 0.0f;								// 移動方向
+	m_nCntFrame = 0;								// フレームカウント
+	m_nMaxAction = 0;								// アクション数
+	m_nNumAction = 0;								// アクション番号
+	m_bAutoMove = false;							// 自動移動
 }
 
 //=============================================================================
@@ -64,51 +74,30 @@ CCamera::~CCamera()
 //=============================================================================
 HRESULT CCamera::Init()
 {
+	m_pCameraAction = CApplication::GetCameraManager()->GetCameraAction();
+	m_nMaxAction = CApplication::GetCameraManager()->GetNumAction();
+
 	m_posV = D3DXVECTOR3(0.0f, 500.0f, 0.0f);
 	m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);			// 固定
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 	// 視点と注視点の距離
-	D3DXVECTOR3 posDiss = m_posR - m_posV;
-	m_fDistance = sqrtf((posDiss.y * posDiss.y) + (posDiss.x * posDiss.x) + (posDiss.z * posDiss.z));
+	SetDistance();
 
-	// 角度の算出
-	m_rot.y = atan2f(posDiss.x, posDiss.z);
-	m_rot.x = atan2f(sqrtf((posDiss.x * posDiss.x) + (posDiss.z * posDiss.z)), posDiss.y);
-	m_rot.z = 0.0f;
+	// 向きの設定
+	SetRot();
 
 	// メモリの確保
 	m_pRoll = new CMove;
 	assert(m_pRoll != nullptr);
 	m_pRoll->SetMoving(2.0f, 10.0f, 0.0f, 0.2f);
 
-	if (m_rot.y < -D3DX_PI)
-	{// 向きが-D3DX_PI未満の時
-		m_rot.y += D3DX_PI * 2;
-	}
-	if (m_rot.y > D3DX_PI)
-	{// 向きがD3DX_PI以上の時
-		m_rot.y -= D3DX_PI * 2;
-	}
-	if (m_rot.x < 0.0f + 0.1f)
-	{// 向きが0以下の時
-		m_rot.x = 0.0f + 0.1f;
-	}
-	if (m_rot.x > D3DX_PI - 0.1f)
-	{// 向きがD3DX_PI以上の時
-		m_rot.x = D3DX_PI - 0.1f;
-	}
-
 	// 注視点の算出
-	m_posR.z = m_posV.z + sinf(m_rot.x) * cosf(m_rot.y) * m_fDistance;
-	m_posR.x = m_posV.x + sinf(m_rot.x) * sinf(m_rot.y) * m_fDistance;
-	m_posR.y = m_posV.y + cosf(m_rot.x) * m_fDistance;
+	SetPosR();
 
 	// 視点の算出
-	m_posV.z = m_posR.z - sinf(m_rot.x) * cosf(m_rot.y) * m_fDistance;
-	m_posV.x = m_posR.x - sinf(m_rot.x) * sinf(m_rot.y) * m_fDistance;
-	m_posV.y = m_posR.y - cosf(m_rot.x) * m_fDistance;
+	SetPosV();
 
 	return S_OK;
 }
@@ -137,10 +126,11 @@ void CCamera::Update(void)
 {
 	if(m_viewType == TYPE_CLAIRVOYANCE)
 	{
-		Rotate();
+		Action();
+
+		/*Move();
+		Rotate();*/
 	}
-	//Move();
-	//FollowCamera();
 }
 
 //=============================================================================
@@ -194,6 +184,117 @@ void CCamera::Set()
 
 	// プロジェクションマトリックスの設定
 	pDevice->SetTransform(D3DTS_PROJECTION, &m_mtxProj);
+}
+
+//=============================================================================
+// カメラの投影方法の設定
+// Author : 唐﨑結斗
+// 概要 : 
+//=============================================================================
+void CCamera::SetViewType(VIEW_TYPE type)
+{
+	m_viewType = type;
+}
+
+//=============================================================================
+// カメラの視点の設定
+// Author : 唐﨑結斗
+// 概要 : 引数から視点を設定する
+//=============================================================================
+void CCamera::SetPosV(const D3DXVECTOR3 posV)
+{
+	// 視点の設定
+	m_posV = posV;
+
+	// 視点と注視点の距離
+	SetDistance();
+
+	// 向きの設定
+	SetRot();
+
+	// 視点の算出
+	SetPosV();
+}
+
+//=============================================================================
+// カメラの注視点の設定
+// Author : 唐﨑結斗
+// 概要 : 引数から注視点を設定する
+//=============================================================================
+void CCamera::SetPosR(const D3DXVECTOR3 posR)
+{
+	// 注視点の設定
+	m_posR = posR;
+
+	// 視点と注視点の距離
+	SetDistance();
+
+	// 向きの設定
+	SetRot();
+
+	// 注視点の算出
+	SetPosR();
+}
+
+//=============================================================================
+// カメラの視点から注視点までの距離を設定する
+// Author : 唐﨑結斗
+// 概要 : 視点から注視点までの距離を算出する
+//=============================================================================
+void CCamera::SetRot(const D3DXVECTOR3 rot, const int nShaft)
+{
+	// 向きの算出
+	m_rot = rot;
+
+	if (m_rot.y < -D3DX_PI)
+	{// 向きが-D3DX_PI未満の時
+		m_rot.y += D3DX_PI * 2;
+	}
+	if (m_rot.y > D3DX_PI)
+	{// 向きがD3DX_PI以上の時
+		m_rot.y -= D3DX_PI * 2;
+	}
+	if (m_rot.x < 0.0f + 0.1f)
+	{// 向きが0以下の時
+		m_rot.x = 0.0f + 0.1f;
+	}
+	if (m_rot.x > D3DX_PI - 0.1f)
+	{// 向きがD3DX_PI以上の時
+		m_rot.x = D3DX_PI - 0.1f;
+	}
+
+	if (nShaft == 0)
+	{// 注視点の算出
+		SetPosR();
+	}
+	else
+	{// 視点の算出
+		SetPosV();
+	}
+}
+
+//=============================================================================
+// カメラの設定
+// Author : 唐﨑結斗
+// 概要 : 
+//=============================================================================
+void CCamera::Set(const D3DXVECTOR3 posV, const D3DXVECTOR3 posR, const D3DXVECTOR3 rot)
+{
+	m_posV = posV;
+	m_posR = posR;
+	m_rot = rot;
+
+	// 視点と注視点の距離
+	SetDistance();
+
+	// 向きの設定
+	SetRot();
+
+	// 注視点の算出
+	SetPosR();
+
+	// 視点の算出
+	SetPosV();
 }
 
 //=============================================================================
@@ -283,7 +384,7 @@ void CCamera::Rotate(void)
 //=============================================================================
 void CCamera::Move(void)
 {
-	const float CAMERA_MOVE_SPEED = 0.5f;
+	const float CAMERA_MOVE_SPEED = 5.0f;
 	CKeyboard *pKeyboard = CApplication::GetKeyboard();
 
 	if (pKeyboard->GetPress(DIK_W) == true
@@ -414,6 +515,119 @@ void CCamera::FollowCamera(void)
 
 	// 視点の移動
 	m_posV += (m_posVDest - m_posV) * 0.1f;
+}
+
+//=============================================================================
+// カメラのアクション
+// Author : 唐﨑結斗
+// 概要 : カメラのアクション設定
+//=============================================================================
+void CCamera::Action()
+{
+	if (m_pCameraAction != nullptr
+		&& CApplication::GetMode() == CApplication::MODE_GAME
+		&& m_nNumAction < m_nMaxAction)
+	{
+		if (m_nCntFrame == 0)
+		{// 追加する数値の算出
+			m_posVDest = m_pCameraAction[m_nNumAction].posVDest - m_posV;
+			m_posRDest = m_pCameraAction[m_nNumAction].posRDest - m_posR;
+		}
+
+		m_nCntFrame++;
+
+		D3DXVECTOR3 addPosV = m_posVDest / (float)m_pCameraAction[m_nNumAction].nFrame;
+		D3DXVECTOR3 addPosR = m_posRDest / (float)m_pCameraAction[m_nNumAction].nFrame;
+
+		// 視点の移動
+		D3DXVECTOR3 posV = GetPosV() + addPosV;
+
+		// 視点の設定
+		SetPosV(posV);
+
+		// 注視点の移動
+		D3DXVECTOR3 posR = GetPosR() + addPosR;
+
+		// 注視点の設定
+		SetPosR(posR);
+
+		if (m_nCntFrame >= m_pCameraAction[m_nNumAction].nFrame)
+		{
+			m_nNumAction++;
+			m_nCntFrame = 0;
+		}
+	}
+}
+
+//=============================================================================
+// カメラの視点の設定
+// Author : 唐﨑結斗
+// 概要 : 視点を設定する
+//=============================================================================
+void CCamera::SetPosV()
+{
+	// 視点の算出
+	m_posV.z = m_posR.z - sinf(m_rot.x) * cosf(m_rot.y) * m_fDistance;
+	m_posV.x = m_posR.x - sinf(m_rot.x) * sinf(m_rot.y) * m_fDistance;
+	m_posV.y = m_posR.y - cosf(m_rot.x) * m_fDistance;
+}
+
+//=============================================================================
+// カメラの注視点の設定
+// Author : 唐﨑結斗
+// 概要 : 注視点を設定する
+//=============================================================================
+void CCamera::SetPosR()
+{
+	// 注視点の算出
+	m_posR.z = m_posV.z + sinf(m_rot.x) * cosf(m_rot.y) * m_fDistance;
+	m_posR.x = m_posV.x + sinf(m_rot.x) * sinf(m_rot.y) * m_fDistance;
+	m_posR.y = m_posV.y + cosf(m_rot.x) * m_fDistance;
+}
+
+//=============================================================================
+// カメラの角度の設定
+// Author : 唐﨑結斗
+// 概要 : カメラの角度
+//=============================================================================
+void CCamera::SetRot()
+{
+	// 視点と注視点の距離
+	D3DXVECTOR3 posDiss = m_posR - m_posV;
+
+	// 角度の算出
+	m_rot.y = atan2f(posDiss.x, posDiss.z);
+	m_rot.x = atan2f(sqrtf((posDiss.x * posDiss.x) + (posDiss.z * posDiss.z)), posDiss.y);
+	m_rot.z = 0.0f;
+
+	if (m_rot.y < -D3DX_PI)
+	{// 向きが-D3DX_PI未満の時
+		m_rot.y += D3DX_PI * 2;
+	}
+	if (m_rot.y > D3DX_PI)
+	{// 向きがD3DX_PI以上の時
+		m_rot.y -= D3DX_PI * 2;
+	}
+	if (m_rot.x < 0.0f + 0.1f)
+	{// 向きが0以下の時
+		m_rot.x = 0.0f + 0.1f;
+	}
+	if (m_rot.x > D3DX_PI - 0.1f)
+	{// 向きがD3DX_PI以上の時
+		m_rot.x = D3DX_PI - 0.1f;
+	}
+}
+
+//=============================================================================
+// カメラの視点から注視点までの距離を設定する
+// Author : 唐﨑結斗
+// 概要 : 視点から注視点までの距離を算出する
+//=============================================================================
+void CCamera::SetDistance()
+{
+	// 視点と注視点の距離
+	D3DXVECTOR3 posDiss = m_posR - m_posV;
+	m_fDistance = sqrtf((posDiss.y * posDiss.y) + (posDiss.x * posDiss.x) + (posDiss.z * posDiss.z));
 }
 
 

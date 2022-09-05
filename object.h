@@ -82,20 +82,6 @@ public:
 	};
 
 	//--------------------------------------------------------------------
-	// オブジェクトの使用シーン
-	// Author : 唐﨑結斗
-	// 概要 : オブジェクトの使用シーンの列挙
-	//--------------------------------------------------------------------
-	enum SCENE_OBJECT
-	{
-		SCENE_TITLE = 0,		// タイトル
-		SCENE_GAME,				// ゲーム
-		SCENE_RESULT,			// リザルト
-		MAX_SCENE,				// 種別の最大
-		SCENE_NONE,				// 種別無し
-	};
-
-	//--------------------------------------------------------------------
 	// 定数定義
 	//--------------------------------------------------------------------
 	static const unsigned int MAX_OBJECT = (0x1000) / MAX_LEVEL;
@@ -139,7 +125,6 @@ public:
 	void SetColisonSize(const D3DXVECTOR3 &colisonSize) { m_colisonSize = colisonSize; }				// あたり判定の大きさのセッター
 	D3DXVECTOR3 GetColisonSize() { return m_colisonSize; }												// あたり判定の大きさの取得
 
-
 protected:
 	//--------------------------------------------------------------------
 	// メンバ関数
@@ -163,7 +148,6 @@ private:
 	EObjectDrowType		m_objectDrowType;	// オブジェクトの描画方法
 	COLOR_TYPE			m_colorType;		// 色の種別
 	D3DXVECTOR3			m_colisonSize;		// あたり判定の大きさ
-	SCENE_OBJECT		m_sceneObject;		// オブジェクトの使用シーン
 	int					m_nNumID;			// 格納先の番号
 	int					m_nLevPriority;		// プライオリティのレベル
 };
