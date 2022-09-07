@@ -52,6 +52,8 @@ CMesh3D::CMesh3D()
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 向き
 	m_size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 大きさ
 	m_blockSize = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// ブロックサイズ
+	m_tex = D3DXVECTOR2(1.0f, 1.0f);					// テクスチャ座標の基準値
+	m_addTex = D3DXVECTOR2(0.0f, 0.0f);					// テクスチャ座標の加算値
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);			// カラー
 	m_nNumTex = -1;										// テクスチャタイプ
 	m_block = DOUBLE_INT(0, 0);							// ブロック数
@@ -63,6 +65,7 @@ CMesh3D::CMesh3D()
 	m_nPolygon = 0;										// ポリゴン数
 	m_nIndex = 0;										// インデックス数
 	m_bSplitTex = false;								// 分割するかどうか
+	m_bScrollTex = false;								// テクスチャがスクロールするかどうか
 }
 
 //=============================================================================
@@ -101,7 +104,7 @@ HRESULT CMesh3D::Init()
 	SetCol(m_col);
 
 	// テクスチャの設定
-	SetTex(m_bSplitTex);
+	SetTex();
 
 	// インデックスの設定
 	SetIndexBuff();
@@ -143,7 +146,7 @@ void CMesh3D::Uninit()
 //=============================================================================
 void CMesh3D::Update()
 {
-
+	TexScroll();
 }
 
 //=============================================================================
@@ -219,7 +222,7 @@ void CMesh3D::SetPos(const D3DXVECTOR3 &pos)
 	SetCol(m_col);
 
 	// テクスチャの設定
-	SetTex(m_bSplitTex);
+	SetTex();
 
 	// インデックスの設定
 	SetIndexBuff();
@@ -242,7 +245,7 @@ void CMesh3D::SetRot(const D3DXVECTOR3 &rot)
 	SetCol(m_col);
 
 	// テクスチャの設定
-	SetTex(m_bSplitTex);
+	SetTex();
 
 	// インデックスの設定
 	SetIndexBuff();
@@ -268,7 +271,7 @@ void CMesh3D::SetSize(const D3DXVECTOR3 & size)
 	SetCol(m_col);
 
 	// テクスチャの設定
-	SetTex(m_bSplitTex);
+	SetTex();
 
 	// インデックスの設定
 	SetIndexBuff();
@@ -293,7 +296,7 @@ void CMesh3D::SetBlock(DOUBLE_INT block)
 	SetCol(m_col);
 
 	// テクスチャの設定
-	SetTex(m_bSplitTex);
+	SetTex();
 
 	// インデックスの設定
 	SetIndexBuff();
@@ -309,7 +312,18 @@ void CMesh3D::SetSplitTex(bool bSplitTex)
 	m_bSplitTex = bSplitTex;
 
 	// テクスチャの設定
-	SetTex(m_bSplitTex);
+	SetTex();
+}
+
+//=============================================================================
+// テクスチャスクロールの設定
+// Author : 唐﨑結斗
+// 概要 : テクスチャスクロールの設定
+//=============================================================================
+void CMesh3D::SetScrollTex(D3DXVECTOR2 addTex, bool bScrollTex)
+{
+	m_addTex = addTex;
+	m_bScrollTex = bScrollTex;
 }
 
 //=============================================================================
@@ -352,7 +366,7 @@ void CMesh3D::SetVtx()
 // Author : 唐﨑結斗
 // 概要 : 3Dメッシュのテクスチャ座標を設定する
 //=============================================================================
-void CMesh3D::SetTex(const bool bSplit)
+void CMesh3D::SetTex()
 {
 	// 頂点情報の取得
 	VERTEX_3D *pVtx = NULL;
@@ -366,13 +380,13 @@ void CMesh3D::SetTex(const bool bSplit)
 		{// 変数宣言
 			int nCntVtx = nCntX + (nCntZ *  m_line.x);
 
-			if (bSplit)
+			if (m_bSplitTex)
 			{// テクスチャ座標の設定
-				pVtx[nCntVtx].tex = D3DXVECTOR2(1.0f * nCntX, 1.0f * nCntZ);
+				pVtx[nCntVtx].tex = D3DXVECTOR2(1.0f * nCntX + m_tex.x, 1.0f * nCntZ + m_tex.y);
 			}
 			else
 			{// テクスチャ座標の設定
-				pVtx[nCntVtx].tex = D3DXVECTOR2(1.0f / m_block.x * nCntX, 1.0f / m_block.y * nCntZ);
+				pVtx[nCntVtx].tex = D3DXVECTOR2(1.0f / m_block.x * nCntX + m_tex.x, 1.0f / m_block.y * nCntZ + m_tex.y);
 			}	
 		}
 	}
@@ -480,5 +494,19 @@ void CMesh3D::SetMeshInfo()
 		D3DPOOL_MANAGED,
 		&m_pIdxBuff,
 		NULL);
+}
+
+//=============================================================================
+// テクスチャスクロール
+// Author : 唐﨑結斗
+// 概要 : テクスチャスクロール
+//=============================================================================
+void CMesh3D::TexScroll()
+{
+	if (m_bScrollTex)
+	{
+		m_tex += m_addTex;
+		SetTex();
+	}
 }
 

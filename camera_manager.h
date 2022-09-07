@@ -37,11 +37,11 @@ public:
 	// 終了
 	void Uninit(void);
 
-	// カメラのアクション情報のゲッター
-	CCamera::CAMERA_ACTION *GetCameraAction() { return m_pCameraAction; }
+	// カメラのモーション情報のゲッター
+	CCamera::CAMERA_MOTION *GetCameraMotion() { return m_pMotion; }
 
-	// カメラのアクション数のゲッター
-	int GetNumAction() { return m_nMaxAction; }
+	// カメラのモーション数のゲッター
+	int GetMaxMotion() { return m_nMaxMotion; }
 
 	// ファイルの読み込み
 	void LoadFile(const char *pFileName);
@@ -59,11 +59,11 @@ private:
 	//--------------------------------------------------------------------
 	// メンバ変数
 	//--------------------------------------------------------------------
-	CCamera::CAMERA_ACTION		*m_pCameraAction;			// カメラのアクション
+	CCamera::CAMERA_MOTION		*m_pMotion;					// モーション
 	D3DXVECTOR3					m_posV;						// 視点
 	D3DXVECTOR3					m_posR;						// 注視点
 	D3DXVECTOR3					m_rot;						// 向き
-	int							m_nMaxAction;				// アクション数
+	int							m_nMaxMotion;				// モーション数
 };
 
 #endif

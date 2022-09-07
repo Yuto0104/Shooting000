@@ -41,7 +41,7 @@ public:
 	void Update() override;											// XV
 	void Draw() override;											// •`‰æ
 	void SetVtx() override;											// ’¸“_À•W‚È‚Ç‚Ìİ’è
-	void SetTex(const bool bSplit) override;
+	void SetTex() override;
 	void SetRadius(float fRadius);									// ”¼Œa‚Ìæ“¾
 	void SetSphereRange(D3DXVECTOR2 sphereRange);					// ‹…‚Ì•`‰æ”ÍˆÍ‚Ìæ“¾
 

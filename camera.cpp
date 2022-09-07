@@ -36,7 +36,7 @@ const float CCamera::CAMERA_FUR = (100000.0f);			// ファー
 //=============================================================================
 CCamera::CCamera()
 {
-	m_pCameraAction = nullptr;						// カメラのアクション情報
+	m_pMotion = nullptr;							// カメラのモーション情報
 	m_pRoll = nullptr;								// 移動クラスのインスタンス(角度)
 	m_mtxWorld = {};								// ワールドマトリックス
 	m_mtxProj = {};									// プロジェクションマトリックス
@@ -52,8 +52,9 @@ CCamera::CCamera()
 	m_fDistance = 0.0f;								// 視点から注視点までの距離
 	m_fRotMove = 0.0f;								// 移動方向
 	m_nCntFrame = 0;								// フレームカウント
-	m_nMaxAction = 0;								// アクション数
-	m_nNumAction = 0;								// アクション番号
+	m_nCntKey = 0;									// キーカウント
+	m_nMaxMotion = 0;								// モーションの最大数
+	m_nCntMotion = 0;								// モーションカウント
 	m_bAutoMove = false;							// 自動移動
 }
 
@@ -74,8 +75,8 @@ CCamera::~CCamera()
 //=============================================================================
 HRESULT CCamera::Init()
 {
-	m_pCameraAction = CApplication::GetCameraManager()->GetCameraAction();
-	m_nMaxAction = CApplication::GetCameraManager()->GetNumAction();
+	m_pMotion = CApplication::GetCameraManager()->GetCameraMotion();
+	m_nMaxMotion = CApplication::GetCameraManager()->GetMaxMotion();
 
 	m_posV = D3DXVECTOR3(0.0f, 500.0f, 0.0f);
 	m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -525,20 +526,20 @@ void CCamera::FollowCamera(void)
 //=============================================================================
 void CCamera::Action()
 {
-	if (m_pCameraAction != nullptr
+	if (m_pMotion != nullptr
 		&& CApplication::GetMode() == CApplication::MODE_GAME
-		&& m_nNumAction < m_nMaxAction)
+		&& m_nCntMotion < m_nMaxMotion)
 	{
 		if (m_nCntFrame == 0)
 		{// 追加する数値の算出
-			m_posVDest = m_pCameraAction[m_nNumAction].posVDest - m_posV;
-			m_posRDest = m_pCameraAction[m_nNumAction].posRDest - m_posR;
+			m_posVDest = m_pMotion[m_nCntMotion].pCameraAction[m_nCntKey].posVDest - m_posV;
+			m_posRDest = m_pMotion[m_nCntMotion].pCameraAction[m_nCntKey].posRDest - m_posR;
 		}
 
 		m_nCntFrame++;
 
-		D3DXVECTOR3 addPosV = m_posVDest / (float)m_pCameraAction[m_nNumAction].nFrame;
-		D3DXVECTOR3 addPosR = m_posRDest / (float)m_pCameraAction[m_nNumAction].nFrame;
+		D3DXVECTOR3 addPosV = m_posVDest / (float)m_pMotion[m_nCntMotion].pCameraAction[m_nCntKey].nFrame;
+		D3DXVECTOR3 addPosR = m_posRDest / (float)m_pMotion[m_nCntMotion].pCameraAction[m_nCntKey].nFrame;
 
 		// 視点の移動
 		D3DXVECTOR3 posV = GetPosV() + addPosV;
@@ -552,10 +553,22 @@ void CCamera::Action()
 		// 注視点の設定
 		SetPosR(posR);
 
-		if (m_nCntFrame >= m_pCameraAction[m_nNumAction].nFrame)
+		if (m_nCntFrame >= m_pMotion[m_nCntMotion].pCameraAction[m_nCntKey].nFrame)
 		{
-			m_nNumAction++;
+			m_nCntKey++;
 			m_nCntFrame = 0;
+
+			if (m_nCntKey >= m_pMotion[m_nCntMotion].nMaxKey)
+			{
+				if (m_pMotion[m_nCntMotion].bLoop)
+				{
+					m_nCntKey = 0;
+				}
+				else
+				{
+					m_nCntMotion++;
+				}
+			}
 		}
 	}
 }

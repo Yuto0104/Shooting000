@@ -21,11 +21,11 @@
 //=============================================================================
 CCameraManager::CCameraManager()
 {
-	m_pCameraAction = nullptr;						// カメラのアクション
+	m_pMotion = nullptr;							// カメラのアクション
 	m_posV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 視点
 	m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 注視点
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 向き
-	m_nMaxAction = 0;								// アクション数
+	m_nMaxMotion = 0;								// モーション数
 }
 
 //=============================================================================
@@ -55,9 +55,16 @@ void CCameraManager::Init(void)
 //=============================================================================
 void CCameraManager::Uninit(void)
 {
+	for (int nCntMotion = 0; nCntMotion < m_nMaxMotion; nCntMotion++)
+	{
+		// メモリの解放
+		delete[] m_pMotion[nCntMotion].pCameraAction;
+		m_pMotion[nCntMotion].pCameraAction = nullptr;
+	}
+
 	// メモリの解放
-	delete[] m_pCameraAction;
-	m_pCameraAction = nullptr;
+	delete[] m_pMotion;
+	m_pMotion = nullptr;
 }
 
 //=============================================================================
@@ -69,6 +76,7 @@ void CCameraManager::LoadFile(const char *pFileName)
 {
 	// 変数宣言
 	char aStr[128];
+	int nCntMotion = 0;
 	int nCntSetAction = 0;
 
 	// ファイルの読み込み
@@ -83,13 +91,13 @@ void CCameraManager::LoadFile(const char *pFileName)
 				fgets(&aStr[0], sizeof(aStr), pFile);
 			}
 
-			if (strstr(&aStr[0], "MAX_ACTION") != NULL)
+			if (strstr(&aStr[0], "MAX_MOTION") != NULL)
 			{
 				fscanf(pFile, "%s", &aStr[0]);
-				fscanf(pFile, "%d", &m_nMaxAction);
-				m_pCameraAction = new CCamera::CAMERA_ACTION[m_nMaxAction];
-				assert(m_pCameraAction != nullptr);
-				memset(&m_pCameraAction[0], 0, sizeof(CCamera::CAMERA_ACTION));
+				fscanf(pFile, "%d", &m_nMaxMotion);
+				m_pMotion = new CCamera::CAMERA_MOTION[m_nMaxMotion];
+				assert(m_pMotion != nullptr);
+				memset(&m_pMotion[0], 0, sizeof(CCamera::CAMERA_MOTION));
 			}
 
 			if (strstr(&aStr[0], "SET_CAMERA") != NULL)
@@ -129,41 +137,69 @@ void CCameraManager::LoadFile(const char *pFileName)
 				}
 			}
 
-			if (strstr(&aStr[0], "ACTIONSET") != NULL)
+			if (strstr(&aStr[0], "MOTIONSET") != NULL)
 			{
-				while (strstr(&aStr[0], "END_ACTIONSET") == NULL)
+				while (strstr(&aStr[0], "END_MOTIONSET") == NULL)
 				{
 					fscanf(pFile, "%s", &aStr[0]);
 
-					if (strncmp(&aStr[0], "#", 1) == 0)
-					{// 一列読み込む
-						fgets(&aStr[0], sizeof(aStr), pFile);
+					if (strstr(&aStr[0], "MAX_ACTION") != NULL)
+					{
+						fscanf(pFile, "%s", &aStr[0]);
+						fscanf(pFile, "%d", &m_pMotion[nCntMotion].nMaxKey);
+						m_pMotion[nCntMotion].pCameraAction = new CCamera::CAMERA_ACTION[m_pMotion[nCntMotion].nMaxKey];
+						assert(m_pMotion[nCntMotion].pCameraAction != nullptr);
+						memset(&m_pMotion[nCntMotion].pCameraAction[0], 0, sizeof(CCamera::CAMERA_ACTION));
 					}
 
-					if (strstr(&aStr[0], "POSV") != NULL)
-					{// モデルのファイル名の設定
+					if (strstr(&aStr[0], "LOOP") != NULL)
+					{
+						int nLoop = 0;
 						fscanf(pFile, "%s", &aStr[0]);
-						fscanf(pFile, "%f", &m_pCameraAction[nCntSetAction].posVDest.x);
-						fscanf(pFile, "%f", &m_pCameraAction[nCntSetAction].posVDest.y);
-						fscanf(pFile, "%f", &m_pCameraAction[nCntSetAction].posVDest.z);
+						fscanf(pFile, "%d", &nLoop);
+						m_pMotion[nCntMotion].bLoop = (bool)nLoop;
 					}
 
-					if (strstr(&aStr[0], "POSR") != NULL)
-					{// モデルのファイル名の設定
-						fscanf(pFile, "%s", &aStr[0]);
-						fscanf(pFile, "%f", &m_pCameraAction[nCntSetAction].posRDest.x);
-						fscanf(pFile, "%f", &m_pCameraAction[nCntSetAction].posRDest.y);
-						fscanf(pFile, "%f", &m_pCameraAction[nCntSetAction].posRDest.z);
-					}
+					if (strstr(&aStr[0], "ACTIONSET") != NULL)
+					{
+						while (strstr(&aStr[0], "END_ACTIONSET") == NULL)
+						{
+							fscanf(pFile, "%s", &aStr[0]);
 
-					if (strcmp(&aStr[0], "FRAME") == 0)
-					{// キー数の読み込み
-						fscanf(pFile, "%s", &aStr[0]);
-						fscanf(pFile, "%d", &m_pCameraAction[nCntSetAction].nFrame);
+							if (strncmp(&aStr[0], "#", 1) == 0)
+							{// 一列読み込む
+								fgets(&aStr[0], sizeof(aStr), pFile);
+							}
+
+							if (strstr(&aStr[0], "POSV") != NULL)
+							{// モデルのファイル名の設定
+								fscanf(pFile, "%s", &aStr[0]);
+								fscanf(pFile, "%f", &m_pMotion[nCntMotion].pCameraAction[nCntSetAction].posVDest.x);
+								fscanf(pFile, "%f", &m_pMotion[nCntMotion].pCameraAction[nCntSetAction].posVDest.y);
+								fscanf(pFile, "%f", &m_pMotion[nCntMotion].pCameraAction[nCntSetAction].posVDest.z);
+							}
+
+							if (strstr(&aStr[0], "POSR") != NULL)
+							{// モデルのファイル名の設定
+								fscanf(pFile, "%s", &aStr[0]);
+								fscanf(pFile, "%f", &m_pMotion[nCntMotion].pCameraAction[nCntSetAction].posRDest.x);
+								fscanf(pFile, "%f", &m_pMotion[nCntMotion].pCameraAction[nCntSetAction].posRDest.y);
+								fscanf(pFile, "%f", &m_pMotion[nCntMotion].pCameraAction[nCntSetAction].posRDest.z);
+							}
+
+							if (strcmp(&aStr[0], "FRAME") == 0)
+							{// キー数の読み込み
+								fscanf(pFile, "%s", &aStr[0]);
+								fscanf(pFile, "%d", &m_pMotion[nCntMotion].pCameraAction[nCntSetAction].nFrame);
+							}
+						}
+
+						nCntSetAction++;
 					}
 				}
 
-				nCntSetAction++;
+				nCntSetAction = 0;
+				nCntMotion++;
 			}
 		}
 	}

@@ -136,17 +136,19 @@ public:
 	DOUBLE_INT GetLine() { return m_line; }											// ライン数のゲッター
 	void SetSplitTex(bool bSplitTex);												// テクスチャ分割するかのセッター
 	bool GetSplitTex() { return m_bSplitTex; }										// テクスチャ分割するかのゲッター
+	void SetScrollTex(D3DXVECTOR2 addTex, bool bScrollTex);							// テクスチャスクロールの設定
 	void LoadTex(const int nNumTex) { m_nNumTex = nNumTex; }						// テクスチャの設定
 	void SetCol(const D3DXCOLOR &col);												// 色の設定
-
+	D3DXVECTOR2 GetTex() { return m_tex; }											// テクスチャのゲッター
 protected:
 	//--------------------------------------------------------------------
 	// メンバ関数
 	//--------------------------------------------------------------------
 	virtual void SetVtx();									// 頂点座標などの設定
-	virtual void SetTex(const bool bSplit);					// テクスチャ座標の設定
+	virtual void SetTex();									// テクスチャ座標の設定
 	void SetIndexBuff();									// インデックスバッファの設定
 	void SetMeshInfo();										// メッシュの数値の計算
+	void TexScroll();										// テクスチャスクロール
 
 	//--------------------------------------------------------------------
 	// メンバ変数
@@ -164,6 +166,8 @@ private:
 	D3DXVECTOR3						m_rot;								// 向き
 	D3DXVECTOR3						m_size;								// 大きさ
 	D3DXVECTOR3						m_blockSize;						// ブロックサイズ
+	D3DXVECTOR2						m_tex;								// テクスチャ座標の基準値
+	D3DXVECTOR2						m_addTex;							// テクスチャ座標の加算値
 	D3DXCOLOR						m_col;								// カラー
 	int 							m_nNumTex;							// テクスチャの種別
 	DOUBLE_INT						m_block;							// ブロック数
@@ -174,7 +178,8 @@ private:
 	int								m_nVtx;								// 頂点数
 	int								m_nPolygon;							// ポリゴン数
 	int								m_nIndex;							// インデックス数
-	bool							m_bSplitTex;						// テクスチャの分割するか						
+	bool							m_bSplitTex;						// テクスチャの分割するか
+	bool							m_bScrollTex;						// テクスチャをスクロールするかどうか
 };
 
 #endif

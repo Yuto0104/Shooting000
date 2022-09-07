@@ -87,20 +87,23 @@ HRESULT CGame::Init()
 	m_MotionPlayer3D->SetRot(D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
 
 	CMesh3D *pMesh3D = CMesh3D::Create();
+	pMesh3D->SetRot(D3DXVECTOR3(D3DX_PI * -0.15f, 0.0f, 0.0f));
 	pMesh3D->SetSize(D3DXVECTOR3(100000.0f, 0, 100000.0f));
 	pMesh3D->SetBlock(CMesh3D::DOUBLE_INT(100, 100));
 	pMesh3D->SetSplitTex(true);
 	pMesh3D->SetObjectDrowType(CObject::DROWTYPE_BG);
-	pMesh3D->LoadTex(8);
+	pMesh3D->LoadTex(13);
+	pMesh3D->SetScrollTex(D3DXVECTOR2(-0.08f, -0.06f), true);
 
 	CSphere *pSphere = CSphere::Create();
-	pSphere->SetRot(D3DXVECTOR3(D3DX_PI, 0.0f, 0.0f));
+	pSphere->SetRot(D3DXVECTOR3(D3DX_PI * 0.85, 0.0f, 0.0f));
 	pSphere->SetSize(D3DXVECTOR3(100.0f, 0, 100.0f));
 	pSphere->SetBlock(CMesh3D::DOUBLE_INT(100, 100));
-	//pSphere->SetSplitTex(true);
 	pSphere->SetRadius(50000.0f);
 	pSphere->SetSphereRange(D3DXVECTOR2(D3DX_PI * 2.0f, D3DX_PI * -0.5f));
 	pSphere->SetObjectDrowType(CObject::DROWTYPE_BG);
+	pSphere->SetScrollTex(D3DXVECTOR2(0.005f, 0.0f), true);
+	pSphere->LoadTex(12);
 
 	/*CCirclePolygon3D *pCirclePolygon3D = CCirclePolygon3D::Create();
 	pCirclePolygon3D->SetPos(D3DXVECTOR3(0.0f, 10.0f, 0.0f));

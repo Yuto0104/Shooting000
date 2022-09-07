@@ -179,11 +179,12 @@ void CSphere::SetVtx()
 // Author : 唐﨑結斗
 // 概要 : 3Dメッシュのテクスチャ座標を設定する
 //=============================================================================
-void CSphere::SetTex(const bool bSplit)
+void CSphere::SetTex()
 {
 	// 情報の取得
 	DOUBLE_INT block = GetBlock();
 	DOUBLE_INT line = GetLine();
+	D3DXVECTOR2 tex = GetTex();
 
 	// 頂点情報の取得
 	VERTEX_3D *pVtx = NULL;
@@ -197,13 +198,13 @@ void CSphere::SetTex(const bool bSplit)
 		{// 変数宣言
 			int nCntVtx = nCntX + (nCntZ *  line.x);
 
-			if (bSplit)
+			if (GetSplitTex())
 			{// テクスチャ座標の設定
-				pVtx[nCntVtx].tex = D3DXVECTOR2(1.0f * nCntX, 1.0f * (line.y - nCntZ));
+				pVtx[nCntVtx].tex = D3DXVECTOR2(1.0f * nCntX + tex.x, 1.0f * (line.y - nCntZ) + tex.y);
 			}
 			else
 			{// テクスチャ座標の設定
-				pVtx[nCntVtx].tex = D3DXVECTOR2(1.0f / block.x * nCntX, 1.0f / block.y * (line.y - nCntZ));
+				pVtx[nCntVtx].tex = D3DXVECTOR2(1.0f / block.x * nCntX + tex.x, 1.0f / block.y * (line.y - nCntZ) + tex.y);
 			}
 		}
 	}
