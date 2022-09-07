@@ -87,18 +87,19 @@ HRESULT CGame::Init()
 	m_MotionPlayer3D->SetRot(D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
 
 	CMesh3D *pMesh3D = CMesh3D::Create();
-	pMesh3D->SetSize(D3DXVECTOR3(2000.0f, 0, 2000.0f));
-	pMesh3D->SetBlock(CMesh3D::DOUBLE_INT(10, 10));
+	pMesh3D->SetSize(D3DXVECTOR3(100000.0f, 0, 100000.0f));
+	pMesh3D->SetBlock(CMesh3D::DOUBLE_INT(100, 100));
 	pMesh3D->SetSplitTex(true);
 	pMesh3D->SetObjectDrowType(CObject::DROWTYPE_BG);
+	pMesh3D->LoadTex(8);
 
 	CSphere *pSphere = CSphere::Create();
 	pSphere->SetRot(D3DXVECTOR3(D3DX_PI, 0.0f, 0.0f));
 	pSphere->SetSize(D3DXVECTOR3(100.0f, 0, 100.0f));
 	pSphere->SetBlock(CMesh3D::DOUBLE_INT(100, 100));
 	//pSphere->SetSplitTex(true);
-	pSphere->SetRadius(1000.0f);
-	pSphere->SetSphereRange(D3DXVECTOR2(D3DX_PI * 2.0f, D3DX_PI * -0.35f));
+	pSphere->SetRadius(50000.0f);
+	pSphere->SetSphereRange(D3DXVECTOR2(D3DX_PI * 2.0f, D3DX_PI * -0.5f));
 	pSphere->SetObjectDrowType(CObject::DROWTYPE_BG);
 
 	/*CCirclePolygon3D *pCirclePolygon3D = CCirclePolygon3D::Create();

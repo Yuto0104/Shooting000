@@ -9,8 +9,9 @@
 //*****************************************************************************
 // インクルード
 //*****************************************************************************
-#include <string.h>
 #include <assert.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "texture.h"
 #include "renderer.h" 
@@ -23,7 +24,8 @@
 //=============================================================================
 CTexture::CTexture()
 {
-	
+	m_pTexture = nullptr;		// テクスチャ情報
+	m_nMaxTexture = 0;			// テクスチャの最大数
 }
 
 //=============================================================================
@@ -45,26 +47,14 @@ void CTexture::Init(void)
 {// レンダラーのゲット
 	CRenderer *pRenderer = CApplication::GetRenderer();
 
-	// ファイル名の設定
-	const char *pFileName[] =
-	{
-		"data/TEXTURE/bullet000.png",				// 2Dポリゴン
-		"data/TEXTURE/effect000.jpg" ,				// 2Dプレイヤー
-		"data/TEXTURE/695783_VvJuOyc1.png",			// 2D弾
-		"data/TEXTURE/explosion000.png",			// 2D爆発
-		"data/TEXTURE/ボス.png",					// 2Dエネミー
-		"data/TEXTURE/sky002.jpg",					// 空(0)
-		"data/TEXTURE/number003.png",				// ナンバー(0)
-		"data/TEXTURE/ハート.png",					// ハート(0)
-		"data/TEXTURE/field005.jpg",				// 床(0)
-		"data/TEXTURE/砂漠.jpg",					// 背景(0)
-	};
+	// ファイルの読み込み
+	LoadFile();
 
-	for (int nCnt = 0; nCnt < MAX_TYPE; nCnt++)
+	for (int nCnt = 0; nCnt < m_nMaxTexture; nCnt++)
 	{//ポリゴンに貼り付けるテクスチャの読み込み
 		D3DXCreateTextureFromFile(pRenderer->GetDevice(),
-			pFileName[nCnt],
-			&m_pTexture[nCnt]);
+			&m_pTexture[nCnt].aFileName[0],
+			&m_pTexture[nCnt].pTexture);
 	}
 }
 
@@ -75,13 +65,13 @@ void CTexture::Init(void)
 //=============================================================================
 void CTexture::Uninit(void)
 {
-	for (int nCnt = 0; nCnt < MAX_TYPE; nCnt++)
+	for (int nCnt = 0; nCnt < m_nMaxTexture; nCnt++)
 	{//テクスチャの破棄	  
-		if (m_pTexture[nCnt] != nullptr)
+		if (m_pTexture[nCnt].pTexture != nullptr)
 		{
-			m_pTexture[nCnt]->Release();
+			m_pTexture[nCnt].pTexture->Release();
 
-			m_pTexture[nCnt] = nullptr;
+			m_pTexture[nCnt].pTexture = nullptr;
 		}
 	}
 }
@@ -91,14 +81,60 @@ void CTexture::Uninit(void)
 // Author : 唐﨑結斗
 // 概要 : テクスチャのゲッター
 //=============================================================================
-LPDIRECT3DTEXTURE9 CTexture::GetTexture(TEXTURE_TYPE type)
+LPDIRECT3DTEXTURE9 CTexture::GetTexture(const int nNumTex)
 {
 	LPDIRECT3DTEXTURE9 pTexture = nullptr;
 
-	if (type != TYPE_NULL)
+	if (nNumTex != -1)
 	{// タイプが設定されてる
-		pTexture = m_pTexture[type];
+		pTexture = m_pTexture[nNumTex].pTexture;
 	}
 
 	return pTexture;
+}
+
+//=============================================================================
+// ファイルの読み込み
+// Author : 唐﨑結斗
+// 概要 : ファイルから読み込むテクスチャ数と名前を読み込む
+//=============================================================================
+void CTexture::LoadFile()
+{
+	// 変数宣言
+	char aStr[128];
+	int nCntTex = 0;
+
+	// ファイルの読み込み
+	FILE *pFile = fopen("data/FILE/texture.txt", "r");
+
+	if (pFile != nullptr)
+	{
+		while (fscanf(pFile, "%s", &aStr[0]) != EOF)
+		{// "EOF"を読み込むまで 
+			if (strncmp(&aStr[0], "#", 1) == 0)
+			{// 一列読み込む
+				fgets(&aStr[0], sizeof(aStr), pFile);
+			}
+
+			if (strstr(&aStr[0], "MAX_TEXTURE") != NULL)
+			{
+				fscanf(pFile, "%s", &aStr[0]);
+				fscanf(pFile, "%d", &m_nMaxTexture);
+				m_pTexture = new TEXTURE[m_nMaxTexture];
+				assert(m_pTexture != nullptr);
+				memset(&m_pTexture[0], 0, sizeof(TEXTURE));
+			}
+
+			if (strstr(&aStr[0], "TEXTURE_FILENAME") != NULL)
+			{
+				fscanf(pFile, "%s", &aStr[0]);
+				fscanf(pFile, "%s", &m_pTexture[nCntTex].aFileName[0]);
+				nCntTex++;
+			}
+		}
+	}
+	else
+	{
+		assert(false);
+	}
 }

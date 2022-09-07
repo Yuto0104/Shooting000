@@ -15,6 +15,7 @@
 #include "renderer.h"
 #include "application.h"
 #include "model_manager.h"
+#include "texture.h"
 
 //=============================================================================
 // インスタンス生成
@@ -46,9 +47,7 @@ CModel3D * CModel3D::Create(const int nModelNam)
 //=============================================================================
 CModel3D::CModel3D()
 {
-	m_pMesh = nullptr;											// メッシュ情報へのポインタ
-	m_pBuffer = nullptr;										// マテリアル情報へのポインタ
-	m_nNumMat = 0;												// マテリアル情報の数
+	memset(&m_material, 0, sizeof(MODEL_MATERIAL));				// マテリアル情報
 	m_mtxWorld = {};											// ワールドマトリックス
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);						// 位置
 	m_posOld = D3DXVECTOR3(0.0f, 0.0f, 0.0f);					// 過去位置
@@ -74,9 +73,7 @@ CModel3D::~CModel3D()
 HRESULT CModel3D::Init()
 {
 	// メンバ変数の初期化
-	m_pMesh = nullptr;											// メッシュ情報へのポインタ
-	m_pBuffer = nullptr;										// マテリアル情報へのポインタ
-	m_nNumMat = 0;												// マテリアル情報の数
+	memset(&m_material, 0, sizeof(MODEL_MATERIAL));				// マテリアル情報
 	m_mtxWorld = {};											// ワールドマトリックス
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);						// 位置
 	m_posOld = D3DXVECTOR3(0.0f, 0.0f, 0.0f);					// 過去位置
@@ -103,7 +100,7 @@ HRESULT CModel3D::Init(const int nModelNam)
 	m_size = D3DXVECTOR3(1.0f, 1.0f, 1.0f);					// 大きさ
 
 	// モデルのマテリアル情報の設定
-	pModelManager->GetModelMateria(nModelNam, m_pMesh, m_pBuffer, m_nNumMat);
+	m_material = pModelManager->GetModelMateria(nModelNam);
 	
 	return S_OK;
 }
@@ -139,6 +136,9 @@ void CModel3D::Draw()
 	// デバイスの取得
 	LPDIRECT3DDEVICE9 pDevice = CApplication::GetRenderer()->GetDevice();
 
+	// テクスチャポインタの取得
+	CTexture *pTexture = CApplication::GetTexture();
+
 	// 計算用マトリックス
 	D3DXMATRIX mtxRot, mtxTrans, mtxScaling;
 
@@ -169,16 +169,22 @@ void CModel3D::Draw()
 	// 現在のマテリアルを保持
 	pDevice->GetMaterial(&matDef);
 
-	if (m_pBuffer != nullptr)
+	if (m_material.pBuffer != nullptr)
 	{// マテリアルデータへのポインタを取得
-		pMat = (D3DXMATERIAL*)m_pBuffer->GetBufferPointer();
+		pMat = (D3DXMATERIAL*)m_material.pBuffer->GetBufferPointer();
 
-		for (int nCntMat = 0; nCntMat < (int)m_nNumMat; nCntMat++)
+		for (int nCntMat = 0; nCntMat < (int)m_material.nNumMat; nCntMat++)
 		{// マテリアルの設定
 			pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
 
+			// テクスチャの設定
+			pDevice->SetTexture(0, pTexture->GetTexture(m_material.pNumTex[nCntMat]));
+
 			// モデルパーツの描画
-			m_pMesh->DrawSubset(nCntMat);
+			m_material.pMesh->DrawSubset(nCntMat);
+
+			// テクスチャの設定
+			pDevice->SetTexture(0, nullptr);
 		}
 	}
 

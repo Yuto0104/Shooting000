@@ -49,9 +49,10 @@ CObject3D::CObject3D()
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 位置
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 向き
 	m_size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 大きさ
-	m_color = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);			// カラー
+	m_color = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);		// カラー
 	m_fAngle = 0.0f;									// 対角線の角度
 	m_fLength = 0.0f;									// 対角線の長さ
+	m_nNumTex = -1;										// テクスチャタイプ
 }
 
 //=============================================================================
@@ -85,8 +86,8 @@ HRESULT CObject3D::Init()
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 位置
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 向き
 	m_size = D3DXVECTOR3(10.0f, 10.0f, 0.0f);		// 大きさ
-	m_color = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);		// カラー
-	m_typeTex = CTexture::TYPE_2DBULLET;			// テクスチャタイプ
+	m_color = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);	// カラー
+	m_nNumTex = -1;									// テクスチャタイプ
 	m_bBillboard = false;							// ビルボードかどうか
 
 	// 頂点座標などの設定
@@ -190,7 +191,7 @@ void CObject3D::Draw()
 	pDevice->SetFVF(FVF_VERTEX_3D);
 
 	// テクスチャの設定
-	pDevice->SetTexture(0, pTexture->GetTexture(m_typeTex));
+	pDevice->SetTexture(0, pTexture->GetTexture(m_nNumTex));
 
 	// Zテストを使用する
 	pDevice->SetRenderState(D3DRS_ZENABLE, TRUE);

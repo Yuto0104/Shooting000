@@ -2,7 +2,7 @@
 MAX_TYPE = 2
 
 // 敵の移動数
-MAX_MOVE = 3
+MAX_MOVE = 4
 
 //***************************************
 // ステータスの設定
@@ -83,15 +83,15 @@ MOVE_SET
 	LOOP = 0
 	
 	KEY_SET
-		FRAME = 120
+		FRAME = 180
 		MOVE_MODE = 3
 		MOVE_VEC = 0.0
 		ADD_MOVE_VEC = -1.0
-		SPEED = -1.5
+		SPEED = -3.0
 	KEY_END
 	
 	KEY_SET
-		FRAME = 180
+		FRAME = 240
 		MOVE_MODE = 2
 		MOVE_VEC = 0.0
 		SPEED = 0
@@ -100,11 +100,42 @@ MOVE_SET
 	KEY_END
 	
 	KEY_SET
-		FRAME = 120
+		FRAME = 180
 		MOVE_MODE = 3
 		MOVE_VEC = 0.0
 		ADD_MOVE_VEC = 1.0
-		SPEED = -1.5
+		SPEED = -3.0
+	KEY_END
+	
+MOVE_END
+
+MOVE_SET
+	MAX_KEY = 3
+	LOOP = 0
+	
+	KEY_SET
+		FRAME = 180
+		MOVE_MODE = 3
+		MOVE_VEC = 0.0
+		ADD_MOVE_VEC = 1.0
+		SPEED = -3.0
+	KEY_END
+	
+	KEY_SET
+		FRAME = 240
+		MOVE_MODE = 2
+		MOVE_VEC = 0.0
+		SPEED = 0
+		WAVE_LENGTH = 0.05
+		WAVE_SIZE = 1.0
+	KEY_END
+	
+	KEY_SET
+		FRAME = 180
+		MOVE_MODE = 3
+		MOVE_VEC = 0.0
+		ADD_MOVE_VEC = -1.0
+		SPEED = -3.0
 	KEY_END
 	
 MOVE_END

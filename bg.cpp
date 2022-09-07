@@ -47,7 +47,7 @@ CBG::CBG(int nPriority/* = PRIORITY_LEVEL0*/) : CObject(nPriority)
 {
 	m_pVtxBuff = nullptr;								// 頂点バッファ
 	m_col = D3DXCOLOR(1.0f,1.0f,1.0f,1.0f);				// カラー
-	m_typeTex = CTexture::TYPE_NULL;					// テクスチャの種別
+	m_nNumTex = -1;										// テクスチャの種別
 }
 
 //=============================================================================
@@ -79,7 +79,7 @@ HRESULT CBG::Init()
 
 	// ポリゴン情報の設定
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);		// カラー
-	m_typeTex = CTexture::TYPE_BG_000;				// テクスチャタイプ
+	m_nNumTex = 9;									// テクスチャタイプ
 
 	// 頂点座標の設定
 	SetVtx();
@@ -138,7 +138,7 @@ void CBG::Draw()
 	pRenderer->GetDevice()->SetTexture(0, nullptr);
 
 	//テクスチャの設定
-	pRenderer->GetDevice()->SetTexture(0, pTexture->GetTexture(m_typeTex));
+	pRenderer->GetDevice()->SetTexture(0, pTexture->GetTexture(m_nNumTex));
 
 	//頂点バッファをデータストリームに設定
 	pRenderer->GetDevice()->SetStreamSource(0, m_pVtxBuff, 0, sizeof(VERTEX_2D));

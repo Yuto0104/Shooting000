@@ -15,6 +15,7 @@
 #include "motion.h"	
 #include "model_manager.h"
 #include "calculation.h"
+#include "texture.h"
 
 //=============================================================================
 // コンストラクタ
@@ -75,7 +76,7 @@ void CMotion::Init(void)
 		parts->mtxWorld = {};		// ワールドマトリックス
 
 		// マテリアル情報の代入
-		pModelManager->GetModelMateria(parts->nType, parts->pMesh, parts->pBuffer, parts->nNumMat);
+		parts->material = pModelManager->GetModelMateria(parts->nType);
 	}
 }
 
@@ -88,6 +89,9 @@ void CMotion::SetParts(D3DXMATRIX mtxWorld)
 {
 	// デバイスの取得
 	LPDIRECT3DDEVICE9 pDevice = CApplication::GetRenderer()->GetDevice();
+
+	// テクスチャポインタの取得
+	CTexture *pTexture = CApplication::GetTexture();
 
 	// 計算用マトリックス
 	D3DXMATRIX mtxRot, mtxTrans;
@@ -143,15 +147,21 @@ void CMotion::SetParts(D3DXMATRIX mtxWorld)
 		pDevice->GetMaterial(&matDef);
 
 		// マテリアルデータへのポインタを取得
-		pMat = (D3DXMATERIAL*)parts->pBuffer->GetBufferPointer();
+		pMat = (D3DXMATERIAL*)parts->material.pBuffer->GetBufferPointer();
 
-		for (int nCntMat = 0; nCntMat < (int)parts->nNumMat; nCntMat++)
+		for (int nCntMat = 0; nCntMat < (int)parts->material.nNumMat; nCntMat++)
 		{
 			// マテリアルの設定
 			pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
 
+			// テクスチャの設定
+			pDevice->SetTexture(0, pTexture->GetTexture(parts->material.pNumTex[nCntMat]));
+
 			// プレイヤーパーツの描画
-			parts->pMesh->DrawSubset(nCntMat);
+			parts->material.pMesh->DrawSubset(nCntMat);
+
+			// テクスチャの設定
+			pDevice->SetTexture(0, nullptr);
 		}
 
 		// 保していたマテリアルを戻す
@@ -171,6 +181,9 @@ void CMotion::SetParts(D3DXMATRIX mtxWorld, const D3DXCOLOR col)
 {// デバイスの取得
 	LPDIRECT3DDEVICE9 pDevice = CApplication::GetRenderer()->GetDevice();
 
+	// テクスチャポインタの取得
+	CTexture *pTexture = CApplication::GetTexture();
+
 	// 計算用マトリックス
 	D3DXMATRIX mtxRot, mtxTrans;
 	D3DMATERIAL9 matDef;
@@ -225,9 +238,9 @@ void CMotion::SetParts(D3DXMATRIX mtxWorld, const D3DXCOLOR col)
 		pDevice->GetMaterial(&matDef);
 
 		// マテリアルデータへのポインタを取得
-		pMat = (D3DXMATERIAL*)parts->pBuffer->GetBufferPointer();
+		pMat = (D3DXMATERIAL*)parts->material.pBuffer->GetBufferPointer();
 
-		for (int nCntMat = 0; nCntMat < (int)parts->nNumMat; nCntMat++)
+		for (int nCntMat = 0; nCntMat < (int)parts->material.nNumMat; nCntMat++)
 		{// マテリアル情報の設定
 			D3DMATERIAL9  matD3D = pMat[nCntMat].MatD3D;
 
@@ -237,8 +250,14 @@ void CMotion::SetParts(D3DXMATRIX mtxWorld, const D3DXCOLOR col)
 			// マテリアルの設定
 			pDevice->SetMaterial(&matD3D);
 
+			// テクスチャの設定
+			pDevice->SetTexture(0, pTexture->GetTexture(parts->material.pNumTex[nCntMat]));
+
 			// プレイヤーパーツの描画
-			parts->pMesh->DrawSubset(nCntMat);
+			parts->material.pMesh->DrawSubset(nCntMat);
+
+			// テクスチャの設定
+			pDevice->SetTexture(0, nullptr);
 		}
 
 		// 保していたマテリアルを戻す

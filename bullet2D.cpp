@@ -79,7 +79,7 @@ HRESULT CBullet2D::Init()
 	CObject2D::Init();
 
 	// テクスチャの設定
-	LoadTex(CTexture::TYPE_2DBULLET);
+	LoadTex(0);
 
 	// サイズ
 	D3DXVECTOR3 size = GetSize();

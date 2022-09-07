@@ -27,7 +27,7 @@
 // 定数定義
 //*****************************************************************************
 const float CCamera::CAMERA_NEAR = (10.0f);				// ニア
-const float CCamera::CAMERA_FUR = (10000.0f);			// ファー
+const float CCamera::CAMERA_FUR = (100000.0f);			// ファー
 
 //=============================================================================
 // コンストラクタ
@@ -91,7 +91,7 @@ HRESULT CCamera::Init()
 	// メモリの確保
 	m_pRoll = new CMove;
 	assert(m_pRoll != nullptr);
-	m_pRoll->SetMoving(2.0f, 10.0f, 0.0f, 0.2f);
+	m_pRoll->SetMoving(2.0f, 10.0f, 0.0f, 0.7f);
 
 	// 注視点の算出
 	SetPosR();
@@ -129,7 +129,8 @@ void CCamera::Update(void)
 		Action();
 
 		/*Move();
-		Rotate();*/
+		Rotate();
+		Zoom();*/
 	}
 }
 
@@ -557,6 +558,29 @@ void CCamera::Action()
 			m_nCntFrame = 0;
 		}
 	}
+}
+
+//=============================================================================
+// カメラの拡縮処理
+// Author : 唐﨑結斗
+// 概要 : マウスホイールでカメラの拡縮を行う
+//=============================================================================
+void CCamera::Zoom()
+{// マウス情報の取得
+	CMouse *pMouse = CApplication::GetMouse();
+
+	m_fDistance += (float)pMouse->GetMouseWheel() * 1.0f;
+
+	if (m_fDistance >= CAMERA_FUR / 2.0f)
+	{
+		m_fDistance = CAMERA_FUR / 2.0f;
+	}
+	else if (m_fDistance <= CAMERA_NEAR * 2.0f)
+	{
+		m_fDistance = CAMERA_NEAR * 2.0f;
+	}
+
+	SetPosV();
 }
 
 //=============================================================================

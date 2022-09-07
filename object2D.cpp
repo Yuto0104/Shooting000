@@ -56,6 +56,7 @@ CObject2D::CObject2D(int nPriority) : CObject(nPriority)
 	m_fAngle = 0.0f;									// 対角線の角度
 	m_fLength = 0.0f;									// 対角線の長さ
 	SetObjType(CObject::OBJTYPE_2DPOLYGON);				// オブジェクトの種別設定
+	m_nNumTex = -1;										// テクスチャタイプ
 }
 
 //=============================================================================
@@ -89,7 +90,7 @@ HRESULT CObject2D::Init()
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 位置
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 向き
 	m_size = D3DXVECTOR3(100.0f, 100.0f, 0.0f);		// 大きさ
-	m_typeTex = CTexture::TYPE_2DPOLYGON;			// テクスチャタイプ
+	m_nNumTex = -1;									// テクスチャタイプ
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);		// 色の設定
 
 	// 色の設定
@@ -146,7 +147,7 @@ void CObject2D::Draw()
 	pRenderer->GetDevice()->SetTexture(0, nullptr);
 
 	//テクスチャの設定
-	pRenderer->GetDevice()->SetTexture(0, pTexture->GetTexture(m_typeTex));
+	pRenderer->GetDevice()->SetTexture(0, pTexture->GetTexture(m_nNumTex));
 
 	//頂点バッファをデータストリームに設定
 	pRenderer->GetDevice()->SetStreamSource(0, m_pVtxBuff, 0, sizeof(VERTEX_2D));

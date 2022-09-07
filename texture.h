@@ -26,25 +26,10 @@ public:
 	//*****************************************************************************
 	static const unsigned int MAX_NAME = (0x100);
 
-	//--------------------------------------------------------------------
-	// テクスチャの種別の列挙型
-	// Author : 唐﨑結斗
-	// 概要 : オブジェクトの種別情報を格納
-	//--------------------------------------------------------------------
-	enum TEXTURE_TYPE
+	struct TEXTURE
 	{
-		TYPE_2DPOLYGON = 0,		// 2Dポリゴン
-		TYPE_2DPLAYER,			// 2Dプレイヤー
-		TYPE_2DBULLET,			// 2D弾
-		TYPE_2DEXPLOSION,		// 2D爆発
-		TYPE_2DENEMY_000,		// 2Dエネミー(0)
-		TYPE_SKY_000,			// 空(0)
-		TYPE_NUMBER_000,		// ナンバー(0)
-		TYPE_LIFE_000,			// ハート(0)
-		TYPE_FLOOR_000,			// 床(0)
-		TYPE_BG_000,			// 背景(0)
-		MAX_TYPE,				// 種別の最大数
-		TYPE_NULL,				// テクスチャ設定なし
+		LPDIRECT3DTEXTURE9		pTexture;					// テクスチャ情報
+		char					aFileName[MAX_NAME];		// ファイル名
 	};
 
 	//--------------------------------------------------------------------
@@ -63,14 +48,24 @@ public:
 	void Uninit(void);		
 
 	// テクスチャのゲッター
-	LPDIRECT3DTEXTURE9 GetTexture(TEXTURE_TYPE type);
+	LPDIRECT3DTEXTURE9 GetTexture(const int nNumTex);
+
+	// テクスチャの最大数
+	int GetMaxTexture() { return m_nMaxTexture; }
+
+	// テクスチャ情報のゲッター
+	TEXTURE *GetTextureData() { return m_pTexture; }
+
+	// ファイルの読み込み
+	void LoadFile();
 
 private:
 	//--------------------------------------------------------------------
 	// メンバ変数
 	//--------------------------------------------------------------------
-	// テクスチャ
-	LPDIRECT3DTEXTURE9 m_pTexture[MAX_TYPE];
+	TEXTURE		*m_pTexture;		// テクスチャ情報
+	int			m_nMaxTexture;		// テクスチャの最大数
+	
 };
 
 #endif

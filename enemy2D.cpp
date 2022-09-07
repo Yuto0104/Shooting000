@@ -79,7 +79,7 @@ HRESULT CEnemy2D::Init()
 	CObject2D::Init();
 
 	// テクスチャの設定
-	LoadTex(CTexture::TYPE_2DENEMY_000);
+	LoadTex(4);
 
 	// サイズ
 	D3DXVECTOR3 size = GetSize();

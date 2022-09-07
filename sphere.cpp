@@ -75,7 +75,7 @@ HRESULT CSphere::Init()
 	m_fRadius = 50.0f;
 
 	// テクスチャの設定
-	LoadTex(CTexture::TYPE_SKY_000);
+	LoadTex(5);
 
 	return S_OK;
 }

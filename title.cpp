@@ -46,6 +46,7 @@ HRESULT CTitle::Init()
 {
 	CObject2D *pObject2D = CObject2D::Create();
 	pObject2D->SetPos(D3DXVECTOR3(640.0f, 360.0f, 0.0f));
+	pObject2D->LoadTex(6);
 	CBG *pBG = CBG::Create();
 	pBG->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
 	return S_OK;

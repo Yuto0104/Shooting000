@@ -90,7 +90,7 @@ HRESULT CPlayer2D::Init()
 	CObject2D::Init();
 
 	// テクスチャの設定
-	LoadTex(CTexture::TYPE_2DPLAYER);
+	LoadTex(2);
 
 	// サイズ
 	D3DXVECTOR3 size = GetSize();

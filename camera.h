@@ -78,6 +78,7 @@ public:
 	D3DXVECTOR3 GetRot() { return m_rot; }
 	D3DXMATRIX GetMtxView() { return m_mtxView; }
 	D3DXMATRIX GetMtxProj() { return m_mtxProj; }
+	float GetDistance() { return m_fDistance; }
 	void SetPosV(const D3DXVECTOR3 posV);
 	void SetPosR(const D3DXVECTOR3 posR);
 	void SetRot(const D3DXVECTOR3 rot, const int nShaft);
@@ -91,6 +92,7 @@ private:
 	void Move(void);				// 移動
 	void FollowCamera(void);		// 追従
 	void Action();					// カメラのアクション
+	void Zoom();					// カメラの拡縮
 	void SetPosV();					// 視点の設定
 	void SetPosR();					// 注視点の設定
 	void SetRot();					// 向きの設定

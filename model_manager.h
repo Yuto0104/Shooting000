@@ -23,19 +23,6 @@ class CModelManager
 {
 public:
 	//--------------------------------------------------------------------
-	// モデルのマテリアル情報
-	// Author : 唐﨑結斗
-	// 概要 : モデルのマテリアル情報の設定
-	//--------------------------------------------------------------------
-	struct MODEL_MATERIAL
-	{
-		LPD3DXMESH		pMesh;				// メッシュ情報へのポインタ
-		LPD3DXBUFFER	pBuffer;			// マテリアル情報へのポインタ
-		DWORD			nNumMat;			// マテリアル情報の数
-		char			aFileName[0xff];	// Xファイルのパス
-	};
-
-	//--------------------------------------------------------------------
 	// オブジェクトの配置情報
 	// Author : 唐﨑結斗
 	// 概要 : 敵の配置情報
@@ -64,7 +51,7 @@ public:
 	void Uninit(void);
 
 	// モデルマテリアル情報のゲッター
-	void GetModelMateria(const int nNumModel, LPD3DXMESH &pMesh, LPD3DXBUFFER &pBuffer,DWORD &nNumMat);
+	CModel3D::MODEL_MATERIAL GetModelMateria(const int nNumModel) { return m_pModelMaterial[nNumModel]; }
 
 	// ファイルの読み込み
 	void LoadFile(const char *pFileName);
@@ -82,10 +69,10 @@ private:
 	//--------------------------------------------------------------------
 	// メンバ変数
 	//--------------------------------------------------------------------
-	MODEL_MATERIAL		*m_pModelMaterial;			// モデルのマテリアル情報
-	OBJECT_SETER		*m_pObjectSeter;			// オブジェクトの配置設定
-	int					m_nMaxModelMaterial;		// モデルの種別数
-	int					m_nMaxSetModelBG;			// 背景モデルの設置数		
+	CModel3D::MODEL_MATERIAL		*m_pModelMaterial;			// モデルのマテリアル情報
+	OBJECT_SETER					*m_pObjectSeter;			// オブジェクトの配置設定
+	int								m_nMaxModelMaterial;		// モデルの種別数
+	int								m_nMaxSetModelBG;			// 背景モデルの設置数		
 };
 
 #endif

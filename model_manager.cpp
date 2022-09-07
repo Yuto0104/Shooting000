@@ -15,6 +15,7 @@
 #include "model_manager.h"
 #include "renderer.h" 
 #include "application.h"
+#include "texture.h"
 
 //=============================================================================
 // コンストラクタ
@@ -46,6 +47,12 @@ void CModelManager::Init(void)
 {// レンダラーのゲット
 	CRenderer *pRenderer = CApplication::GetRenderer();
 
+	// テクスチャポインタの取得
+	CTexture *pTexture = CApplication::GetTexture();
+
+	// テクスチャ情報の取得
+	CTexture::TEXTURE *pTextureData = pTexture->GetTextureData();
+
 	// デバイスの取得
 	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
 
@@ -55,16 +62,42 @@ void CModelManager::Init(void)
 	// 背景モデルの設置
 	LoadFile("data/FILE/BG_model.txt");
 
-	for (int nCnt = 0; nCnt < m_nMaxModelMaterial; nCnt++)
+	for (int nCntModel = 0; nCntModel < m_nMaxModelMaterial; nCntModel++)
 	{// Xファイルの読み込み
-		D3DXLoadMeshFromX(&m_pModelMaterial[nCnt].aFileName[0],
+		D3DXLoadMeshFromX(&m_pModelMaterial[nCntModel].aFileName[0],
 			D3DXMESH_SYSTEMMEM,
 			pDevice,
 			NULL,
-			&m_pModelMaterial[nCnt].pBuffer,
+			&m_pModelMaterial[nCntModel].pBuffer,
 			NULL,
-			&m_pModelMaterial[nCnt].nNumMat,
-			&m_pModelMaterial[nCnt].pMesh);
+			&m_pModelMaterial[nCntModel].nNumMat,
+			&m_pModelMaterial[nCntModel].pMesh);
+
+		m_pModelMaterial[nCntModel].pNumTex = new int[m_pModelMaterial[nCntModel].nNumMat];
+		assert(m_pModelMaterial[nCntModel].pNumTex != nullptr);
+		memset(&m_pModelMaterial[nCntModel].pNumTex[0], -1, sizeof(m_pModelMaterial[nCntModel].pNumTex));
+
+		// バッファの先頭ポインタをD3DXMATERIALにキャストして取得
+		D3DXMATERIAL *pMat = (D3DXMATERIAL*)m_pModelMaterial[nCntModel].pBuffer->GetBufferPointer();
+
+		// 各メッシュのマテリアル情報を取得する
+		for (int nCntMat = 0; nCntMat < (int)m_pModelMaterial[nCntModel].nNumMat; nCntMat++)
+		{
+			m_pModelMaterial[nCntModel].pNumTex[nCntMat] = -1;
+
+			if (pMat[nCntMat].pTextureFilename != NULL)
+			{
+				int nMaxTex = pTexture->GetMaxTexture();
+				for (int nCntTexture = 0; nCntTexture < nMaxTex; nCntTexture++)
+				{
+					if (strcmp(pMat[nCntMat].pTextureFilename, pTextureData[nCntTexture].aFileName) == 0)
+					{
+						m_pModelMaterial[nCntModel].pNumTex[nCntMat] = nCntTexture;
+						break;
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -90,23 +123,15 @@ void CModelManager::Uninit(void)
 			m_pModelMaterial[nCnt].pBuffer->Release();
 			m_pModelMaterial[nCnt].pBuffer = nullptr;
 		}
+
+		// メモリの解放
+		delete[] m_pModelMaterial[nCnt].pNumTex;
+		m_pModelMaterial[nCnt].pNumTex = nullptr;
 	}
 
 	// メモリの解放
 	delete[] m_pModelMaterial;
 	m_pModelMaterial = nullptr;
-}
-
-//=============================================================================
-// モデルマテリアル情報のゲッター
-// Author : 唐﨑結斗
-// 概要 : モデルマテリアル情報のゲッター
-//=============================================================================
-void CModelManager::GetModelMateria(const int nNumModel, LPD3DXMESH &pMesh, LPD3DXBUFFER &pBuffer, DWORD &nNumMat)
-{
-	pMesh = m_pModelMaterial[nNumModel].pMesh;
-	pBuffer = m_pModelMaterial[nNumModel].pBuffer;
-	nNumMat = m_pModelMaterial[nNumModel].nNumMat;
 }
 
 //=============================================================================
@@ -137,9 +162,9 @@ void CModelManager::LoadFile(const char *pFileName)
 			{
 				fscanf(pFile, "%s", &aStr[0]);
 				fscanf(pFile, "%d", &m_nMaxModelMaterial);
-				m_pModelMaterial = new MODEL_MATERIAL[m_nMaxModelMaterial];
+				m_pModelMaterial = new CModel3D::MODEL_MATERIAL[m_nMaxModelMaterial];
 				assert(m_pModelMaterial != nullptr);
-				memset(&m_pModelMaterial[0], 0, sizeof(MODEL_MATERIAL));
+				memset(&m_pModelMaterial[0], 0, sizeof(CModel3D::MODEL_MATERIAL));
 			}
 
 			if (strstr(&aStr[0], "NUM_MODEL") != NULL)

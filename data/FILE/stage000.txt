@@ -1,16 +1,16 @@
-// $BE($NG[CV?t(B
+// “G‚Ì”z’u”
 MAX_INSTALL = 2
 
-// $B%2!<%`$N=*N;;~4V(B
-GAME_END_FRAME = 1000
+// ƒQ[ƒ€‚ÌI—¹ŽžŠÔ
+GAME_END_FRAME = 100000
 
 //***************************************
-// $BE($N@_CV(B
+// “G‚ÌÝ’u
 //***************************************
 ARRANGEMENT_SET
 	POS = 0.0 0.0 200.0
 	FRAME =  1
-	MOVE_ID = 1
+	MOVE_ID = 3
 	ID = 1
 	DRAW_TYPE = 0
 ARRANGEMENT_END

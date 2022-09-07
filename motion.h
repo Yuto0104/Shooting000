@@ -75,18 +75,16 @@ public:
 	//***************************************************************
 	typedef struct
 	{
-		LPD3DXMESH					pMesh;					// メッシュ情報へのポインタ
-		LPD3DXBUFFER				pBuffer;				// マテリアル情報へのポインタ
-		DWORD						nNumMat;				// マテリアル情報の数
-		D3DXMATRIX					mtxWorld;				// ワールドマトリックス
-		D3DXVECTOR3					posOrigin;				// 元の位置
-		D3DXVECTOR3					rotOrigin;				// 元の向き
-		D3DXVECTOR3					pos;					// 現在の位置
-		D3DXVECTOR3					rot;					// 現在の向き
-		D3DXVECTOR3					posDest;				// 目的の位置
-		D3DXVECTOR3					rotDest;				// 目的の向き
-		int							nIdxModelParent;		// 親モデルのインデックス数
-		int							nType;					// パーツのタイプ
+		CModel3D::MODEL_MATERIAL		material;				// マテリアル情報
+		D3DXMATRIX						mtxWorld;				// ワールドマトリックス
+		D3DXVECTOR3						posOrigin;				// 元の位置
+		D3DXVECTOR3						rotOrigin;				// 元の向き
+		D3DXVECTOR3						pos;					// 現在の位置
+		D3DXVECTOR3						rot;					// 現在の向き
+		D3DXVECTOR3						posDest;				// 目的の位置
+		D3DXVECTOR3						rotDest;				// 目的の向き
+		int								nIdxModelParent;		// 親モデルのインデックス数
+		int								nType;					// パーツのタイプ
 	}Parts;
 
 	//--------------------------------------------------------------------

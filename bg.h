@@ -64,7 +64,7 @@ public:
 	D3DXVECTOR3 GetRot()  override { return D3DXVECTOR3(0.0f, 0.0f, 0.0f); }		// 向きのゲッター
 	D3DXVECTOR3 GetSize()  override { return D3DXVECTOR3(0.0f, 0.0f, 0.0f); }		// 大きさのゲッター
 	void SetCol(const D3DXCOLOR color);												// 頂点カラーの設定
-	void LoadTex(CTexture::TEXTURE_TYPE type) { m_typeTex = type; }					// テクスチャの設定
+	void LoadTex(const int nNumTex) { m_nNumTex = nNumTex; }						// テクスチャの設定
 
 private:
 	//--------------------------------------------------------------------
@@ -78,7 +78,7 @@ private:
 	//--------------------------------------------------------------------
 	LPDIRECT3DVERTEXBUFFER9		 m_pVtxBuff;		// 頂点バッファ
 	D3DCOLOR					 m_col;				// カラー
-	CTexture::TEXTURE_TYPE		 m_typeTex;			// テクスチャの種別
+	int							 m_nNumTex;			// テクスチャの種別
 };
 
 #endif

@@ -79,7 +79,7 @@ HRESULT CBullet3D::Init()
 	CObject3D::Init();
 
 	// テクスチャの設定
-	LoadTex(CTexture::TYPE_2DPOLYGON);
+	LoadTex(0);
 
 	// ビルボードオン
 	SetBillboard(true);

@@ -84,7 +84,7 @@ HRESULT CFade::Init()
 	SetCol(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f));
 
 	// テクスチャの設定
-	LoadTex(CTexture::TYPE_NULL);
+	LoadTex(-1);
 
 	// テクスチャ座標の設定
 	SetTex(D3DXVECTOR2(0.0f, 0.0f), D3DXVECTOR2(1.0f / 10, 1.0f));

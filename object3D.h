@@ -71,7 +71,7 @@ public:
 	virtual void SetVtx();															// 頂点座標などの設定
 	void SetCol();																	// 頂点カラーの設定
 	void SetTex(const D3DXVECTOR2 &minTex, const D3DXVECTOR2 &maxTex);				// テクスチャ座標の設定
-	void LoadTex(CTexture::TEXTURE_TYPE type) { m_typeTex = type; }					// テクスチャの設定
+	void LoadTex(const int nNumTex) { m_nNumTex = nNumTex; }						// テクスチャの設定
 
 private:
 	//--------------------------------------------------------------------
@@ -84,7 +84,7 @@ private:
 	D3DXVECTOR3						m_rot;				// 向き
 	D3DXVECTOR3						m_size;				// 大きさ
 	D3DXCOLOR						m_color;			// カラー
-	CTexture::TEXTURE_TYPE			m_typeTex;			// テクスチャの種別
+	int								m_nNumTex;			// テクスチャの種別
 	float							m_fAngle;			// 対角線の角度
 	float							m_fLength;			// 対角線の長さ
 	bool							m_bBillboard;		// ビルボードかどうか

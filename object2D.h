@@ -63,7 +63,7 @@ public:
 	D3DXVECTOR3 GetPosOld()  override { return m_posOld; }							// 過去位置のゲッター
 	D3DXVECTOR3 GetRot()  override { return m_rot; }								// 向きのゲッター
 	D3DXVECTOR3 GetSize()  override { return m_size; }								// 大きさのゲッター
-	void LoadTex(CTexture::TEXTURE_TYPE type) { m_typeTex = type; }					// テクスチャの設定
+	void LoadTex(const int nNumTex) { m_nNumTex = nNumTex; }						// テクスチャの設定
 	void SetCol(const D3DCOLOR &col);												// 色のセッター
 
 protected:
@@ -83,7 +83,7 @@ private:
 	D3DXVECTOR3						m_rot;				// 向き
 	D3DXVECTOR3						m_size;				// 大きさ
 	D3DCOLOR						m_col;				// カラー
-	CTexture::TEXTURE_TYPE			m_typeTex;			// テクスチャの種別
+	int								m_nNumTex;			// テクスチャの種別番号
 	float							m_fAngle;			// 対角線の角度
 	float							m_fLength;			// 対角線の長さ
 };

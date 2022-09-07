@@ -81,7 +81,7 @@ HRESULT CEnergyGage::Init()
 	// 2Dオブジェクトの生成
 	m_pObject2D = CObject2D::Create();
 	assert(m_pObject2D != nullptr);
-	m_pObject2D->LoadTex(CTexture::TYPE_NULL);
+	m_pObject2D->LoadTex(-1);
 	m_pObject2D->SetCol(D3DXCOLOR(0.7f, 0.7f, 0.7f, 1.0f));
 
 	// スコアの生成

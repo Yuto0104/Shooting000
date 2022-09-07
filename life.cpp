@@ -67,7 +67,7 @@ HRESULT CLife::Init()
 	CObject2D::Init();
 
 	// テクスチャの設定
-	LoadTex(CTexture::TYPE_LIFE_000);
+	LoadTex(7);
 
 	// テクスチャ座標の設定
 	SetTex(D3DXVECTOR2(0.0f, 0.0f), D3DXVECTOR2(1.0f, 1.0f));

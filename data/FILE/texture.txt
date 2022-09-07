@@ -1,0 +1,18 @@
+// テクスチャの最大数
+MAX_TEXTURE = 12
+
+//***************************
+// TEXTUREファイル名の読み込み
+//***************************
+TEXTURE_FILENAME = data/TEXTURE/bullet000.png			# [0]
+TEXTURE_FILENAME = data/TEXTURE/effect000.jpg			# [1]
+TEXTURE_FILENAME = data/TEXTURE/695783_VvJuOyc1.png		# [2]
+TEXTURE_FILENAME = data/TEXTURE/explosion000.png		# [3]
+TEXTURE_FILENAME = data/TEXTURE/ボス.png				# [4]
+TEXTURE_FILENAME = data/TEXTURE/sky002.jpg				# [5]
+TEXTURE_FILENAME = data/TEXTURE/number003.png			# [6]
+TEXTURE_FILENAME = data/TEXTURE/ハート.png				# [7]
+TEXTURE_FILENAME = data/TEXTURE/field005.jpg			# [8]
+TEXTURE_FILENAME = data/TEXTURE/砂漠.jpg				# [9]
+TEXTURE_FILENAME = data/TEXTURE/bill000.png				# [10]
+TEXTURE_FILENAME = data/TEXTURE/装甲.png				# [11]

@@ -232,6 +232,8 @@ void CRenderer::DrawFPS()
 		strcat(str, strCopy);
 		sprintf(strCopy, _T("カメラの向き | x : %.3f | y : %.3f | z : %.3f |\n"), rot.x, rot.y, rot.z);
 		strcat(str, strCopy);
+		sprintf(strCopy, _T("カメラのディスタンス : %.3f\n"), pCamera->GetDistance());
+		strcat(str, strCopy);
 
 		int nCntSetEnemy = CEnemy3D::GetCntSetEnemy();
 		sprintf(strCopy, _T("敵の設置数 : %d \n"), nCntSetEnemy);

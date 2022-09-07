@@ -136,7 +136,7 @@ public:
 	DOUBLE_INT GetLine() { return m_line; }											// ライン数のゲッター
 	void SetSplitTex(bool bSplitTex);												// テクスチャ分割するかのセッター
 	bool GetSplitTex() { return m_bSplitTex; }										// テクスチャ分割するかのゲッター
-	void LoadTex(CTexture::TEXTURE_TYPE type) { m_typeTex = type; }					// テクスチャの設定
+	void LoadTex(const int nNumTex) { m_nNumTex = nNumTex; }						// テクスチャの設定
 	void SetCol(const D3DXCOLOR &col);												// 色の設定
 
 protected:
@@ -165,7 +165,7 @@ private:
 	D3DXVECTOR3						m_size;								// 大きさ
 	D3DXVECTOR3						m_blockSize;						// ブロックサイズ
 	D3DXCOLOR						m_col;								// カラー
-	CTexture::TEXTURE_TYPE			m_typeTex;							// テクスチャの種別
+	int 							m_nNumTex;							// テクスチャの種別
 	DOUBLE_INT						m_block;							// ブロック数
 	DOUBLE_INT						m_line;								// 列数
 	float							m_fAngle;							// 対角線の角度

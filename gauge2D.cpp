@@ -63,6 +63,7 @@ CGauge2D::CGauge2D(int nPriority) : CObject(nPriority)
 	m_fNumber = 0.0f;									// 数値
 	m_fDestNumber = 0.0f;								// 目的の数値
 	m_fCoefficient = 0.0f;								// 減衰係数
+	m_nNumTex = -1;										// テクスチャタイプ
 }
 
 //=============================================================================
@@ -97,7 +98,7 @@ HRESULT CGauge2D::Init()
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 向き
 	m_size = D3DXVECTOR3(100.0f, 100.0f, 0.0f);		// 大きさ
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);		// カラー
-	m_typeTex = CTexture::TYPE_NULL;				// テクスチャタイプ
+	m_nNumTex = -1;									// テクスチャタイプ
 
 	// 色の設定
 	SetCol(m_col);
@@ -174,7 +175,7 @@ void CGauge2D::Draw()
 	pRenderer->GetDevice()->SetTexture(0, nullptr);
 
 	//テクスチャの設定
-	pRenderer->GetDevice()->SetTexture(0, pTexture->GetTexture(m_typeTex));
+	pRenderer->GetDevice()->SetTexture(0, pTexture->GetTexture(m_nNumTex));
 
 	//頂点バッファをデータストリームに設定
 	pRenderer->GetDevice()->SetStreamSource(0, m_pVtxBuff, 0, sizeof(VERTEX_2D));
