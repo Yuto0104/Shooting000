@@ -67,6 +67,8 @@ public:
 	static void SetNextMode(SCENE_MODE mode) { m_nextMode = mode; }						// 次のモードの設定
 	static void SetMode(SCENE_MODE mode);												// モードの設定
 	static SCENE_MODE GetMode() { return m_mode; }										// モードの取得
+	static void SetScore(const int nScore) { m_nScore = nScore; }						// スコアの設定
+	static int GetScore() { return m_nScore; }											// スコアの取得
 
 	//--------------------------------------------------------------------
 	// コンストラクタとデストラクタ
@@ -99,6 +101,7 @@ private:
 	static SCENE_MODE m_nextMode;				// 次に設定するモード
 	static CSceneMode *pSceneMode;				// シーンモードを格納
 	static CFade *pFade;						// フェードクラス
+	static int m_nScore;						// 現在のスコア
 };
 
 #endif

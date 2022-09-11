@@ -1,5 +1,5 @@
 // モデルの最大数
-MAX_TYPE = 25
+MAX_TYPE = 47
 
 //***************************
 // Xファイル名の読み込み
@@ -29,3 +29,26 @@ MODEL_FILENAME = data/MODEL/shark/08_サメ(左足).x		# [21]
 MODEL_FILENAME = data/MODEL/shark/09_サメ(尾ひれ).x		# [22]
 MODEL_FILENAME = data/MODEL/shark/10_サメ(下顎).x		# [23]
 MODEL_FILENAME = data/MODEL/飛行装甲船000.x				# [24]
+MODEL_FILENAME = data/MODEL/白/00_本体.x				# [25]
+MODEL_FILENAME = data/MODEL/白/01_右関節1.x				# [26]
+MODEL_FILENAME = data/MODEL/白/02_左関節1.x				# [27]
+MODEL_FILENAME = data/MODEL/白/03_右大翼.x				# [28]
+MODEL_FILENAME = data/MODEL/白/04_左大翼.x				# [29]
+MODEL_FILENAME = data/MODEL/白/05_右関節2.x				# [30]
+MODEL_FILENAME = data/MODEL/白/06_左関節2.x				# [31]
+MODEL_FILENAME = data/MODEL/白/07_右小翼.x				# [32]
+MODEL_FILENAME = data/MODEL/白/08_左小翼.x				# [33]
+MODEL_FILENAME = data/MODEL/黒/00_本体.x				# [34]
+MODEL_FILENAME = data/MODEL/黒/01_右関節1.x				# [35]
+MODEL_FILENAME = data/MODEL/黒/02_左関節1.x				# [36]
+MODEL_FILENAME = data/MODEL/黒/03_右大翼.x				# [37]
+MODEL_FILENAME = data/MODEL/黒/04_左大翼.x				# [38]
+MODEL_FILENAME = data/MODEL/黒/05_右関節2.x				# [39]
+MODEL_FILENAME = data/MODEL/黒/06_左関節2.x				# [40]
+MODEL_FILENAME = data/MODEL/黒/07_右小翼.x				# [41]
+MODEL_FILENAME = data/MODEL/黒/08_左小翼.x				# [42]
+MODEL_FILENAME = data/MODEL/enemy_white_001.x			# [43]
+MODEL_FILENAME = data/MODEL/enemy_black_001.x			# [44]
+MODEL_FILENAME = data/MODEL/enemy_white_002.x			# [45]
+MODEL_FILENAME = data/MODEL/enemy_black_002.x			# [46]
+

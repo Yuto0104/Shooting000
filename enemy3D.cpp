@@ -17,7 +17,9 @@
 #include "application.h"
 #include "score.h"
 #include "bullet3D.h"
+#include "follow_bullet3D.h"
 #include "game.h"
+#include "motion_player3D.h"
 
 //*****************************************************************************
 // 静的メンバ変数の定義
@@ -59,19 +61,26 @@ CEnemy3D::CEnemy3D()
 	SetObjType(CObject::OBJTYPE_3DENEMY);
 
 	m_moveMode = MODE_NONE;								// 移動モード
+	m_shotMode = SHOTMODE_NONE;							// 弾の種別
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 移動量
 	m_moveData = {};									// 移動情報
-	m_fSpeed = 0.0f;									// 移動速度
+	m_fSpeed = 10.0f;									// 移動速度
 	m_fMoveVec = 0.0f;									// 移動方向
 	m_fAddMoveVec = 0.0f;								// 移動方向の加算値
 	m_fWave = 0.0f;										// 波
 	m_fWaveLength = 0.0f;								// 波長
 	m_fWaveSize = 0.0f;									// 波の大きさ
-	m_CntKey = 0;										// キーカウント
+	m_fBulletRot = 0.0f;								// 弾の発射方向
+	m_fDiffusionWidth = 0.0f;							// 弾の拡散範囲
+	m_fBulletSpeed = 0.0f;								// 弾速
+	m_fCoeffBullet = 0.0f;								// 弾の追従の減衰係数
+	m_nMaxBullet = 0;									// 弾の発射数
+	m_nCntKey = 0;										// キーカウント
 	m_nCntFrame = 0;									// フレームカウント
 	m_nLife = 0;										// 体力
 	m_nScore = 0;										// スコア
 	m_nCntShot = 0;										// 弾発射までのカウント
+	m_nMaxShot = 0;										// 弾発射するカウント
 	m_bMove = false;									// 移動を行っている
 	m_bUse = false;										// 使用されているかどうか
 
@@ -111,6 +120,9 @@ HRESULT CEnemy3D::Init(const int nNumModel)
 
 	// スコア
 	m_nScore = 100;
+
+	// 弾発射するカウント
+	m_nMaxShot = 180;
 
 	return S_OK;
 }
@@ -191,7 +203,7 @@ void CEnemy3D::Hit(COLOR_TYPE colorType, int nAttack)
 		COLOR_TYPE MyColorType = GetColorType();
 		int nMyAttack = nAttack;
 
-		if (MyColorType == colorType)
+		if (MyColorType != colorType)
 		{// 色のタイプが同一の場合
 			nMyAttack *= 2;
 		}
@@ -278,17 +290,92 @@ void CEnemy3D::Shot()
 
 	m_nCntShot++;
 
-	if (m_nCntShot % 180 == 0)
+	if (m_nCntShot % m_nMaxShot == 0)
 	{
-		// 弾の生成
-		CBullet3D * pBullet3D = CBullet3D::Create();
-		pBullet3D->SetPos(GetPos());
-		pBullet3D->SetSize(D3DXVECTOR3(10.0f, 10.0f, 0.0f));
-		pBullet3D->SetMoveVec(D3DXVECTOR3(rot.x + D3DX_PI * -0.5f, rot.y, 0.0f));
-		pBullet3D->SetSpeed(10.0f);
-		pBullet3D->SetColor(bulletColor);
-		pBullet3D->SetColorType(GetColorType());
-		pBullet3D->SetParent(CObject::OBJTYPE_3DENEMY);
+		// 計算用変数の設定
+		CBullet3D * pBullet3D = nullptr;
+		CFollowBullet3D* pFollowBullet3D = nullptr;
+		CMotionPlayer3D* pPlayer = nullptr;
+		D3DXVECTOR3 targetPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		D3DXVECTOR3 diffPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		D3DXVECTOR3 diffRot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		float fBulletRot = 0.0f;
+
+		switch (m_shotMode)
+		{
+		case CEnemy3D::SHOTMODE_NORMAL:
+			// 弾の生成
+			pBullet3D = CBullet3D::Create();
+			pBullet3D->SetPos(GetPos());
+			pBullet3D->SetSize(D3DXVECTOR3(10.0f, 10.0f, 0.0f));
+			pBullet3D->SetMoveVec(D3DXVECTOR3(rot.x + D3DX_PI * -0.5f, rot.y + m_fBulletRot, 0.0f));
+			pBullet3D->SetSpeed(m_fBulletSpeed);
+			pBullet3D->SetColor(bulletColor);
+			pBullet3D->SetColorType(GetColorType());
+			pBullet3D->SetParent(CObject::OBJTYPE_3DENEMY);
+			break;
+
+		case CEnemy3D::SHOTMODE_DIFFUSION:
+
+			for (int nCntBullet = 0; nCntBullet < m_nMaxBullet; nCntBullet++)
+			{// 弾の発射角度の設定
+				fBulletRot = m_fBulletRot - (m_fDiffusionWidth / 2) + (m_fDiffusionWidth / m_nMaxBullet * nCntBullet);
+				fBulletRot = CApplication::RotNormalization(fBulletRot);
+
+				// 弾の生成
+				pBullet3D = CBullet3D::Create();
+				pBullet3D->SetPos(GetPos());
+				pBullet3D->SetSize(D3DXVECTOR3(10.0f, 10.0f, 0.0f));
+				pBullet3D->SetMoveVec(D3DXVECTOR3(rot.x + D3DX_PI * -0.5f, rot.y + fBulletRot, 0.0f));
+				pBullet3D->SetSpeed(m_fBulletSpeed);
+				pBullet3D->SetColor(bulletColor);
+				pBullet3D->SetColorType(GetColorType());
+				pBullet3D->SetParent(CObject::OBJTYPE_3DENEMY);
+			}
+			
+			break;
+
+		case CEnemy3D::SHOTMODE_SNIPE:
+			// 目的の向きの算出
+			pPlayer = CGame::GetMotionPlayer3D();
+			targetPos = pPlayer->GetPos();
+			diffPos = targetPos - GetPos();
+			diffRot.y = atan2f(diffPos.x, diffPos.z);
+			diffRot.x = atan2f(sqrtf((diffPos.x * diffPos.x) + (diffPos.z * diffPos.z)), diffPos.y);
+			diffRot.z = 0.0f;
+
+			// 弾の生成
+			pBullet3D = CBullet3D::Create();
+			pBullet3D->SetPos(GetPos());
+			pBullet3D->SetSize(D3DXVECTOR3(10.0f, 10.0f, 0.0f));
+			pBullet3D->SetMoveVec(diffRot);
+			pBullet3D->SetSpeed(m_fBulletSpeed);
+			pBullet3D->SetColor(bulletColor);
+			pBullet3D->SetColorType(GetColorType());
+			pBullet3D->SetParent(CObject::OBJTYPE_3DENEMY);
+			break;
+
+		case CEnemy3D::SHOTMODE_FOLLOW:
+			// 弾の生成
+			pFollowBullet3D = CFollowBullet3D::Create();
+			pFollowBullet3D->SetPos(GetPos());
+			pFollowBullet3D->SetSize(D3DXVECTOR3(10.0f, 10.0f, 0.0f));
+			pFollowBullet3D->SetMoveVec(D3DXVECTOR3(rot.x + D3DX_PI * -0.5f, rot.y, 0.0f));
+			pFollowBullet3D->SetSpeed(m_fBulletSpeed);
+			pFollowBullet3D->SetCoefficient(m_fCoeffBullet);
+			pFollowBullet3D->SetColor(bulletColor);
+			pFollowBullet3D->SetColorType(GetColorType());
+			pFollowBullet3D->SetParent(CObject::OBJTYPE_3DENEMY);
+			break;
+
+		case CEnemy3D::SHOTMODE_NONE:
+			break;
+
+		default:
+			assert(false);
+			break;
+		}
+		
 	}
 }
 
@@ -344,16 +431,16 @@ void CEnemy3D::Move()
 	// 移動フレームのインクリメント
 	m_nCntFrame++;
 
-	if (m_nCntFrame >= m_moveData.moveKey[m_CntKey].nFrame)
+	if (m_nCntFrame >= m_moveData.moveKey[m_nCntKey].nFrame)
 	{
 		m_nCntFrame = 0;
-		m_CntKey++;
+		m_nCntKey++;
 
-		if (m_CntKey >= m_moveData.nMaxKey)
+		if (m_nCntKey >= m_moveData.nMaxKey)
 		{
 			if (m_moveData.bLoop)
 			{
-				m_CntKey = 0;
+				m_nCntKey = 0;
 			}
 			else
 			{
@@ -370,12 +457,12 @@ void CEnemy3D::Move()
 //=============================================================================
 void CEnemy3D::SetMoveCopy()
 {
-	m_moveMode = m_moveData.moveKey[m_CntKey].moveMode;				// 移動モード
-	m_fMoveVec = m_moveData.moveKey[m_CntKey].fMoveVec;				// 移動方向
-	m_fAddMoveVec = m_moveData.moveKey[m_CntKey].fAddMoveVec;		// 移動方向の加算値
-	m_fWaveLength = m_moveData.moveKey[m_CntKey].fWaveLength;		// 波長
-	m_fWaveSize = m_moveData.moveKey[m_CntKey].fWaveSize;			// 波の大きさ
-	m_fSpeed = m_moveData.moveKey[m_CntKey].fSpeed;					// 移動速度
+	m_moveMode = m_moveData.moveKey[m_nCntKey].moveMode;				// 移動モード
+	m_fMoveVec = m_moveData.moveKey[m_nCntKey].fMoveVec;				// 移動方向
+	m_fAddMoveVec = m_moveData.moveKey[m_nCntKey].fAddMoveVec;			// 移動方向の加算値
+	m_fWaveLength = m_moveData.moveKey[m_nCntKey].fWaveLength;			// 波長
+	m_fWaveSize = m_moveData.moveKey[m_nCntKey].fWaveSize;				// 波の大きさ
+	m_fSpeed = m_moveData.moveKey[m_nCntKey].fSpeed;					// 移動速度
 }
 
 //=============================================================================
@@ -388,6 +475,9 @@ void CEnemy3D::ScreenIn()
 	// 位置の取得
 	D3DXVECTOR3 pos = GetPos();
 
+	// 当たり判定の取得
+	D3DXVECTOR3 collision = CObject::GetColisonSize();
+
 	// スクリーン座標にキャスト
 	D3DXVECTOR3 screenPos = CApplication::ScreenCastWorld(pos);
 
@@ -399,10 +489,10 @@ void CEnemy3D::ScreenIn()
 	{
 		m_bUse = true;
 	}
-	else if ((screenPos.x <= 0.0f
-		|| screenPos.x >= (float)CRenderer::SCREEN_WIDTH
-		|| screenPos.y <= 0.0f
-		|| screenPos.y >= (float)CRenderer::SCREEN_HEIGHT)
+	else if ((screenPos.x + collision.x <= 0.0f
+		|| screenPos.x - collision.x >= (float)CRenderer::SCREEN_WIDTH
+		|| screenPos.y + collision.y <= 0.0f
+		|| screenPos.y - collision.y >= (float)CRenderer::SCREEN_HEIGHT)
 		&& m_bUse)
 	{
 		Uninit();

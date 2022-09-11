@@ -40,11 +40,19 @@ public:
 	//--------------------------------------------------------------------
 	struct ENEMY_STATUS
 	{
-		COLOR_TYPE		colorType;			// カラータイプ
-		D3DXVECTOR3		collisionSize;		// あたり判定の大きさ
-		int				nModelID;			// モデルID
-		int				nLife;				// 体力
-		int				nScore;				// スコア
+		COLOR_TYPE				colorType;				// カラータイプ
+		CEnemy3D::SHOT_MODE		shotMode;				// 弾の種別
+		D3DXVECTOR3				collisionSize;			// あたり判定の大きさ
+		D3DXVECTOR3				size;					// 大きさ
+		float					fBulletRot;				// 弾の発射方向
+		float					fDiffusionWidth;		// 弾の拡散範囲
+		float					fBulletSpeed;			// 弾速
+		float					fCoeffBullet;			// 弾の追従の減衰係数
+		int						nMaxBullet;				// 弾の発射数
+		int						nModelID;				// モデルID
+		int						nLife;					// 体力
+		int						nScore;					// スコア
+		int						nMaxShot;				// 弾発射するカウント
 	};
 
 	//--------------------------------------------------------------------

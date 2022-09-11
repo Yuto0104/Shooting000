@@ -42,10 +42,11 @@ CCameraManager *CApplication::m_pCameraManager = nullptr;			// ƒJƒƒ‰ƒ}ƒl[ƒWƒƒ
 CSound *CApplication::m_pSound = nullptr;							// ƒTƒEƒ“ƒhƒCƒ“ƒXƒ^ƒ“ƒX
 CCamera *CApplication::m_pCamera = nullptr;							// ƒJƒƒ‰ƒCƒ“ƒXƒ^ƒ“ƒX
 CCamera *CApplication::m_pCameraBG = nullptr;						// ƒJƒƒ‰ƒCƒ“ƒXƒ^ƒ“ƒX
-CApplication::SCENE_MODE CApplication::m_mode = MODE_TITLE;			// Œ»İ‚Ìƒ‚[ƒh‚ÌŠi”[
-CApplication::SCENE_MODE CApplication::m_nextMode = MODE_GAME;		// Ÿ‚Ìƒ‚[ƒh‚ÌŠi”[
+CApplication::SCENE_MODE CApplication::m_mode = MODE_NONE;			// Œ»İ‚Ìƒ‚[ƒh‚ÌŠi”[
+CApplication::SCENE_MODE CApplication::m_nextMode = MODE_RESULT;	// Ÿ‚Ìƒ‚[ƒh‚ÌŠi”[
 CSceneMode *CApplication::pSceneMode = nullptr;						// ƒV[ƒ“ƒ‚[ƒh‚ğŠi”[
-CFade *CApplication::pFade = nullptr;										// ƒtƒF[ƒhƒNƒ‰ƒX
+CFade *CApplication::pFade = nullptr;								// ƒtƒF[ƒhƒNƒ‰ƒX
+int CApplication::m_nScore = 0;										// Œ»İ‚ÌƒXƒRƒA
 
 //=============================================================================
 // ƒXƒNƒŠ[ƒ“À•W‚ğƒ[ƒ‹ƒhÀ•W‚ÉƒLƒƒƒXƒg‚·‚é
@@ -177,6 +178,7 @@ void CApplication::SetMode(SCENE_MODE mode)
 		break;
 
 	case CApplication::MODE_GAME:
+		m_nScore = 0;
 		pSceneMode = new CGame;
 		break;
 

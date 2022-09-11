@@ -53,8 +53,8 @@ CCamera::CCamera()
 	m_fRotMove = 0.0f;								// 移動方向
 	m_nCntFrame = 0;								// フレームカウント
 	m_nCntKey = 0;									// キーカウント
-	m_nMaxMotion = 0;								// モーションの最大数
 	m_nCntMotion = 0;								// モーションカウント
+	m_nMaxMotion = 0;								// モーションの最大数
 	m_bAutoMove = false;							// 自動移動
 }
 
@@ -280,7 +280,7 @@ void CCamera::SetRot(const D3DXVECTOR3 rot, const int nShaft)
 // Author : 唐﨑結斗
 // 概要 : 
 //=============================================================================
-void CCamera::Set(const D3DXVECTOR3 posV, const D3DXVECTOR3 posR, const D3DXVECTOR3 rot)
+void CCamera::SetCamera(const D3DXVECTOR3 posV, const D3DXVECTOR3 posR, const D3DXVECTOR3 rot)
 {
 	m_posV = posV;
 	m_posR = posR;
@@ -297,6 +297,18 @@ void CCamera::Set(const D3DXVECTOR3 posV, const D3DXVECTOR3 posR, const D3DXVECT
 
 	// 視点の算出
 	SetPosV();
+}
+
+//=============================================================================
+// モーション関係のカウントの初期化
+// Author : 唐﨑結斗
+// 概要 : 
+//=============================================================================
+void CCamera::MotionReset(void)
+{
+	m_nCntFrame = 0;								// フレームカウント
+	m_nCntKey = 0;									// キーカウント
+	m_nCntMotion = 0;								// モーションカウント
 }
 
 //=============================================================================

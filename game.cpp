@@ -73,7 +73,8 @@ HRESULT CGame::Init()
 
 	// カメラマネージャーのインスタンス取得
 	CCameraManager *pCameraManager = CApplication::GetCameraManager();
-	CApplication::GetCameraBG()->Set(pCameraManager->GetPosV(), pCameraManager->GetPosR(), pCameraManager->GetRot());
+	CApplication::GetCameraBG()->MotionReset();
+	CApplication::GetCameraBG()->SetCamera(pCameraManager->GetPosV(), pCameraManager->GetPosR(), pCameraManager->GetRot());
 
 	CEnemyManager *pEnemyManager = CEnemyManager::Create();
 	pEnemyManager->LoadFile("data/FILE/stage000.txt");
@@ -96,7 +97,7 @@ HRESULT CGame::Init()
 	pMesh3D->SetScrollTex(D3DXVECTOR2(-0.08f, -0.06f), true);
 
 	CSphere *pSphere = CSphere::Create();
-	pSphere->SetRot(D3DXVECTOR3(D3DX_PI * 0.85, 0.0f, 0.0f));
+	pSphere->SetRot(D3DXVECTOR3(D3DX_PI * 0.85f, 0.0f, 0.0f));
 	pSphere->SetSize(D3DXVECTOR3(100.0f, 0, 100.0f));
 	pSphere->SetBlock(CMesh3D::DOUBLE_INT(100, 100));
 	pSphere->SetRadius(50000.0f);
@@ -130,6 +131,8 @@ HRESULT CGame::Init()
 //=============================================================================
 void CGame::Uninit()
 {
+	CApplication::SetScore(m_pScore->GetScore());
+
 	// スコアの解放
 	Release();
 }

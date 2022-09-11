@@ -46,6 +46,21 @@ public:
 	};
 
 	//--------------------------------------------------------------------
+	// 発射する弾の種別
+	// Author : 唐﨑結斗
+	// 概要 : 発射する弾の種別分けを行う
+	//--------------------------------------------------------------------
+	enum SHOT_MODE
+	{
+		SHOTMODE_NORMAL = 0,		// 通常
+		SHOTMODE_DIFFUSION,			// 拡散
+		SHOTMODE_SNIPE,				// スナイプ
+		SHOTMODE_FOLLOW,			// 追従
+		SHOTMODE_NONE,				// 弾無し
+		SHOTMAX_MODE,				// 移動方法の最大数
+	};
+
+	//--------------------------------------------------------------------
 	// 敵の移動キー
 	// Author : 唐﨑結斗
 	// 概要 : 敵の移動キー設定
@@ -93,14 +108,21 @@ public:
 	//--------------------------------------------------------------------
 	// メンバ関数
 	//--------------------------------------------------------------------
-	HRESULT Init(const int nNumModel);					// 初期化
-	void Uninit() override;								// 終了
-	void Update() override;								// 更新
-	void Draw() override;								// 描画
-	void Hit(COLOR_TYPE colorType, int nAttack);		// ヒット
-	void SetLife(int nLife) { m_nLife = nLife; }		// 体力のセッター
-	void SetScore(int nScore) { m_nScore = nScore; }	// スコアのセッター
-	void SetMoveData(ENEMY_MOVE moveData);				// 移動情報のセッター
+	HRESULT Init(const int nNumModel);																// 初期化
+	void Uninit() override;																			// 終了
+	void Update() override;																			// 更新
+	void Draw() override;																			// 描画
+	void Hit(COLOR_TYPE colorType, int nAttack);													// ヒット
+	void SetLife(int nLife) { m_nLife = nLife; }													// 体力のセッター
+	void SetScore(int nScore) { m_nScore = nScore; }												// スコアのセッター
+	void SetMoveData(const ENEMY_MOVE moveData);													// 移動情報のセッター
+	void SetShotMode(const SHOT_MODE _shotMode) { m_shotMode = _shotMode; }							// 弾の種別のセッター
+	void SetMaxShot(const int nMaxShot) { m_nMaxShot = nMaxShot; }									// 弾の発射カウントの設定
+	void SetBulletRot(const float fBulletRot) { m_fBulletRot = fBulletRot; }						// 弾の発射方向の設定
+	void SetDiffusionWidth(const float fDiffusionWidth) { m_fDiffusionWidth = fDiffusionWidth; }	// 弾の拡散範囲の設定
+	void SetBulletSpeed(const float fBulletSpeed) { m_fBulletSpeed = fBulletSpeed; }				// 弾の発射速度の設定
+	void SetCoeffBullet(const float fCoeffBullet) { m_fCoeffBullet = fCoeffBullet; }				// 追従弾の減衰係数の設定
+	void SetMaxBullet(const int nMaxBullet) { m_nMaxBullet = nMaxBullet; }							// 弾の最大発射数
 
 private:
 	//--------------------------------------------------------------------
@@ -118,17 +140,24 @@ private:
 	D3DXVECTOR3		m_move;				// 移動量
 	ENEMY_MOVE		m_moveData;			// 移動情報
 	MOVE_MODE		m_moveMode;			// 移動方法
+	SHOT_MODE		m_shotMode;			// 弾の種別
 	float			m_fSpeed;			// 移動速度
 	float			m_fMoveVec;			// 移動方向
 	float			m_fAddMoveVec;		// 移動方向の加算値
 	float			m_fWave;			// 波
 	float			m_fWaveLength;		// 波長
 	float			m_fWaveSize;		// 波の大きさ
-	int				m_CntKey;			// キーカウント
+	float			m_fBulletRot;		// 弾の発射方向
+	float			m_fDiffusionWidth;	// 弾の拡散範囲
+	float			m_fBulletSpeed;		// 弾速
+	float			m_fCoeffBullet;		// 弾の追従の減衰係数
+	int				m_nMaxBullet;		// 弾の発射数
+	int				m_nCntKey;			// キーカウント
 	int				m_nCntFrame;		// フレームカウント
 	int				m_nLife;			// 体力
 	int				m_nScore;			// スコア
 	int				m_nCntShot;			// 弾発射までのカウント
+	int				m_nMaxShot;			// 弾発射するカウント
 	bool			m_bMove;			// 移動を行っている
 	bool			m_bUse;				// 使用されているかどうか
 };

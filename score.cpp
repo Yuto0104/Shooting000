@@ -380,7 +380,7 @@ void CScore::AddDigit()
 		// ナンバーの設定
 		SetNumber();
 	}
-	else if (m_nScore <= (int)pow(10, m_nDigit - 1))
+	else if (m_nScore < (int)pow(10, m_nDigit - 1))
 	{
 		if (m_pNumber != nullptr)
 		{// 終了処理

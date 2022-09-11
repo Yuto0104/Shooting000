@@ -12,8 +12,10 @@
 #include <assert.h>
 
 #include "result.h"
-#include "application.h"
 #include "keyboard.h"
+#include "object2D.h"
+#include "score.h"
+#include "bg.h"
 
 //=============================================================================
 // コンストラクタ
@@ -22,7 +24,14 @@
 //=============================================================================
 CResult::CResult()
 {
-
+	m_nextMode = CApplication::MODE_NONE;		// 次に設定するモード
+	m_pScoreObj = nullptr;						// スコアオブジェクト
+	m_pTitleObj = nullptr;						// タイトルオブジェクト
+	m_pGameObj = nullptr;						// ゲームオブジェクト
+	m_pScore = nullptr;							// スコアクラス
+	m_fAddAlpha = 0.0f;							// アルファの加算値
+	m_nCntFrame = 0;							// フレームカウント
+	m_bPressEnter = true;						// プレスエンターを使用できるか
 }
 
 //=============================================================================
@@ -42,6 +51,37 @@ CResult::~CResult()
 //=============================================================================
 HRESULT CResult::Init()
 {
+	// 次に行くモードの設定
+	m_nextMode = CApplication::MODE_TITLE;
+
+	m_pScoreObj = CObject2D::Create();
+	m_pScoreObj->SetPos(D3DXVECTOR3(640.0f, 300.0f, 0.0f));
+	m_pScoreObj->SetSize(D3DXVECTOR3(700.0f, 200.0f, 0.0f));
+	m_pScoreObj->SetCol(D3DXCOLOR(1.0f, 1.0f, 0.1f, 1.0f));
+	m_pScoreObj->LoadTex(17);
+
+	m_pTitleObj = CObject2D::Create();
+	m_pTitleObj->SetPos(D3DXVECTOR3(340.0f, 600.0f, 0.0f));
+	m_pTitleObj->SetSize(D3DXVECTOR3(300.0f, 100.0f, 0.0f));
+	m_pTitleObj->SetCol(D3DXCOLOR(0.3f, 0.1f, 1.0f, 1.0f));
+	m_pTitleObj->LoadTex(18);
+
+	m_pGameObj = CObject2D::Create();
+	m_pGameObj->SetPos(D3DXVECTOR3(940.0f, 600.0f, 0.0f));
+	m_pGameObj->SetSize(D3DXVECTOR3(320.0f, 100.0f, 0.0f));
+	m_pGameObj->SetCol(D3DXCOLOR(0.3f, 0.1f, 1.0f, 1.0f));
+	m_pGameObj->LoadTex(19);
+
+	m_pScore = CScore::Create(10, false);
+	m_pScore->SetDestScore(CApplication::GetScore());
+	m_pScore->SetScore(CApplication::GetScore());
+	m_pScore->SetPos(D3DXVECTOR3(970.0f, 320.0, 0.0f));
+	m_pScore->SetSize(D3DXVECTOR3(80.0f, 100.0, 0.0f));
+	m_pScore->SetWholeSize(D3DXVECTOR3(600.0f, 100.0, 0.0f));
+
+	CBG *pBG = CBG::Create();
+	pBG->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
+
 	return S_OK;
 }
 
@@ -63,12 +103,22 @@ void CResult::Uninit()
 //=============================================================================
 void CResult::Update()
 {
+	SelectMode();
+
+	FlashObj();
+
 	// 入力情報の取得
 	CKeyboard *pKeyboard = CApplication::GetKeyboard();
 
-	if (pKeyboard->GetTrigger(DIK_RETURN))
+	if (m_bPressEnter
+		&& pKeyboard->GetTrigger(DIK_RETURN))
 	{
-		CApplication::SetNextMode(CApplication::MODE_TITLE);
+		m_bPressEnter = false;
+	}
+
+	if (m_nCntFrame >= 40)
+	{
+		CApplication::SetNextMode(m_nextMode);
 	}
 }
 
@@ -80,5 +130,78 @@ void CResult::Update()
 void CResult::Draw()
 {
 
+}
+
+//=============================================================================
+// オブジェクトの点滅
+// Author : 唐﨑結斗
+// 概要 : 指定のオブジェクトを点滅させる
+//=============================================================================
+void CResult::FlashObj()
+{
+	CObject2D *pObj = nullptr;
+
+	if (m_bPressEnter)
+	{
+		m_fAddAlpha += 0.07f;
+	}
+	else if (!m_bPressEnter)
+	{
+		m_fAddAlpha += 0.5f;
+		m_nCntFrame++;
+	}
+
+	switch (m_nextMode)
+	{
+	case CApplication::MODE_TITLE:
+		pObj = m_pTitleObj;
+		m_pGameObj->SetCol(D3DXCOLOR(0.3f, 0.1f, 1.0f, 1.0f));
+		break;
+
+	case CApplication::MODE_GAME:
+		pObj = m_pGameObj;
+		m_pTitleObj->SetCol(D3DXCOLOR(0.3f, 0.1f, 1.0f, 1.0f));
+		break;
+
+	default:
+		assert(false);
+		break;
+	}
+
+	pObj->SetCol(D3DXCOLOR(0.25f, 0.1f, 0.8f, sinf(m_fAddAlpha) * 3.0f));
+}
+
+//=============================================================================
+// モードの選択
+// Author : 唐﨑結斗
+// 概要 : モードの選択する
+//=============================================================================
+void CResult::SelectMode()
+{
+	int nMode = (int)m_nextMode;
+
+	// 入力情報の取得
+	CKeyboard *pKeyboard = CApplication::GetKeyboard();
+
+	if (pKeyboard->GetTrigger(DIK_A))
+	{
+		nMode--;
+
+		if (nMode < 0)
+		{
+			nMode = 1;
+		}
+	}
+	else if (pKeyboard->GetTrigger(DIK_D))
+	{
+		nMode++;
+
+		if (nMode > 1)
+		{
+			nMode = 0;
+		}
+	}
+
+	m_nextMode = (CApplication::SCENE_MODE)nMode;
 }
 

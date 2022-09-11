@@ -193,7 +193,7 @@ bool CBullet3D::Collision()
 						}
 						else
 						{// プレイヤーのエネルギー吸収
-							pPlayer->Charge();
+							pPlayer->Charge(1);
 						}
 
 						bCollision = true;

@@ -275,7 +275,7 @@ void CMotion::SetParts(D3DXMATRIX mtxWorld, const D3DXCOLOR col)
 //=============================================================================
 bool CMotion::PlayMotion(const int nCntMotionSet)
 {
-	CMotion::MyMotion* motion = (m_motion + nCntMotionSet);
+	CMotion::MyMotion *motion = (m_motion + nCntMotionSet);
 
 	for (int nCntParts = 0; nCntParts < m_nMaxParts; nCntParts++)
 	{
@@ -304,9 +304,9 @@ bool CMotion::PlayMotion(const int nCntMotionSet)
 		parts->rot += addRot;
 
 		// 角度の正規化
-		parts->rotDest.x = RotNormalization(parts->rotDest.x);
-		parts->rotDest.y = RotNormalization(parts->rotDest.y);
-		parts->rotDest.z = RotNormalization(parts->rotDest.z);
+		parts->rot.x = RotNormalization(parts->rot.x);
+		parts->rot.y = RotNormalization(parts->rot.y);
+		parts->rot.z = RotNormalization(parts->rot.z);
 	}
 
 	// フレームカウントの加算

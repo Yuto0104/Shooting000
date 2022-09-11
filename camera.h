@@ -94,7 +94,8 @@ public:
 	void SetPosV(const D3DXVECTOR3 posV);
 	void SetPosR(const D3DXVECTOR3 posR);
 	void SetRot(const D3DXVECTOR3 rot, const int nShaft);
-	void Set(const D3DXVECTOR3 posV, const D3DXVECTOR3 posR, const D3DXVECTOR3 rot);
+	void SetCamera(const D3DXVECTOR3 posV, const D3DXVECTOR3 posR, const D3DXVECTOR3 rot);
+	void MotionReset(void);
 
 private:
 	//--------------------------------------------------------------------

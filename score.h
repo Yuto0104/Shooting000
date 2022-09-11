@@ -65,6 +65,8 @@ public:
 	void SetNumber();																// ナンバーの設定
 	void AddScore(int nAdd);														// スコアの加算
 	void CalScore();																// スコアの算出
+	void SetDestScore(const int nScore) { m_nDestScore = nScore; }					// 目的のスコアの設定
+	int GetScore() { return m_nDestScore; }											// スコアの取得
 
 private:
 	//--------------------------------------------------------------------

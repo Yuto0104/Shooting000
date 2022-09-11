@@ -230,6 +230,14 @@ void CEnemyManager::LoadFile(char *pFileName)
 						fscanf(pFile, "%f", &m_status[nCntStatus].collisionSize.z);
 					}
 
+					if (strstr(&aStr[0], "SIZE") != NULL)
+					{// モデルのファイル名の設定
+						fscanf(pFile, "%s", &aStr[0]);
+						fscanf(pFile, "%f", &m_status[nCntStatus].size.x);
+						fscanf(pFile, "%f", &m_status[nCntStatus].size.y);
+						fscanf(pFile, "%f", &m_status[nCntStatus].size.z);
+					}
+
 					if (strstr(&aStr[0], "COLOR") != NULL)
 					{// カラータイプの設定
 						fscanf(pFile, "%s", &aStr[0]);
@@ -261,6 +269,50 @@ void CEnemyManager::LoadFile(char *pFileName)
 					{// モデルのファイル名の設定
 						fscanf(pFile, "%s", &aStr[0]);
 						fscanf(pFile, "%d", &m_status[nCntStatus].nScore);
+					}
+
+					if (strstr(&aStr[0], "CNTSHOT") != NULL)
+					{// モデルのファイル名の設定
+						fscanf(pFile, "%s", &aStr[0]);
+						fscanf(pFile, "%d", &m_status[nCntStatus].nMaxShot);
+					}
+
+					if (strstr(&aStr[0], "SHOT_ID") != NULL)
+					{// モデルのファイル名の設定
+						int nShotID = 0;
+						fscanf(pFile, "%s", &aStr[0]);
+						fscanf(pFile, "%d", &nShotID);
+						m_status[nCntStatus].shotMode = (CEnemy3D::SHOT_MODE)nShotID;
+					}
+
+					if (strstr(&aStr[0], "SHOT_SPEED") != NULL)
+					{// モデルのファイル名の設定
+						fscanf(pFile, "%s", &aStr[0]);
+						fscanf(pFile, "%f", &m_status[nCntStatus].fBulletSpeed);
+					}
+
+					if (strstr(&aStr[0], "SHOT_ROT") != NULL)
+					{// モデルのファイル名の設定
+						fscanf(pFile, "%s", &aStr[0]);
+						fscanf(pFile, "%f", &m_status[nCntStatus].fBulletRot);
+					}
+
+					if (strstr(&aStr[0], "DIFFUSIONWIDTH") != NULL)
+					{// モデルのファイル名の設定
+						fscanf(pFile, "%s", &aStr[0]);
+						fscanf(pFile, "%f", &m_status[nCntStatus].fDiffusionWidth);
+					}
+
+					if (strstr(&aStr[0], "MAXBULLET") != NULL)
+					{// モデルのファイル名の設定
+						fscanf(pFile, "%s", &aStr[0]);
+						fscanf(pFile, "%d", &m_status[nCntStatus].nMaxBullet);
+					}
+
+					if (strstr(&aStr[0], "COEFFBULLET") != NULL)
+					{// モデルのファイル名の設定
+						fscanf(pFile, "%s", &aStr[0]);
+						fscanf(pFile, "%f", &m_status[nCntStatus].fCoeffBullet);
 					}
 				}
 
@@ -423,8 +475,16 @@ void CEnemyManager::SetEnemy()
 			pEnemy = CEnemy3D::Create(m_status[nID].nModelID);
 			pEnemy->SetColisonSize(m_status[nID].collisionSize);
 			pEnemy->SetColorType(m_status[nID].colorType);
+			pEnemy->SetSize(m_status[nID].size);
 			pEnemy->SetLife(m_status[nID].nLife);
 			pEnemy->SetScore(m_status[nID].nScore);
+			pEnemy->SetMaxShot(m_status[nID].nMaxShot);
+			pEnemy->SetShotMode(m_status[nID].shotMode);
+			pEnemy->SetBulletSpeed(m_status[nID].fBulletSpeed);
+			pEnemy->SetBulletRot(m_status[nID].fBulletRot);
+			pEnemy->SetDiffusionWidth(m_status[nID].fDiffusionWidth);
+			pEnemy->SetCoeffBullet(m_status[nID].fCoeffBullet);
+			pEnemy->SetMaxBullet(m_status[nID].nMaxBullet);
 			pEnemy->SetPos(m_arrangement[nCntEnemy].pos);
 			pEnemy->SetObjectDrowType((EObjectDrowType)m_arrangement[nCntEnemy].nDrawType);
 			pEnemy->SetMoveData(m_move[m_arrangement[nCntEnemy].nMoveID]);

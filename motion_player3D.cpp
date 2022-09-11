@@ -72,7 +72,7 @@ CMotionPlayer3D::CMotionPlayer3D()
 	m_nEnergy = 0;									// エネルギー
 	m_bPressShot = false;							// 長押し弾を使用してるかどうか
 	m_bLockShot = false;							// 弾発射が可能かどうか
-
+	m_bFollowShot = false;							// 追従弾を発射しているか否
 	// オブジェクトの種別設定
 	SetObjType(CObject::OBJTYPE_3DPLAYER);
 }
@@ -98,9 +98,9 @@ HRESULT CMotionPlayer3D::Init()
 	CModel3D::Init();
 
 	// モーション情報
-	m_pMotion[0] = new CMotion("data/MOTION/motion.txt");
+	m_pMotion[0] = new CMotion("data/MOTION/white.txt");
 	assert(m_pMotion[0] != nullptr);
-	m_pMotion[1] = new CMotion("data/MOTION/motionShark.txt");
+	m_pMotion[1] = new CMotion("data/MOTION/black.txt");
 	assert(m_pMotion[1] != nullptr);
 
 	// 移動
@@ -119,6 +119,7 @@ HRESULT CMotionPlayer3D::Init()
 	SetColisonSize(D3DXVECTOR3(50.0f, 50.0f, 50.0f));
 	m_nLife = 5;
 	m_nInvalidLife = 0;
+	SetSize(D3DXVECTOR3(1.2f, 1.2f, 1.2f));
 
 	return E_NOTIMPL;
 }
@@ -164,8 +165,10 @@ void CMotionPlayer3D::Update()
 	D3DXVECTOR3 pos = GetPos();
 	D3DXVECTOR3 rot = GetRot();
 
-	// ニュートラルモーションの入力
-	m_nNumMotion = TYPE_NEUTRAL;
+	if (!m_bFollowShot)
+	{// ニュートラルモーションの入力
+		m_nNumMotion = TYPE_NEUTRAL;
+	}
 
 	// 移動
 	pos += Move();
@@ -259,8 +262,10 @@ D3DXVECTOR3 CMotionPlayer3D::Move()
 		|| pKeyboard->GetPress(DIK_D)
 		|| pKeyboard->GetPress(DIK_S))
 	{// 移動キーが押された
-		// 移動モーション
-		m_nNumMotion = TYPE_MOVE;
+		if (!m_bFollowShot)
+		{// 移動モーション
+			m_nNumMotion = TYPE_MOVE;
+		}
 
 		if (pKeyboard->GetPress(DIK_W))
 		{// [↑]キーが押された時
@@ -467,31 +472,36 @@ void CMotionPlayer3D::CollisionScreen()
 	D3DXVECTOR3 pos = GetPos();
 	D3DXVECTOR3 worldPos;
 
+	// 当たり判定の取得
+	D3DXVECTOR3 collision = CObject::GetColisonSize();
+
 	// スクリーン座標にキャスト
 	D3DXVECTOR3 screenPos = CApplication::ScreenCastWorld(pos);
+	D3DXVECTOR3 screenPosUp = CApplication::ScreenCastWorld(pos + collision);
+	D3DXVECTOR3 screenPosUnder = CApplication::ScreenCastWorld(pos - collision);
 
-	if (screenPos.x < 0.0f)
+	if (screenPosUnder.x < 0.0f)
 	{
-		worldPos = CApplication::WorldCastScreen(D3DXVECTOR3(0.0f, screenPos.y, screenPos.z));
+		worldPos = CApplication::WorldCastScreen(D3DXVECTOR3(collision.x, screenPos.y, screenPos.z));
 		SetPos(D3DXVECTOR3(worldPos.x, pos.y, worldPos.z));
 		screenPos = CApplication::ScreenCastWorld(GetPos());
 	}
-	else if (screenPos.x > (float)CRenderer::SCREEN_WIDTH)
+	else if (screenPosUp.x > (float)CRenderer::SCREEN_WIDTH)
 	{
-		worldPos = CApplication::WorldCastScreen(D3DXVECTOR3((float)CRenderer::SCREEN_WIDTH, screenPos.y, screenPos.z));
+		worldPos = CApplication::WorldCastScreen(D3DXVECTOR3((float)CRenderer::SCREEN_WIDTH - collision.x, screenPos.y, screenPos.z));
 		SetPos(D3DXVECTOR3(worldPos.x, pos.y, worldPos.z));
 		screenPos = CApplication::ScreenCastWorld(GetPos());
 	}
 
-	if (screenPos.y < 0.0f)
+	if (screenPosUp.y < 0.0f)
 	{
-		worldPos = CApplication::WorldCastScreen(D3DXVECTOR3(screenPos.x, 0.0f, screenPos.z));
+		worldPos = CApplication::WorldCastScreen(D3DXVECTOR3(screenPos.x, collision.y, screenPos.z));
 		SetPos(D3DXVECTOR3(worldPos.x, pos.y, worldPos.z));
 		screenPos = CApplication::ScreenCastWorld(GetPos());
 	}
-	else if (screenPos.y > (float)CRenderer::SCREEN_HEIGHT)
+	else if (screenPosUnder.y > (float)CRenderer::SCREEN_HEIGHT)
 	{
-		worldPos = CApplication::WorldCastScreen(D3DXVECTOR3(screenPos.x, (float)CRenderer::SCREEN_HEIGHT, screenPos.z));
+		worldPos = CApplication::WorldCastScreen(D3DXVECTOR3(screenPos.x, (float)CRenderer::SCREEN_HEIGHT - collision.y, screenPos.z));
 		SetPos(D3DXVECTOR3(worldPos.x, pos.y, worldPos.z));
 		screenPos = CApplication::ScreenCastWorld(GetPos());
 	}
@@ -548,6 +558,7 @@ void CMotionPlayer3D::MotionSet()
 	else if (!m_bMotionBlend)
 	{// モーションブレンドを使用してない場合
 		m_bMotion = m_pMotion[GetColorType() - 1]->PlayMotion((int)(m_nNumMotion));
+		m_bFollowShot = false;
 	}
 }
 
@@ -561,21 +572,10 @@ void CMotionPlayer3D::Recovery()
 	if (m_nLife < MAX_LIFE
 		&& m_nEnergy >= ENERGY_RECOVERY)
 	{
-		CEnergyGage *pEnergyGage = CGame::GetEnergyGage();
-		CGauge2D *pEnergyGauge2D = pEnergyGage->GetGauge2D();
-		CScore *pEnergy = pEnergyGage->GetScore();
+		int nRecoveryEnergy = (int)ENERGY_RECOVERY;
 
-		int nEnergy = ENERGY_RECOVERY;
-		nEnergy *= -1;
-		m_nEnergy += nEnergy;
-		pEnergy->AddScore(nEnergy);
-
-		if (m_nEnergy <= 0)
-		{
-			m_nEnergy = 0;
-		}
-
-		pEnergyGauge2D->SetNumber((float)m_nEnergy);
+		// エネルギーの消費
+		Charge(-nRecoveryEnergy);
 
 		m_nLife++;
 
@@ -600,21 +600,14 @@ void CMotionPlayer3D::FollowShot()
 {
 	if (m_nEnergy >= ENERGY_FOLLOW_SHOT)
 	{
-		CEnergyGage *pEnergyGage = CGame::GetEnergyGage();
-		CGauge2D *pEnergyGauge2D = pEnergyGage->GetGauge2D();
-		CScore *pEnergy = pEnergyGage->GetScore();
+		// 攻撃モーション
+		m_nNumMotion = TYPE_ATTACK;
+		m_bFollowShot = true;
 
-		int nEnergy = ENERGY_RECOVERY;
-		nEnergy *= -1;
-		m_nEnergy += nEnergy;
-		pEnergy->AddScore(nEnergy);
+		int nFollowShotEnergy = (int)ENERGY_FOLLOW_SHOT;
 
-		if (m_nEnergy <= 0)
-		{
-			m_nEnergy = 0;
-		}
-
-		pEnergyGauge2D->SetNumber((float)m_nEnergy);
+		// エネルギーの消費
+		Charge(-nFollowShotEnergy);
 
 		// Object2Dのメンバ変数の取得
 		D3DXVECTOR3 pos = GetPos();
@@ -647,7 +640,7 @@ void CMotionPlayer3D::FollowShot()
 			pFollowBullet3D = CFollowBullet3D::Create();
 			pFollowBullet3D->SetPos(bulletPos);
 			pFollowBullet3D->SetSize(D3DXVECTOR3(10.0f, 10.0f, 0.0f));
-			pFollowBullet3D->SetMoveVec(D3DXVECTOR3(rot.x + D3DX_PI * -0.5f, rot.y - D3DX_PI * (0.5f + fAttRot), 0.0f));
+			pFollowBullet3D->SetMoveVec(D3DXVECTOR3(rot.x + D3DX_PI * -0.5f, rot.y - D3DX_PI * (0.5f - fAttRot), 0.0f));
 			pFollowBullet3D->SetSpeed(30.0f);
 			pFollowBullet3D->SetColor(bulletColor);
 			pFollowBullet3D->SetColorType(GetColorType());
@@ -658,7 +651,7 @@ void CMotionPlayer3D::FollowShot()
 			pFollowBullet3D = CFollowBullet3D::Create();
 			pFollowBullet3D->SetPos(bulletPos);
 			pFollowBullet3D->SetSize(D3DXVECTOR3(10.0f, 10.0f, 0.0f));
-			pFollowBullet3D->SetMoveVec(D3DXVECTOR3(rot.x + D3DX_PI * -0.5f, rot.y - D3DX_PI * (-0.5f - fAttRot), 0.0f));
+			pFollowBullet3D->SetMoveVec(D3DXVECTOR3(rot.x + D3DX_PI * -0.5f, rot.y - D3DX_PI * (-0.5f + fAttRot), 0.0f));
 			pFollowBullet3D->SetSpeed(30.0f);
 			pFollowBullet3D->SetColor(bulletColor);
 			pFollowBullet3D->SetColorType(GetColorType());
@@ -761,25 +754,44 @@ void CMotionPlayer3D::Hit()
 // Author : 唐﨑結斗
 // 概要 : エネルギーを吸収する
 //=============================================================================
-void CMotionPlayer3D::Charge()
+void CMotionPlayer3D::Charge(const int nEnergy)
 {
 	CEnergyGage *pEnergyGage = CGame::GetEnergyGage();
 	CGauge2D *pEnergyGauge2D = pEnergyGage->GetGauge2D();
 	CScore *pEnergy = pEnergyGage->GetScore();
 
 	// エネルギーのインクリメント
-	m_nEnergy++;
-	pEnergy->AddScore(1);
+	int nEnergyPoint = pEnergy->GetScore();
+	int nEnergyPointOld = nEnergyPoint;
+	int nDiffEP = 0;
 
-	if (m_nEnergy > MAX_ENERGY)
+	// エネルギーの加算
+	nEnergyPoint += nEnergy;
+
+	// 加算値の差分の算出
+	nDiffEP = nEnergyPoint - nEnergyPointOld;
+
+	// 数値の設定
+	pEnergy->AddScore(nDiffEP);
+
+	if (nEnergyPoint >= MAX_ENERGY)
 	{
-		int nEnergy = MAX_ENERGY - m_nEnergy;
-		m_nEnergy = MAX_ENERGY;
-		pEnergy->AddScore(nEnergy);
+		nDiffEP = MAX_ENERGY - nEnergyPoint;
+		nEnergyPoint = MAX_ENERGY;
+		pEnergy->AddScore(nDiffEP);
 	}
-	pEnergy->AddScore(0);
+	else if (nEnergyPoint <= 0)
+	{
+		nDiffEP = 0 - nEnergyPoint;
+		nEnergyPoint = 0;
+		pEnergy->AddScore(nDiffEP);
+	}
 
-	pEnergyGauge2D->SetNumber((float)m_nEnergy);
+	// ゲージの設定
+	pEnergyGauge2D->SetNumber((float)nEnergyPoint);
+
+	// エネルギーゲージの設定
+	m_nEnergy = nEnergyPoint;
 }
 
 

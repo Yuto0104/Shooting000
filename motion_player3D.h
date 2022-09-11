@@ -49,6 +49,7 @@ public:
 	{
 		TYPE_NEUTRAL = 0,			// ニュートラルモーション
 		TYPE_MOVE,					// 移動モーション
+		TYPE_ATTACK,				// 攻撃モーション
 		MAX_MOTION_TYPE,			// タイプの最大数
 	};
 
@@ -71,7 +72,7 @@ public:
 	void Update() override;									// 更新
 	void Draw() override;									// 描画
 	void Hit();												// ダメージ
-	void Charge();											// エネルギー吸収
+	void Charge(const int nEnergy);							// エネルギー吸収
 	int GetLife() { return m_nLife; }						// 体力のゲッター
 	int GetInvalidLife() { return m_nInvalidLife; }			// 追加体力のゲッター
 	
@@ -110,6 +111,7 @@ private:
 	bool			m_bPressConsumption;			// エネルギー消費してるかどうか
 	bool			m_bLockConsumption;				// エネルギー消費が可能かどうか
 	bool			m_bRecovery;					// 回復を行ったかどうか
+	bool			m_bFollowShot;					// 追従弾を発射しているか否
 };
 
 #endif
