@@ -19,6 +19,7 @@
 //*****************************************************************************
 class CObject2D;
 class CScore;
+class CRanking;
 
 //=============================================================================
 // リザルトクラス
@@ -57,6 +58,7 @@ private:
 	CObject2D					*m_pTitleObj;					// タイトルオブジェクト
 	CObject2D					*m_pGameObj;					// ゲームオブジェクト
 	CScore						*m_pScore;						// スコアクラス
+	CRanking					*m_pRanking;					// ランキングクラス
 	float						m_fAddAlpha;					// アルファの加算値
 	int							m_nCntFrame;					// フレームカウント
 	bool						m_bPressEnter;					// プレスエンターを使用できるか

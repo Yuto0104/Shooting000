@@ -2,7 +2,7 @@
 MAX_INSTALL = 41
 
 // ƒQ[ƒ€‚ÌI—¹ŽžŠÔ
-GAME_END_FRAME = 100000
+GAME_END_FRAME = 10000
 
 //***************************************
 // “G‚ÌÝ’u

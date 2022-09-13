@@ -16,6 +16,7 @@
 #include "object2D.h"
 #include "score.h"
 #include "bg.h"
+#include "ranking.h"
 
 //=============================================================================
 // コンストラクタ
@@ -29,6 +30,7 @@ CResult::CResult()
 	m_pTitleObj = nullptr;						// タイトルオブジェクト
 	m_pGameObj = nullptr;						// ゲームオブジェクト
 	m_pScore = nullptr;							// スコアクラス
+	m_pRanking = nullptr;						// ランキングクラス
 	m_fAddAlpha = 0.0f;							// アルファの加算値
 	m_nCntFrame = 0;							// フレームカウント
 	m_bPressEnter = true;						// プレスエンターを使用できるか
@@ -55,19 +57,19 @@ HRESULT CResult::Init()
 	m_nextMode = CApplication::MODE_TITLE;
 
 	m_pScoreObj = CObject2D::Create();
-	m_pScoreObj->SetPos(D3DXVECTOR3(640.0f, 300.0f, 0.0f));
-	m_pScoreObj->SetSize(D3DXVECTOR3(700.0f, 200.0f, 0.0f));
+	m_pScoreObj->SetPos(D3DXVECTOR3(640.0f, 520.0f, 0.0f));
+	m_pScoreObj->SetSize(D3DXVECTOR3(600.0f, 120.0f, 0.0f));
 	m_pScoreObj->SetCol(D3DXCOLOR(1.0f, 1.0f, 0.1f, 1.0f));
 	m_pScoreObj->LoadTex(17);
 
 	m_pTitleObj = CObject2D::Create();
-	m_pTitleObj->SetPos(D3DXVECTOR3(340.0f, 600.0f, 0.0f));
+	m_pTitleObj->SetPos(D3DXVECTOR3(340.0f, 650.0f, 0.0f));
 	m_pTitleObj->SetSize(D3DXVECTOR3(300.0f, 100.0f, 0.0f));
 	m_pTitleObj->SetCol(D3DXCOLOR(0.3f, 0.1f, 1.0f, 1.0f));
 	m_pTitleObj->LoadTex(18);
 
 	m_pGameObj = CObject2D::Create();
-	m_pGameObj->SetPos(D3DXVECTOR3(940.0f, 600.0f, 0.0f));
+	m_pGameObj->SetPos(D3DXVECTOR3(940.0f, 650.0f, 0.0f));
 	m_pGameObj->SetSize(D3DXVECTOR3(320.0f, 100.0f, 0.0f));
 	m_pGameObj->SetCol(D3DXCOLOR(0.3f, 0.1f, 1.0f, 1.0f));
 	m_pGameObj->LoadTex(19);
@@ -75,9 +77,13 @@ HRESULT CResult::Init()
 	m_pScore = CScore::Create(10, false);
 	m_pScore->SetDestScore(CApplication::GetScore());
 	m_pScore->SetScore(CApplication::GetScore());
-	m_pScore->SetPos(D3DXVECTOR3(970.0f, 320.0, 0.0f));
-	m_pScore->SetSize(D3DXVECTOR3(80.0f, 100.0, 0.0f));
-	m_pScore->SetWholeSize(D3DXVECTOR3(600.0f, 100.0, 0.0f));
+	m_pScore->SetPos(D3DXVECTOR3(900.0f, 530.0, 0.0f));
+	m_pScore->SetSize(D3DXVECTOR3(80.0f, 80.0, 0.0f));
+	m_pScore->SetWholeSize(D3DXVECTOR3(480.0f, 70.0, 0.0f));
+
+	m_pRanking = CRanking::Create(5, CApplication::GetScore());
+	m_pRanking->SetPos(D3DXVECTOR3(660.0f, 280.0f, 0.0f));
+	m_pRanking->SetWholeSize(D3DXVECTOR3(500.0f, 300.0f, 0.0f));
 
 	CBG *pBG = CBG::Create();
 	pBG->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
