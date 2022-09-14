@@ -57,6 +57,7 @@ private:
 	CObject2D					*m_pScoreObj;					// スコアオブジェクト
 	CObject2D					*m_pTitleObj;					// タイトルオブジェクト
 	CObject2D					*m_pGameObj;					// ゲームオブジェクト
+	CObject2D					*m_pRankingObj;					// ランキングオブジェクト
 	CScore						*m_pScore;						// スコアクラス
 	CRanking					*m_pRanking;					// ランキングクラス
 	float						m_fAddAlpha;					// アルファの加算値

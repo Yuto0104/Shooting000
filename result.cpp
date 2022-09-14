@@ -29,6 +29,7 @@ CResult::CResult()
 	m_pScoreObj = nullptr;						// スコアオブジェクト
 	m_pTitleObj = nullptr;						// タイトルオブジェクト
 	m_pGameObj = nullptr;						// ゲームオブジェクト
+	m_pRankingObj = nullptr;					// ランキングオブジェクト
 	m_pScore = nullptr;							// スコアクラス
 	m_pRanking = nullptr;						// ランキングクラス
 	m_fAddAlpha = 0.0f;							// アルファの加算値
@@ -73,6 +74,12 @@ HRESULT CResult::Init()
 	m_pGameObj->SetSize(D3DXVECTOR3(320.0f, 100.0f, 0.0f));
 	m_pGameObj->SetCol(D3DXCOLOR(0.3f, 0.1f, 1.0f, 1.0f));
 	m_pGameObj->LoadTex(19);
+
+	m_pRankingObj = CObject2D::Create();
+	m_pRankingObj->SetPos(D3DXVECTOR3(640.0f, 80.0f, 0.0f));
+	m_pRankingObj->SetSize(D3DXVECTOR3(320.0f, 100.0f, 0.0f));
+	m_pRankingObj->SetCol(D3DXCOLOR(1.0f, 0.1f, 0.1f, 1.0f));
+	m_pRankingObj->LoadTex(21);
 
 	m_pScore = CScore::Create(10, false);
 	m_pScore->SetDestScore(CApplication::GetScore());

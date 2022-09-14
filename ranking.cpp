@@ -18,6 +18,7 @@
 #include "ranking.h"
 #include "score.h"
 #include "renderer.h"
+#include "object2D.h"
 
 //=============================================================================
 // インスタンス生成
@@ -49,6 +50,7 @@ CRanking *CRanking::Create(int nMaxRanking, int nNewScore)
 CRanking::CRanking(int nPriority /*= CObject::PRIORITY_LEVEL3*/) : CObject(nPriority)
 {
 	m_pScore = nullptr;											// スコア
+	pFailObj = nullptr;											// 失敗時のアナウンス用のオブジェクト
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);						// 位置
 	m_posOld = D3DXVECTOR3(0.0f, 0.0f, 0.0f);					// 過去の位置
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);						// 向き
@@ -124,14 +126,26 @@ HRESULT CRanking::Init(int nMaxRanking, int nNewScore)
 	// 全体の大きさの設定
 	m_wholeSize = D3DXVECTOR3(300.0f, 300.0f, 0.0f);
 
-	// スコアの生成
-	CreateScore();
+	if (m_bRankingUpdatedSuccess)
+	{// スコアの生成
+		CreateScore();
 
-	// スコアの設定
-	SetScore();
+		// スコアの設定
+		SetScore();
 
-	// ランキングスコアの設定
-	SetScoreNomber();
+		// ランキングスコアの設定
+		SetScoreNomber();
+	}
+	else if (!m_bRankingUpdatedSuccess)
+	{
+		pFailObj = CObject2D::Create();
+		pFailObj->SetPos(m_pos);
+		pFailObj->SetRot(m_rot);
+		pFailObj->SetSize(D3DXVECTOR3(500.0f, 70.0f, 0.0f));
+		pFailObj->LoadTex(20);
+		pFailObj->SetCol(D3DXCOLOR(1.0f, 0.1f, 0.1f, 1.0f));
+	}
+	
 
 	return S_OK;
 }
@@ -166,7 +180,10 @@ void CRanking::Uninit()
 //=============================================================================
 void CRanking::Update()
 {
-	FlashScore();
+	if (m_bRankingUpdatedSuccess)
+	{
+		FlashScore();
+	}
 }
 
 //=============================================================================
@@ -388,15 +405,22 @@ void CRanking::CreateScore()
 //=============================================================================
 void CRanking::SetScore()
 {
-	for (int nCntRanking = 0; nCntRanking < m_nMaxRanking; nCntRanking++)
-	{// ナンバーの設定
-		m_pScore[nCntRanking]->SetWholeSize(D3DXVECTOR3(m_wholeSize.x, m_wholeSize.y / m_nMaxRanking, 0.0f));
+	if (m_pScore != nullptr)
+	{
+		for (int nCntRanking = 0; nCntRanking < m_nMaxRanking; nCntRanking++)
+		{// ナンバーの設定
+			m_pScore[nCntRanking]->SetWholeSize(D3DXVECTOR3(m_wholeSize.x, m_wholeSize.y / m_nMaxRanking, 0.0f));
 
-		D3DXVECTOR3 scoreWholeSize = m_pScore[nCntRanking]->GetWholeSize();
-		m_pScore[nCntRanking]->SetSize(D3DXVECTOR3(scoreWholeSize.x / m_nDigit, scoreWholeSize.y, 0.0f));
+			D3DXVECTOR3 scoreWholeSize = m_pScore[nCntRanking]->GetWholeSize();
+			m_pScore[nCntRanking]->SetSize(D3DXVECTOR3(scoreWholeSize.x / m_nDigit, scoreWholeSize.y, 0.0f));
 
-		D3DXVECTOR3 size = m_pScore[nCntRanking]->GetSize();
-		m_pScore[nCntRanking]->SetPos(D3DXVECTOR3(m_pos.x + m_wholeSize.x / 2.0f, m_pos.y - m_wholeSize.y / 2.0f + (size.y / 2.0f) + (size.y * nCntRanking), 0.0f));
+			D3DXVECTOR3 size = m_pScore[nCntRanking]->GetSize();
+			m_pScore[nCntRanking]->SetPos(D3DXVECTOR3(m_pos.x + m_wholeSize.x / 2.0f, m_pos.y - m_wholeSize.y / 2.0f + (size.y / 2.0f) + (size.y * nCntRanking), 0.0f));
+		}
+	}
+	else
+	{
+		SetFailObj();
 	}
 }
 
@@ -478,5 +502,19 @@ void CRanking::FlashScore()
 	{
 		m_fAddAlpha += 0.5f;
 		m_pScore[m_UpdateRank]->SetColor(D3DXCOLOR(1.0f, 1.0f, 0.2f, sinf(m_fAddAlpha) * 3.0f));
+	}
+}
+
+//=============================================================================
+// 通信エラー表示処理
+// Author : 唐﨑結斗
+// 概要 : 通信エラー表示をする
+//=============================================================================
+void CRanking::SetFailObj()
+{
+	if (pFailObj != nullptr)
+	{
+		pFailObj->SetPos(m_pos);
+		pFailObj->SetRot(m_rot);
 	}
 }
