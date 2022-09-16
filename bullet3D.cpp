@@ -18,6 +18,7 @@
 #include "motion_player3D.h"
 #include "enemy3D.h"
 #include "score.h"
+#include "effect3D.h"
 
 //=============================================================================
 // インスタンス生成
@@ -110,6 +111,8 @@ void CBullet3D::Update()
 {
 	// 位置の取得
 	D3DXVECTOR3 pos = GetPos();
+	D3DXVECTOR3 size = GetSize();
+	COLOR_TYPE MyColorType = GetColorType();
 
 	// 移動量の算出
 	m_move.z = sinf(m_moveVec.x) * cosf(m_moveVec.y) * m_fSpeed;
@@ -118,6 +121,26 @@ void CBullet3D::Update()
 
 	// 位置の更新
 	pos += m_move;
+
+	// エフェクトの生成
+	CEffect3D *pEffect3D = CEffect3D::Create();
+	pEffect3D->SetPos(pos);
+	pEffect3D->SetSize(D3DXVECTOR3(size.x * 1.5f, size.y * 1.5f, 0.0f));
+
+	if (MyColorType == CObject::TYPE_WHITE)
+	{// エフェクトの色の設定
+		pEffect3D->SetRenderMode(CEffect3D::MODE_ADD);
+		pEffect3D->SetColor(D3DXCOLOR(0.5f, 0.7f, 1.0f, 1.0f));
+	}
+	else if (MyColorType == CObject::TYPE_BLACK)
+	{// エフェクトの色の設定
+		/*pEffect3D->SetRenderMode(CEffect3D::MODE_SUB);
+		pEffect3D->SetColor(D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f));*/
+		pEffect3D->SetRenderMode(CEffect3D::MODE_ADD);
+		pEffect3D->SetColor(D3DXCOLOR(1.0f, 0.1f, 0.1f, 1.0f));
+	}
+
+	pEffect3D->SetLife(10);
 
 	// 位置の更新
 	SetPos(pos);

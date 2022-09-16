@@ -195,7 +195,7 @@ bool CObject::ColisonRange2D(CObject * target)
 //=============================================================================
 bool CObject::ColisonRectangle2D(CObject *target, bool bExtrude)
 {// 返り値用の変数
-	bool bColison = false;
+	bool bColision = false;
 
 	// 自分の情報を取得する
 	D3DXVECTOR3 pos = GetPos();
@@ -217,7 +217,7 @@ bool CObject::ColisonRectangle2D(CObject *target, bool bExtrude)
 				pos.x = posTarget.x - sizeTarget.x  - size.y ;
 			}
 
-			bColison = true;
+			bColision = true;
 		}
 		if (posOld.x - size.y  >= posTarget.x + sizeTarget.x 
 			&& pos.x - size.y  < posTarget.x + sizeTarget.x )
@@ -227,7 +227,7 @@ bool CObject::ColisonRectangle2D(CObject *target, bool bExtrude)
 				pos.x = posTarget.x + sizeTarget.x  + size.y ;
 			}
 
-			bColison = true;
+			bColision = true;
 		}
 	}
 	if (pos.x - size.x  < posTarget.x + sizeTarget.x 
@@ -241,7 +241,7 @@ bool CObject::ColisonRectangle2D(CObject *target, bool bExtrude)
 				pos.y = posTarget.y - sizeTarget.y  - size.y ;
 			}
 
-			bColison = true;
+			bColision = true;
 		}
 		if (posOld.y - size.y  >= posTarget.y + sizeTarget.y 
 			&& pos.y - size.y  < posTarget.y + sizeTarget.y )
@@ -251,13 +251,13 @@ bool CObject::ColisonRectangle2D(CObject *target, bool bExtrude)
 				pos.y = posTarget.y + sizeTarget.y  + size.y ;
 			}
 
-			bColison = true;
+			bColision = true;
 		}
 	}
 
 	// 位置の設定
 	SetPos(pos);
-	return bColison;
+	return bColision;
 }
 
 //=============================================================================
@@ -301,6 +301,108 @@ bool CObject::ColisonCircle2D(CObject * target, bool bExtrude)
 	// 位置の設定
 	SetPos(pos);
 	return bCollision;
+}
+
+//=============================================================================
+// 矩形の判定
+// Author : 唐﨑結斗
+// 概要 : ターゲットとの矩形判定
+//=============================================================================
+bool CObject::ColisonRectangle3D(CObject * target, bool bExtrude)
+{// 返り値用の変数
+	bool bColision = false;
+
+	// 自分の情報を取得する
+	D3DXVECTOR3 pos = GetPos();
+	D3DXVECTOR3 posOld = GetPosOld();
+	D3DXVECTOR3 size = GetSize() / 2.0f;
+
+	// 目標の情報取得
+	D3DXVECTOR3 posTarget = target->GetPos();
+	D3DXVECTOR3 sizeTarget = target->GetSize() / 2.0f;
+
+	if ((pos.z - size.z / 2) < (posTarget.z + sizeTarget.z)
+		&& (pos.z + size.z / 2) > (posTarget.z - sizeTarget.z)
+		&& (pos.x - size.x / 2) < (posTarget.x + sizeTarget.x)
+		&& (pos.x + size.x / 2) > (posTarget.x - sizeTarget.x))
+	{// モデル内にいる(XZ軸)
+		if ((posOld.y + size.y) <= (posTarget.y - sizeTarget.y)
+			&& (pos.y + size.y) >(posTarget.y - sizeTarget.y))
+		{
+			bColision = true;
+
+			if (bExtrude)
+			{
+				pos.y = posTarget.y - sizeTarget.y - size.y;
+			}
+		}
+		if ((posOld.y) >= (posTarget.y + sizeTarget.y)
+			&& (pos.y) < (posTarget.y + sizeTarget.y))
+		{
+			bColision = true;
+
+			if (bExtrude)
+			{
+				pos.y = posTarget.y + sizeTarget.y;
+			}
+		}
+	}
+	if ((pos.y) < (posTarget.y + sizeTarget.y)
+		&& (pos.y + size.y) > (posTarget.y - sizeTarget.y))
+	{// モデル内にいる(Y軸)
+		if ((pos.z - size.z / 2) < (posTarget.z + sizeTarget.z)
+			&& (pos.z + size.z / 2) > (posTarget.z - sizeTarget.z))
+		{// モデル内にいる(Z軸)
+			if ((posOld.x + size.z / 2) <= (posTarget.x - sizeTarget.x)
+				&& (pos.x + size.z / 2) > (posTarget.x - sizeTarget.x))
+			{
+				bColision = true;
+
+				if (bExtrude)
+				{
+					pos.x = posTarget.x - sizeTarget.x - size.z / 2;
+				}
+			}
+			if ((posOld.x - size.z / 2) >= (posTarget.x + sizeTarget.x)
+				&& (pos.x - size.z / 2) < (posTarget.x + sizeTarget.x))
+			{
+				bColision = true;
+
+				if (bExtrude)
+				{
+					pos.x = posTarget.x + sizeTarget.x + size.z / 2;
+				}
+			}
+		}
+		if ((pos.x - size.x / 2) < (posTarget.x + sizeTarget.x)
+			&& (pos.x + size.x / 2) > (posTarget.x - sizeTarget.x))
+		{// モデル内にいる(X軸)
+			if ((posOld.z + size.z / 2) <= (posTarget.z - sizeTarget.z)
+				&& (pos.z + size.z / 2) > (posTarget.z - sizeTarget.z))
+			{
+				bColision = true;
+
+				if (bExtrude)
+				{
+					pos.z = posTarget.z - sizeTarget.z - size.z / 2;
+				}
+			}
+			if ((posOld.z - size.z / 2) >= (posTarget.z + sizeTarget.z)
+				&& (pos.z - size.z / 2) < (posTarget.z + sizeTarget.z))
+			{
+				bColision = true;
+
+				if (bExtrude)
+				{
+					pos.z = posTarget.z + sizeTarget.z + size.z / 2;
+				}
+			}
+		}
+	}
+
+	// 位置の設定
+	SetPos(pos);
+	return bColision;
 }
 
 //=============================================================================

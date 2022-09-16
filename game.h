@@ -20,6 +20,7 @@ class CMotionPlayer3D;
 class CScore;
 class CLifeManager;
 class CEnergyGage;
+class CEnemyManager;
 
 //=============================================================================
 // ゲームクラス
@@ -36,6 +37,9 @@ public:
 	static CScore *GetScore() { return m_pScore; }										// スコアの取得
 	static CLifeManager *GetLifeManager() { return m_pLifeManager; }					// ライフマネージャーの取得
 	static CEnergyGage *GetEnergyGage() { return m_pEnergyGage; }						// エネルギーゲージの取得
+	static CEnemyManager *GetEnemyManager() { return m_pEnemyManager; }					// エネミーマネージャーの取得
+	static bool GetUsePlayer() { return m_bUsePlayer; }									// プレイヤーの使用状況の取得
+	static void SetUsePlayer(const bool bUse) { m_bUsePlayer = bUse; }					// プレイヤーの使用状況の設定
 
 	//--------------------------------------------------------------------
 	// コンストラクタとデストラクタ
@@ -50,6 +54,8 @@ public:
 	static CScore *m_pScore;														// スコアクラス
 	static CLifeManager *m_pLifeManager;											// ライフマネージャークラス
 	static CEnergyGage *m_pEnergyGage;												// エネルギーゲージ
+	static CEnemyManager *m_pEnemyManager;											// エネミーマネージャークラス
+	static bool m_bUsePlayer;														// プレイヤーを使用しているか
 
 	//--------------------------------------------------------------------
 	// メンバ関数

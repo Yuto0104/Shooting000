@@ -116,7 +116,12 @@ void CResult::Uninit()
 //=============================================================================
 void CResult::Update()
 {
-	SelectMode();
+	AutoTransition();
+
+	if (m_bPressEnter)
+	{
+		SelectMode();
+	}
 
 	FlashObj();
 
@@ -129,7 +134,8 @@ void CResult::Update()
 		m_bPressEnter = false;
 	}
 
-	if (m_nCntFrame >= 40)
+	if (!m_bPressEnter
+		&& m_nCntFrame >= 40)
 	{
 		CApplication::SetNextMode(m_nextMode);
 	}
@@ -216,5 +222,22 @@ void CResult::SelectMode()
 	}
 
 	m_nextMode = (CApplication::SCENE_MODE)nMode;
+}
+
+//=============================================================================
+// Ž©“®‘JˆÚ
+// Author : “‚ú±Œ‹“l
+// ŠT—v : Ž©“®‚Å‰æ–Ê‘JˆÚ‚·‚é
+//=============================================================================
+void CResult::AutoTransition()
+{
+	m_nCntFrame++;
+
+	if (m_nCntFrame >= 900)
+	{
+		m_bPressEnter = false;
+		m_nextMode = CApplication::MODE_TITLE;
+		m_nCntFrame = 0;
+	}
 }
 

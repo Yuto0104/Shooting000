@@ -68,10 +68,13 @@ public:
 	void SetBillboard(bool bBillboard) { m_bBillboard = bBillboard; }				// ビルボードの設定
 	bool GetBillboard() { return m_bBillboard; }									// ビルボードの取得
 	void SetColor(D3DXCOLOR color);													// 色の設定
+	D3DXCOLOR GetColor() { return m_color; }										// 色の取得
 	virtual void SetVtx();															// 頂点座標などの設定
 	void SetCol();																	// 頂点カラーの設定
 	void SetTex(const D3DXVECTOR2 &minTex, const D3DXVECTOR2 &maxTex);				// テクスチャ座標の設定
 	void LoadTex(const int nNumTex) { m_nNumTex = nNumTex; }						// テクスチャの設定
+	void SetZFunc(const _D3DCMPFUNC zFunc) { m_zFunc = zFunc; }						// Zテストの優先度のセッター
+	void SetAlphaValue(const int nAlphaValue) { m_nAlphaValue = nAlphaValue; }		// アルファテストの透過率のセッター
 
 private:
 	//--------------------------------------------------------------------
@@ -84,6 +87,8 @@ private:
 	D3DXVECTOR3						m_rot;				// 向き
 	D3DXVECTOR3						m_size;				// 大きさ
 	D3DXCOLOR						m_color;			// カラー
+	_D3DCMPFUNC						m_zFunc;			// Zテストの優先度
+	int								m_nAlphaValue;		// アルファテストの透過率
 	int								m_nNumTex;			// テクスチャの種別
 	float							m_fAngle;			// 対角線の角度
 	float							m_fLength;			// 対角線の長さ

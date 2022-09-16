@@ -32,6 +32,7 @@
 #include "life.h"
 #include "life_manager.h"
 #include "energy_gage.h"
+#include "particle.h"
 
 //*****************************************************************************
 // 静的メンバ変数宣言
@@ -40,6 +41,8 @@ CMotionPlayer3D *CGame::m_MotionPlayer3D = nullptr;		// モーションプレイヤーイン
 CScore *CGame::m_pScore = nullptr;						// スコアインスタンス
 CLifeManager *CGame::m_pLifeManager = nullptr;			// ライフマネージャーインスタンス
 CEnergyGage *CGame::m_pEnergyGage = nullptr;			// エネルギーゲージマネージャー
+CEnemyManager *CGame::m_pEnemyManager = nullptr;		// エネミーマネージャークラス
+bool CGame::m_bUsePlayer = false;						// プレイヤーを使用しているか
 
 //=============================================================================
 // コンストラクタ
@@ -76,8 +79,8 @@ HRESULT CGame::Init()
 	CApplication::GetCameraBG()->MotionReset();
 	CApplication::GetCameraBG()->SetCamera(pCameraManager->GetPosV(), pCameraManager->GetPosR(), pCameraManager->GetRot());
 
-	CEnemyManager *pEnemyManager = CEnemyManager::Create();
-	pEnemyManager->LoadFile("data/FILE/stage000.txt");
+	m_pEnemyManager = CEnemyManager::Create();
+	m_pEnemyManager->LoadFile("data/FILE/stage000.txt");
 
 	CMotionChar3D *pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
 	pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
@@ -86,6 +89,7 @@ HRESULT CGame::Init()
 	m_MotionPlayer3D = CMotionPlayer3D::Create();
 	m_MotionPlayer3D->SetPos(D3DXVECTOR3(40.0f, 0.0f, -50.0f));
 	m_MotionPlayer3D->SetRot(D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
+	m_bUsePlayer = true;
 
 	CMesh3D *pMesh3D = CMesh3D::Create();
 	pMesh3D->SetRot(D3DXVECTOR3(D3DX_PI * -0.15f, 0.0f, 0.0f));
@@ -105,10 +109,6 @@ HRESULT CGame::Init()
 	pSphere->SetObjectDrowType(CObject::DROWTYPE_BG);
 	pSphere->SetScrollTex(D3DXVECTOR2(0.005f, 0.0f), true);
 	pSphere->LoadTex(12);
-
-	/*CCirclePolygon3D *pCirclePolygon3D = CCirclePolygon3D::Create();
-	pCirclePolygon3D->SetPos(D3DXVECTOR3(0.0f, 10.0f, 0.0f));
-	pCirclePolygon3D->SetObjectDrowType(CObject::DROWTYPE_BG);*/
 
 	m_pScore = CScore::Create(10, false);
 	m_pScore->SetScore(0);

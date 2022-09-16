@@ -133,6 +133,7 @@ protected:
 	bool ColisonRange2D(CObject *target);																// ”ÍˆÍ‚Ì”»’è(2D)
 	bool ColisonRectangle2D(CObject *target,bool bExtrude);												// ‹éŒ`‚Ì”»’è(2D)
 	bool ColisonCircle2D(CObject *target, bool bExtrude);												// ‰~‚Ì”»’è(2D)
+	bool ColisonRectangle3D(CObject *target, bool bExtrude);											// ‹éŒ`‚Ì”»’è(3D)
 	bool ColisonSphere3D(CObject *target, D3DXVECTOR3 size, D3DXVECTOR3 targetSize, bool bExtrude);		// ‹…‚Ì”»’è(3D)
 
 private:

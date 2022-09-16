@@ -85,8 +85,10 @@ HRESULT CObject3D::Init()
 	// ポリゴン情報の設定
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 位置
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 向き
-	m_size = D3DXVECTOR3(10.0f, 10.0f, 0.0f);		// 大きさ
+	m_size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 大きさ
 	m_color = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);	// カラー
+	m_zFunc = D3DCMP_LESS;							// Zテストの優先度
+	m_nAlphaValue = 100;							// アルファテストの透過率
 	m_nNumTex = -1;									// テクスチャタイプ
 	m_bBillboard = false;							// ビルボードかどうか
 
@@ -198,13 +200,13 @@ void CObject3D::Draw()
 	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 
 	// Zテストの設定
-	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
+	pDevice->SetRenderState(D3DRS_ZFUNC, m_zFunc);
 
 	// αテストを使用する
 	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 
 	// αテストの設定
-	pDevice->SetRenderState(D3DRS_ALPHAREF, 100);
+	pDevice->SetRenderState(D3DRS_ALPHAREF, m_nAlphaValue);
 	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
 
 	// ポリゴン描画

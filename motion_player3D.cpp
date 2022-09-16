@@ -28,6 +28,7 @@
 #include "gauge2D.h"
 #include "score.h"
 #include "energy_gage.h"
+#include "particle.h"
 
 //*****************************************************************************
 // 定数定義
@@ -66,13 +67,17 @@ CMotionPlayer3D::CMotionPlayer3D()
 {
 	m_rotDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 目的の向き
 	m_nNumMotion = TYPE_NEUTRAL;					// モーションタイプ
+	m_state = STATE_NEUTRAL;						// 状態
 	m_nCntShot = 0;									// 弾発射までのカウント
 	m_nLife = 0;									// 寿命
 	m_nInvalidLife = 0;								// 追加ライフ
 	m_nEnergy = 0;									// エネルギー
+	m_nCntState = 0;								// 状態制御のカウント
+	m_nCntFrame = 0;								// フレームカウント
 	m_bPressShot = false;							// 長押し弾を使用してるかどうか
 	m_bLockShot = false;							// 弾発射が可能かどうか
 	m_bFollowShot = false;							// 追従弾を発射しているか否
+
 	// オブジェクトの種別設定
 	SetObjType(CObject::OBJTYPE_3DPLAYER);
 }
@@ -161,41 +166,79 @@ void CMotionPlayer3D::Uninit()
 //=============================================================================
 void CMotionPlayer3D::Update()
 {
-	// 情報の取得
-	D3DXVECTOR3 pos = GetPos();
-	D3DXVECTOR3 rot = GetRot();
+	if (CGame::GetUsePlayer())
+	{// 情報の取得
+		D3DXVECTOR3 pos = GetPos();
+		D3DXVECTOR3 rot = GetRot();
 
-	if (!m_bFollowShot)
-	{// ニュートラルモーションの入力
-		m_nNumMotion = TYPE_NEUTRAL;
+		if (!m_bFollowShot)
+		{// ニュートラルモーションの入力
+			m_nNumMotion = TYPE_NEUTRAL;
+		}
+
+		// 移動
+		pos += Move();
+
+		// 回転
+		Rotate();
+
+		// 弾の発射
+		Shot();
+
+		// エネルギー消費
+		Consumption();
+
+		// 色の変更
+		ChangeColor();
+
+		// モーションの設定
+		MotionSet();
+
+		// 移動情報の設定
+		SetPos(pos);
+
+		// 敵との当たり判定
+		CollisionEnemy();
+
+		// スクリーンのあたり判定
+		CollisionScreen();
+
+		// 状態の制御
+		SetState();
+
+		// 更新
+		CModel3D::Update();
+
+		if (m_nLife == 0)
+		{
+			// 変数宣言
+			D3DXVECTOR3 pos = GetPos();
+
+			// パーティクルの生成
+			CParticle *pParticle = CParticle::Create();
+			pParticle->SetPos(pos);
+			pParticle->SetSize(D3DXVECTOR3(50.0f, 50.0f, 0.0f));
+			pParticle->SetPopRange(D3DXVECTOR3(3.0f, 3.0f, 3.0f));
+			pParticle->SetSpeed(5.0f);
+			pParticle->SetEffectLife(30);
+			pParticle->SetMoveVec(D3DXVECTOR3(D3DX_PI * 2.0f, D3DX_PI * 2.0f, 0.0f));
+			pParticle->SetLife(10);
+			pParticle->SetColor(D3DXCOLOR(1.0f, 0.4f, 0.1f, 1.0f));
+			pParticle->SetMaxEffect(5);
+
+			CGame::SetUsePlayer(false);
+		}
 	}
+	else if (!CGame::GetUsePlayer())
+	{// カウントアップ
+		m_nCntFrame++;
 
-	// 移動
-	pos += Move();
-
-	// 回転
-	Rotate();
-
-	// 弾の発射
-	Shot();
-
-	// エネルギー消費
-	Consumption();
-
-	// 色の変更
-	ChangeColor();
-
-	// モーションの設定
-	MotionSet();
-
-	// 移動情報の設定
-	SetPos(pos);
-
-	// スクリーンのあたり判定
-	CollisionScreen();
-
-	// 更新
-	CModel3D::Update();
+		if (m_nCntFrame >= 40)
+		{// 終了
+			Uninit();
+			CApplication::SetNextMode(CApplication::MODE_RESULT);
+		}	
+	}
 }
 
 //=============================================================================
@@ -205,14 +248,29 @@ void CMotionPlayer3D::Update()
 //=============================================================================
 void CMotionPlayer3D::Draw()
 {
-	// 描画
-	CModel3D::Draw();
+	if (CGame::GetUsePlayer())
+	{// 描画
+		CModel3D::Draw();
 
-	// ワールドマトリックスの取得
-	D3DXMATRIX mtxWorld = GetMtxWorld();
+		// ワールドマトリックスの取得
+		D3DXMATRIX mtxWorld = GetMtxWorld();
 
-	// パーツの描画設定
-	m_pMotion[GetColorType() - 1]->SetParts(mtxWorld);
+		switch (m_state)
+		{
+		case CMotionPlayer3D::STATE_NEUTRAL:
+			// パーツの描画設定
+			m_pMotion[GetColorType() - 1]->SetParts(mtxWorld);
+			break;
+
+		case CMotionPlayer3D::STATE_DAMAGE:
+			// パーツの描画設定
+			m_pMotion[GetColorType() - 1]->SetParts(mtxWorld, D3DXCOLOR(0.5f, 0.0f, 0.0f, 1.0f));
+			break;
+
+		default:
+			break;
+		}
+	}
 }
 
 //=============================================================================
@@ -587,6 +645,21 @@ void CMotionPlayer3D::Recovery()
 		// ライフの設定
 		CGame::GetLifeManager()->SetLife();
 
+		// 変数宣言
+		D3DXVECTOR3 pos = GetPos();
+
+		// パーティクルの生成
+		CParticle *pParticle = CParticle::Create();
+		pParticle->SetPos(pos);
+		pParticle->SetSize(D3DXVECTOR3(10.0f, 10.0f, 0.0f));
+		pParticle->SetPopRange(D3DXVECTOR3(100.0f, 0.0f, 100.0f));
+		pParticle->SetSpeed(10.0f);
+		pParticle->SetEffectLife(60);
+		pParticle->SetMoveVec(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+		pParticle->SetLife(10);
+		pParticle->SetColor(D3DXCOLOR(0.1f, 1.0f, 0.5f, 1.0f));
+		pParticle->SetMaxEffect(5);
+
 		m_bRecovery = true;
 	}
 }
@@ -714,38 +787,97 @@ void CMotionPlayer3D::Consumption()
 }
 
 //=============================================================================
+// 状態の制御
+// Author : 唐﨑結斗
+// 概要 : 状態の制御を行う
+//=============================================================================
+void CMotionPlayer3D::SetState()
+{
+	switch (m_state)
+	{
+	case CMotionPlayer3D::STATE_NEUTRAL:
+		break;
+
+	case CMotionPlayer3D::STATE_DAMAGE:
+		m_nCntState++;
+
+		if (m_nCntState >= INVINCIBLE_TIME)
+		{
+			m_nCntState = 0;
+			m_state = STATE_NEUTRAL;
+		}
+
+		break;
+
+	case CMotionPlayer3D::MAX_STATE:
+		break;
+
+	default:
+		break;
+	}
+}
+
+//=============================================================================
+// 敵との当たり判定
+// Author : 唐﨑結斗
+// 概要 : 敵との当たり判定
+//=============================================================================
+void CMotionPlayer3D::CollisionEnemy()
+{
+	for (int nCntPriority = 0; nCntPriority < CObject::MAX_LEVEL; nCntPriority++)
+	{
+		for (int nCntObj = 0; nCntObj < MAX_OBJECT; nCntObj++)
+		{
+			// オブジェクトインスタンスの取得
+			CObject *pObject = CObject::MyGetObject(nCntPriority, nCntObj);
+
+			if (pObject != nullptr)
+			{
+				if ((pObject->GetObjType() == CObject::OBJTYPE_3DENEMY))
+				{// タイプが一致した場合
+					if (ColisonSphere3D(pObject, GetColisonSize(), pObject->GetColisonSize(), true))
+					{
+						Hit();
+						break;
+					}
+				}
+			}
+		}
+	}
+}
+
+//=============================================================================
 // ヒット
 // Author : 唐﨑結斗
 // 概要 : ダメージを与える
 //=============================================================================
 void CMotionPlayer3D::Hit()
 {
-	if (m_nInvalidLife > 0)
-	{// 追加ライフの消費
-		m_nInvalidLife--;
-		
-		if (m_nInvalidLife <= 0)
-		{
-			m_nInvalidLife = 0;
+	if (m_state == STATE_NEUTRAL)
+	{
+		m_state = STATE_DAMAGE;
+
+		if (m_nInvalidLife > 0)
+		{// 追加ライフの消費
+			m_nInvalidLife--;
+
+			if (m_nInvalidLife <= 0)
+			{
+				m_nInvalidLife = 0;
+			}
 		}
-	}
-	else
-	{// ライフの消費
-		m_nLife--;
+		else
+		{// ライフの消費
+			m_nLife--;
 
-		if (m_nLife <= 0)
-		{
-			m_nLife = 0;
+			if (m_nLife <= 0)
+			{
+				m_nLife = 0;
+			}
 		}
-	}
 
-	// ライフの設定
-	CGame::GetLifeManager()->SetLife();
-
-	if (m_nLife == 0)
-	{// 終了
-		Uninit();
-		CApplication::SetNextMode(CApplication::MODE_RESULT);
+		// ライフの設定
+		CGame::GetLifeManager()->SetLife();
 	}
 }
 

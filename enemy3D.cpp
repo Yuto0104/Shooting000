@@ -20,6 +20,7 @@
 #include "follow_bullet3D.h"
 #include "game.h"
 #include "motion_player3D.h"
+#include "particle.h"
 
 //*****************************************************************************
 // 静的メンバ変数の定義
@@ -134,6 +135,21 @@ HRESULT CEnemy3D::Init(const int nNumModel)
 //=============================================================================
 void CEnemy3D::Uninit()
 {
+	// 変数宣言
+	D3DXVECTOR3 pos = GetPos();
+
+	// パーティクルの生成
+	CParticle *pParticle = CParticle::Create();
+	pParticle->SetPos(pos);
+	pParticle->SetSize(D3DXVECTOR3(40.0f, 40.0f, 0.0f));
+	pParticle->SetPopRange(D3DXVECTOR3(3.0f, 3.0f, 3.0f));
+	pParticle->SetSpeed(5.0f);
+	pParticle->SetEffectLife(30);
+	pParticle->SetMoveVec(D3DXVECTOR3(D3DX_PI * 2.0f, D3DX_PI * 2.0f, 0.0f));
+	pParticle->SetLife(10);
+	pParticle->SetColor(D3DXCOLOR(1.0f, 0.4f, 0.1f, 1.0f));
+	pParticle->SetMaxEffect(3);
+
 	// モデルの終了
 	CModel3D::Uninit();
 }
@@ -332,17 +348,19 @@ void CEnemy3D::Shot()
 				pBullet3D->SetColorType(GetColorType());
 				pBullet3D->SetParent(CObject::OBJTYPE_3DENEMY);
 			}
-			
+
 			break;
 
 		case CEnemy3D::SHOTMODE_SNIPE:
-			// 目的の向きの算出
-			pPlayer = CGame::GetMotionPlayer3D();
-			targetPos = pPlayer->GetPos();
-			diffPos = targetPos - GetPos();
-			diffRot.y = atan2f(diffPos.x, diffPos.z);
-			diffRot.x = atan2f(sqrtf((diffPos.x * diffPos.x) + (diffPos.z * diffPos.z)), diffPos.y);
-			diffRot.z = 0.0f;
+			if (CGame::GetUsePlayer())
+			{// 目的の向きの算出
+				pPlayer = CGame::GetMotionPlayer3D();
+				targetPos = pPlayer->GetPos();
+				diffPos = targetPos - GetPos();
+				diffRot.y = atan2f(diffPos.x, diffPos.z);
+				diffRot.x = atan2f(sqrtf((diffPos.x * diffPos.x) + (diffPos.z * diffPos.z)), diffPos.y);
+				diffRot.z = 0.0f;
+			}
 
 			// 弾の生成
 			pBullet3D = CBullet3D::Create();

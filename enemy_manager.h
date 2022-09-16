@@ -96,6 +96,7 @@ public:
 	D3DXVECTOR3 GetPosOld()  override { return D3DXVECTOR3(0.0f, 0.0f, 0.0f); }		// 過去位置のゲッター
 	D3DXVECTOR3 GetRot()  override { return D3DXVECTOR3(0.0f, 0.0f, 0.0f); }		// 向きのゲッター
 	D3DXVECTOR3 GetSize()  override { return D3DXVECTOR3(0.0f, 0.0f, 0.0f); }		// 大きさのゲッター
+	int GetCntFrame() { return m_nCntFrame; }										// フレーム数のゲッター
 	void LoadFile(char *pFileName);
 
 private:

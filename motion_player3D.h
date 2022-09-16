@@ -39,6 +39,7 @@ public:
 	static const unsigned int		MAX_CNT_RECOVERY = 60;		// 回復までのカウント
 	static const unsigned int		ENERGY_RECOVERY = 20;		// 回復に消費するエネルギー
 	static const unsigned int		ENERGY_FOLLOW_SHOT = 10;	// 追従弾発射に消費するエネルギー
+	static const unsigned int		INVINCIBLE_TIME = 20;		// 無敵時間
 
 	//=============================================================================
 	// モーションのタイプ列挙型
@@ -51,6 +52,18 @@ public:
 		TYPE_MOVE,					// 移動モーション
 		TYPE_ATTACK,				// 攻撃モーション
 		MAX_MOTION_TYPE,			// タイプの最大数
+	};
+
+	//=============================================================================
+	// 状態の列挙型
+	// Author : 唐﨑結斗
+	// 概要 : 状態の種別
+	//=============================================================================
+	enum STATE
+	{
+		STATE_NEUTRAL = 0,			// 通常状態
+		STATE_DAMAGE,				// ダメージ状態
+		MAX_STATE,					// 状態の最大数
 	};
 
 	//--------------------------------------------------------------------
@@ -89,6 +102,8 @@ private:
 	void Recovery();							// 回復
 	void FollowShot();							// 追従弾の発射
 	void Consumption();							// エネルギー消費
+	void SetState();							// 状態の制御
+	void CollisionEnemy();						// 敵との当たり判定
 
 	//--------------------------------------------------------------------
 	// メンバ変数
@@ -96,6 +111,7 @@ private:
 	CMotion			*m_pMotion[MAX_MOTION];			// モーションインスタンス
 	CMove			*m_pMove;						// 移動クラスのインスタンス
 	D3DXVECTOR3		m_rotDest;						// 目的の向き
+	STATE			m_state;						// 状態
 	int				m_nCntShot;						// 弾発射までのカウント
 	int				m_nNumMotion;					// 現在のモーション番号
 	int				m_nNumMotionOld;				// 過去のモーション番号
@@ -104,6 +120,8 @@ private:
 	int				m_nEnergy;						// エネルギー
 	int				m_nCntConsumption;				// エネルギー消費カウント
 	int				m_nCombo;						// コンボ
+	int				m_nCntState;					// 状態制御のカウント
+	int				m_nCntFrame;					// フレームカウント
 	bool			m_bMotion;						// モーションの使用状況
 	bool			m_bMotionBlend;					// モーションブレンドの使用状況
 	bool			m_bPressShot;					// 長押し弾を使用してるかどうか

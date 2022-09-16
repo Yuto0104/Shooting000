@@ -19,6 +19,7 @@
 #include "motion_player3D.h"
 #include "camera.h"
 #include "enemy3D.h"
+#include "enemy_manager.h"
 
 //=============================================================================
 // コンストラクタ
@@ -237,6 +238,10 @@ void CRenderer::DrawFPS()
 
 		int nCntSetEnemy = CEnemy3D::GetCntSetEnemy();
 		sprintf(strCopy, _T("敵の設置数 : %d \n"), nCntSetEnemy);
+		strcat(str, strCopy);
+
+		int nCntFrame = CGame::GetEnemyManager()->GetCntFrame();
+		sprintf(strCopy, _T("現在のフレーム数 : %d \n"), nCntFrame);
 		strcat(str, strCopy);
 	}
 
