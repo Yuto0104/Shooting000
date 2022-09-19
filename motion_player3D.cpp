@@ -17,8 +17,10 @@
 #include "renderer.h"
 #include "application.h"
 #include "keyboard.h"
+#include "sound.h"
 #include "mouse.h"
 #include "game.h"
+#include "tutorial.h"
 
 #include "calculation.h"
 #include "bullet3D.h"
@@ -77,6 +79,7 @@ CMotionPlayer3D::CMotionPlayer3D()
 	m_bPressShot = false;							// 長押し弾を使用してるかどうか
 	m_bLockShot = false;							// 弾発射が可能かどうか
 	m_bFollowShot = false;							// 追従弾を発射しているか否
+	m_bUse = false;									// 使用状況
 
 	// オブジェクトの種別設定
 	SetObjType(CObject::OBJTYPE_3DPLAYER);
@@ -102,15 +105,20 @@ HRESULT CMotionPlayer3D::Init()
 	// 初期化
 	CModel3D::Init();
 
-	// モーション情報
-	m_pMotion[0] = new CMotion("data/MOTION/white.txt");
-	assert(m_pMotion[0] != nullptr);
-	m_pMotion[1] = new CMotion("data/MOTION/black.txt");
-	assert(m_pMotion[1] != nullptr);
+	if (m_pMotion[0] == nullptr
+		&& m_pMotion[1] == nullptr)
+	{// モーション情報
+		m_pMotion[0] = new CMotion("data/MOTION/white.txt");
+		assert(m_pMotion[0] != nullptr);
+		m_pMotion[1] = new CMotion("data/MOTION/black.txt");
+		assert(m_pMotion[1] != nullptr);
+	}
 
-	// 移動
-	m_pMove = new CMove;
-	assert(m_pMove != nullptr);
+	if (m_pMove == nullptr)
+	{// 移動
+		m_pMove = new CMove;
+		assert(m_pMove != nullptr);
+	}
 
 	// 移動情報の初期化
 	m_pMove->SetMoving(1.0f, 15.0f, 0.0f, 0.1f);
@@ -123,8 +131,27 @@ HRESULT CMotionPlayer3D::Init()
 	SetColorType(CModel3D::TYPE_WHITE);
 	SetColisonSize(D3DXVECTOR3(50.0f, 50.0f, 50.0f));
 	m_nLife = 5;
-	m_nInvalidLife = 0;
+	m_nInvalidLife = 100;
+	SetPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	SetRot(D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
 	SetSize(D3DXVECTOR3(1.2f, 1.2f, 1.2f));
+	m_bUse = true;
+
+	switch (CApplication::GetMode())
+	{
+	case CApplication::MODE_GAME:
+		// プレイヤーの取得
+		CGame::SetUsePlayer(m_bUse);
+		break;
+
+	case CApplication::MODE_TUTORIAL:
+		// プレイヤーの取得
+		CTutorial::SetUsePlayer(m_bUse);
+		break;
+
+	default:
+		break;
+	}
 
 	return E_NOTIMPL;
 }
@@ -166,7 +193,23 @@ void CMotionPlayer3D::Uninit()
 //=============================================================================
 void CMotionPlayer3D::Update()
 {
-	if (CGame::GetUsePlayer())
+	switch (CApplication::GetMode())
+	{
+	case CApplication::MODE_GAME:
+		// プレイヤーの取得
+		m_bUse = CGame::GetUsePlayer();
+		break;
+
+	case CApplication::MODE_TUTORIAL:
+		// プレイヤーの取得
+		m_bUse = CTutorial::GetUsePlayer();
+		break;
+
+	default:
+		break;
+	}
+
+	if (m_bUse)
 	{// 情報の取得
 		D3DXVECTOR3 pos = GetPos();
 		D3DXVECTOR3 rot = GetRot();
@@ -194,6 +237,9 @@ void CMotionPlayer3D::Update()
 		// モーションの設定
 		MotionSet();
 
+		// y座標の修正
+		pos.y = 0.0f;
+
 		// 移動情報の設定
 		SetPos(pos);
 
@@ -209,34 +255,34 @@ void CMotionPlayer3D::Update()
 		// 更新
 		CModel3D::Update();
 
-		if (m_nLife == 0)
-		{
-			// 変数宣言
-			D3DXVECTOR3 pos = GetPos();
-
-			// パーティクルの生成
-			CParticle *pParticle = CParticle::Create();
-			pParticle->SetPos(pos);
-			pParticle->SetSize(D3DXVECTOR3(50.0f, 50.0f, 0.0f));
-			pParticle->SetPopRange(D3DXVECTOR3(3.0f, 3.0f, 3.0f));
-			pParticle->SetSpeed(5.0f);
-			pParticle->SetEffectLife(30);
-			pParticle->SetMoveVec(D3DXVECTOR3(D3DX_PI * 2.0f, D3DX_PI * 2.0f, 0.0f));
-			pParticle->SetLife(10);
-			pParticle->SetColor(D3DXCOLOR(1.0f, 0.4f, 0.1f, 1.0f));
-			pParticle->SetMaxEffect(5);
-
-			CGame::SetUsePlayer(false);
-		}
+		// 死亡処理
+		Death();
 	}
-	else if (!CGame::GetUsePlayer())
-	{// カウントアップ
-		m_nCntFrame++;
+	else if (!m_bUse)
+	{
+		switch (CApplication::GetMode())
+		{
+		case CApplication::MODE_GAME:
+			// カウントアップ
+			m_nCntFrame++;
 
-		if (m_nCntFrame >= 40)
-		{// 終了
-			Uninit();
-			CApplication::SetNextMode(CApplication::MODE_RESULT);
+			if (m_nCntFrame >= 40)
+			{// 終了
+				Uninit();
+				CGame::SetGame(false);
+			}
+
+			break;
+
+		case CApplication::MODE_TUTORIAL:
+			Init();
+
+			// ライフの設定
+			CTutorial::GetLifeManager()->SetLife();
+			break;
+
+		default:
+			break;
 		}	
 	}
 }
@@ -248,7 +294,23 @@ void CMotionPlayer3D::Update()
 //=============================================================================
 void CMotionPlayer3D::Draw()
 {
-	if (CGame::GetUsePlayer())
+	switch (CApplication::GetMode())
+	{
+	case CApplication::MODE_GAME:
+		// プレイヤーの取得
+		m_bUse = CGame::GetUsePlayer();
+		break;
+
+	case CApplication::MODE_TUTORIAL:
+		// プレイヤーの取得
+		m_bUse = CTutorial::GetUsePlayer();
+		break;
+
+	default:
+		break;
+	}
+
+	if (m_bUse)
 	{// 描画
 		CModel3D::Draw();
 
@@ -409,6 +471,9 @@ D3DXVECTOR3 CMotionPlayer3D::Move()
 //=============================================================================
 void CMotionPlayer3D::Shot()
 {
+	// サウンド情報の取得
+	CSound *pSound = CApplication::GetSound();
+	
 	// 入力情報の取得
 	CKeyboard *pKeyboard = CApplication::GetKeyboard();
 
@@ -434,6 +499,8 @@ void CMotionPlayer3D::Shot()
 	if (pKeyboard->GetPress(DIK_SPACE)
 		&& !m_bLockShot)
 	{// 弾の発射
+		pSound->PlaySound(CSound::SOUND_LABEL_SE_SHOT);
+
 		// 弾の発射位置
 		bulletPos = D3DXVECTOR3(0.0f, 18.0f, -45.0f);
 
@@ -471,6 +538,9 @@ void CMotionPlayer3D::Shot()
 
 		if (m_nCntShot >= MAX_CNT_SHOT)
 		{// カウントが弾発射までのカウントに達した
+
+			pSound->PlaySound(CSound::SOUND_LABEL_SE_SHOT);
+
 			// 弾の発射位置
 			bulletPos = D3DXVECTOR3(20.0f, 18.0f, -45.0f);
 
@@ -572,11 +642,16 @@ void CMotionPlayer3D::CollisionScreen()
 //=============================================================================
 void CMotionPlayer3D::ChangeColor()
 {
+	// サウンド情報の取得
+	CSound *pSound = CApplication::GetSound();
+
 	// 入力情報の取得
 	CKeyboard *pKeyboard = CApplication::GetKeyboard();
 
 	if (pKeyboard->GetTrigger(DIK_Q))
 	{
+		pSound->PlaySound(CSound::SOUND_LABEL_SE_TRANCEFARM);
+
 		if (GetColorType() == CObject::TYPE_WHITE)
 		{
 			SetColorType(CObject::TYPE_BLACK);
@@ -627,9 +702,14 @@ void CMotionPlayer3D::MotionSet()
 //=============================================================================
 void CMotionPlayer3D::Recovery()
 {
+	// サウンド情報の取得
+	CSound *pSound = CApplication::GetSound();
+
 	if (m_nLife < MAX_LIFE
 		&& m_nEnergy >= ENERGY_RECOVERY)
 	{
+		pSound->PlaySound(CSound::SOUND_LABEL_SE_HEEL);
+
 		int nRecoveryEnergy = (int)ENERGY_RECOVERY;
 
 		// エネルギーの消費
@@ -642,8 +722,21 @@ void CMotionPlayer3D::Recovery()
 			m_nLife = MAX_LIFE;
 		}
 
-		// ライフの設定
-		CGame::GetLifeManager()->SetLife();
+		switch (CApplication::GetMode())
+		{
+		case CApplication::MODE_GAME:
+			// ライフの設定
+			CGame::GetLifeManager()->SetLife();
+			break;
+
+		case CApplication::MODE_TUTORIAL:
+			// ライフの設定
+			CTutorial::GetLifeManager()->SetLife();
+			break;
+
+		default:
+			break;
+		}
 
 		// 変数宣言
 		D3DXVECTOR3 pos = GetPos();
@@ -671,6 +764,9 @@ void CMotionPlayer3D::Recovery()
 //=============================================================================
 void CMotionPlayer3D::FollowShot()
 {
+	// サウンド情報の取得
+	CSound *pSound = CApplication::GetSound();
+
 	if (m_nEnergy >= ENERGY_FOLLOW_SHOT)
 	{
 		// 攻撃モーション
@@ -709,6 +805,8 @@ void CMotionPlayer3D::FollowShot()
 		// 弾の生成
 		for (int nCnt = 0; nCnt < 4; nCnt++)
 		{
+			pSound->PlaySound(CSound::SOUND_LABEL_SE_SHOT);
+
 			float fAttRot = 0.5f / 4 * nCnt;
 			pFollowBullet3D = CFollowBullet3D::Create();
 			pFollowBullet3D->SetPos(bulletPos);
@@ -847,14 +945,65 @@ void CMotionPlayer3D::CollisionEnemy()
 }
 
 //=============================================================================
+// 死亡処理
+// Author : 唐﨑結斗
+// 概要 : 死ぬときの処理を行う
+//=============================================================================
+void CMotionPlayer3D::Death()
+{
+	if (m_nLife == 0)
+	{
+		// サウンド情報の取得
+		CSound *pSound = CApplication::GetSound();
+		pSound->PlaySound(CSound::SOUND_LABEL_SE_EXPLOSION);
+
+		// 変数宣言
+		D3DXVECTOR3 pos = GetPos();
+
+		// パーティクルの生成
+		CParticle *pParticle = CParticle::Create();
+		pParticle->SetPos(pos);
+		pParticle->SetSize(D3DXVECTOR3(50.0f, 50.0f, 0.0f));
+		pParticle->SetPopRange(D3DXVECTOR3(3.0f, 3.0f, 3.0f));
+		pParticle->SetSpeed(5.0f);
+		pParticle->SetEffectLife(30);
+		pParticle->SetMoveVec(D3DXVECTOR3(D3DX_PI * 2.0f, D3DX_PI * 2.0f, 0.0f));
+		pParticle->SetLife(10);
+		pParticle->SetColor(D3DXCOLOR(1.0f, 0.4f, 0.1f, 1.0f));
+		pParticle->SetMaxEffect(5);
+
+		switch (CApplication::GetMode())
+		{
+		case CApplication::MODE_GAME:
+			// プレイヤーの取得
+			CGame::SetUsePlayer(false);
+			break;
+
+		case CApplication::MODE_TUTORIAL:
+			// プレイヤーの取得
+			CTutorial::SetUsePlayer(false);
+			break;
+
+		default:
+			break;
+		}
+	}
+}
+
+//=============================================================================
 // ヒット
 // Author : 唐﨑結斗
 // 概要 : ダメージを与える
 //=============================================================================
 void CMotionPlayer3D::Hit()
 {
+	// サウンド情報の取得
+	CSound *pSound = CApplication::GetSound();
+
 	if (m_state == STATE_NEUTRAL)
 	{
+		pSound->PlaySound(CSound::SOUND_LABEL_SE_HIT);
+
 		m_state = STATE_DAMAGE;
 
 		if (m_nInvalidLife > 0)
@@ -876,8 +1025,21 @@ void CMotionPlayer3D::Hit()
 			}
 		}
 
-		// ライフの設定
-		CGame::GetLifeManager()->SetLife();
+		switch (CApplication::GetMode())
+		{
+		case CApplication::MODE_GAME:
+			// ライフの設定
+			CGame::GetLifeManager()->SetLife();
+			break;
+
+		case CApplication::MODE_TUTORIAL:
+			// ライフの設定
+			CTutorial::GetLifeManager()->SetLife();
+			break;
+
+		default:
+			break;
+		}
 	}
 }
 
@@ -888,7 +1050,22 @@ void CMotionPlayer3D::Hit()
 //=============================================================================
 void CMotionPlayer3D::Charge(const int nEnergy)
 {
-	CEnergyGage *pEnergyGage = CGame::GetEnergyGage();
+	CEnergyGage *pEnergyGage = nullptr;
+
+	switch (CApplication::GetMode())
+	{
+	case CApplication::MODE_GAME:
+		pEnergyGage = CGame::GetEnergyGage();
+		break;
+
+	case CApplication::MODE_TUTORIAL:
+		pEnergyGage = CTutorial::GetEnergyGage();
+		break;
+
+	default:
+		break;
+	}
+
 	CGauge2D *pEnergyGauge2D = pEnergyGage->GetGauge2D();
 	CScore *pEnergy = pEnergyGage->GetScore();
 

@@ -204,6 +204,9 @@
     <ClInclude Include="particle.h">
       <Filter>ヘッダー ファイル\object\3D</Filter>
     </ClInclude>
+    <ClInclude Include="tutorial.h">
+      <Filter>ヘッダー ファイル\object\scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="texture.cpp">
@@ -352,6 +355,9 @@
     </ClCompile>
     <ClCompile Include="particle.cpp">
       <Filter>ソース ファイル\object\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="tutorial.cpp">
+      <Filter>ソース ファイル\object\scene</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

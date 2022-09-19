@@ -115,6 +115,9 @@ HRESULT CEnergyGage::Init()
 //=============================================================================
 void CEnergyGage::Uninit()
 {
+	m_pScore->Uninit();
+	m_pGauge2D->Uninit();
+
 	// インスタンスの解放
 	Release();
 }

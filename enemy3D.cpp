@@ -15,6 +15,7 @@
 #include "enemy3D.h"
 #include "renderer.h"
 #include "application.h"
+#include "sound.h"
 #include "score.h"
 #include "bullet3D.h"
 #include "follow_bullet3D.h"
@@ -135,21 +136,6 @@ HRESULT CEnemy3D::Init(const int nNumModel)
 //=============================================================================
 void CEnemy3D::Uninit()
 {
-	// 変数宣言
-	D3DXVECTOR3 pos = GetPos();
-
-	// パーティクルの生成
-	CParticle *pParticle = CParticle::Create();
-	pParticle->SetPos(pos);
-	pParticle->SetSize(D3DXVECTOR3(40.0f, 40.0f, 0.0f));
-	pParticle->SetPopRange(D3DXVECTOR3(3.0f, 3.0f, 3.0f));
-	pParticle->SetSpeed(5.0f);
-	pParticle->SetEffectLife(30);
-	pParticle->SetMoveVec(D3DXVECTOR3(D3DX_PI * 2.0f, D3DX_PI * 2.0f, 0.0f));
-	pParticle->SetLife(10);
-	pParticle->SetColor(D3DXCOLOR(1.0f, 0.4f, 0.1f, 1.0f));
-	pParticle->SetMaxEffect(3);
-
 	// モデルの終了
 	CModel3D::Uninit();
 }
@@ -214,10 +200,15 @@ void CEnemy3D::Draw()
 //=============================================================================
 void CEnemy3D::Hit(COLOR_TYPE colorType, int nAttack)
 {
+	// サウンド情報の取得
+	CSound *pSound = CApplication::GetSound();
+
 	if (m_bUse)
 	{// 変数宣言
 		COLOR_TYPE MyColorType = GetColorType();
 		int nMyAttack = nAttack;
+
+		pSound->PlaySound(CSound::SOUND_LABEL_SE_HIT);
 
 		if (MyColorType != colorType)
 		{// 色のタイプが同一の場合
@@ -230,8 +221,14 @@ void CEnemy3D::Hit(COLOR_TYPE colorType, int nAttack)
 		if (m_nLife <= 0)
 		{// 体力が0の場合
 			m_nLife = 0;
-			CScore *pScore = CGame::GetScore();
-			pScore->AddScore(m_nScore);
+
+			if (CApplication::GetMode() == CApplication::MODE_GAME)
+			{
+				CScore *pScore = CGame::GetScore();
+				pScore->AddScore(m_nScore);
+			}
+
+			pSound->PlaySound(CSound::SOUND_LABEL_SE_EXPLOSION);
 
 			// データ格納用変数
 			CBullet3D * pBullet3D;
@@ -239,6 +236,18 @@ void CEnemy3D::Hit(COLOR_TYPE colorType, int nAttack)
 			D3DXVECTOR3 rot = GetRot();
 			D3DXVECTOR3 randLinternBulletSpawnRange = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 			float fRandMoveVec = 0.0f;
+
+			// パーティクルの生成
+			CParticle *pParticle = CParticle::Create();
+			pParticle->SetPos(pos);
+			pParticle->SetSize(D3DXVECTOR3(40.0f, 40.0f, 0.0f));
+			pParticle->SetPopRange(D3DXVECTOR3(3.0f, 3.0f, 3.0f));
+			pParticle->SetSpeed(5.0f);
+			pParticle->SetEffectLife(30);
+			pParticle->SetMoveVec(D3DXVECTOR3(D3DX_PI * 2.0f, D3DX_PI * 2.0f, 0.0f));
+			pParticle->SetLife(10);
+			pParticle->SetColor(D3DXCOLOR(1.0f, 0.4f, 0.1f, 1.0f));
+			pParticle->SetMaxEffect(3);
 
 			// 弾の色
 			D3DXCOLOR bulletColor;
@@ -292,6 +301,9 @@ void CEnemy3D::SetMoveData(ENEMY_MOVE moveData)
 //=============================================================================
 void CEnemy3D::Shot()
 {
+	// サウンド情報の取得
+	CSound *pSound = CApplication::GetSound();
+
 	D3DXVECTOR3 rot = GetRot();
 	D3DXCOLOR bulletColor;					// 弾の色
 
@@ -308,6 +320,8 @@ void CEnemy3D::Shot()
 
 	if (m_nCntShot % m_nMaxShot == 0)
 	{
+		pSound->PlaySound(CSound::SOUND_LABEL_SE_SHOT);
+
 		// 計算用変数の設定
 		CBullet3D * pBullet3D = nullptr;
 		CFollowBullet3D* pFollowBullet3D = nullptr;

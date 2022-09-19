@@ -104,6 +104,7 @@ private:
 	void Consumption();							// エネルギー消費
 	void SetState();							// 状態の制御
 	void CollisionEnemy();						// 敵との当たり判定
+	void Death();								// 死亡処理
 
 	//--------------------------------------------------------------------
 	// メンバ変数
@@ -130,6 +131,7 @@ private:
 	bool			m_bLockConsumption;				// エネルギー消費が可能かどうか
 	bool			m_bRecovery;					// 回復を行ったかどうか
 	bool			m_bFollowShot;					// 追従弾を発射しているか否
+	bool			m_bUse;							// 使用状況
 };
 
 #endif

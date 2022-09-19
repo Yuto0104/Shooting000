@@ -12,8 +12,10 @@
 #include <assert.h>
 
 #include "title.h"
+
 #include "application.h"
 #include "keyboard.h"
+#include "sound.h"
 #include "object2D.h"
 #include "bg.h"
 
@@ -25,7 +27,9 @@
 CTitle::CTitle()
 {
 	m_pTitleLogo = nullptr;				// タイトルロゴオブジェクト
-	m_pPressEnter = nullptr;			// プレスエンターオブジェクト
+	m_pNewGame = nullptr;				// ニューゲームオブジェクト
+	m_pTutorial = nullptr;				// チュートリアルオブジェクト
+	m_pExit = nullptr;					// 終了オブジェクト
 	m_nCntFrame = 0;					// フレームカウント
 	m_bPressEnter = true;				// エンターキーを押せるか
 }
@@ -47,18 +51,34 @@ CTitle::~CTitle()
 //=============================================================================
 HRESULT CTitle::Init()
 {
+	// サウンド情報の取得
+	CSound *pSound = CApplication::GetSound();
+	pSound->PlaySound(CSound::SOUND_LABEL_BGM000);
+
 	m_pTitleLogo = CObject2D::Create();
-	m_pTitleLogo->SetPos(D3DXVECTOR3(640.0f, 300.0f, 0.0f));
+	m_pTitleLogo->SetPos(D3DXVECTOR3(640.0f, 280.0f, 0.0f));
 	m_pTitleLogo->SetSize(D3DXVECTOR3(200.0f, 400.0f, 0.0f));
 	m_pTitleLogo->SetCol(D3DXCOLOR(0.25f, 0.1f, 0.8f, 1.0f));
 	m_pTitleLogo->LoadTex(16);
 
-	m_pPressEnter = CObject2D::Create();
-	m_pPressEnter->SetPos(D3DXVECTOR3(640.0f, 580.0f, 0.0f));
-	m_pPressEnter->SetSize(D3DXVECTOR3(400.0f, 80.0f, 0.0f));
-	m_pPressEnter->SetCol(D3DXCOLOR(0.25f, 0.1f, 0.8f, 1.0f));
-	m_pPressEnter->LoadTex(15);
+	m_pNewGame = CObject2D::Create();
+	m_pNewGame->SetPos(D3DXVECTOR3(640.0f, 550.0f, 0.0f));
+	m_pNewGame->SetSize(D3DXVECTOR3(300.0f, 60.0f, 0.0f));
+	m_pNewGame->SetCol(D3DXCOLOR(0.25f, 0.1f, 0.8f, 1.0f));
+	m_pNewGame->LoadTex(19);
 	
+	m_pTutorial = CObject2D::Create();
+	m_pTutorial->SetPos(D3DXVECTOR3(640.0f, 610.0f, 0.0f));
+	m_pTutorial->SetSize(D3DXVECTOR3(280.0f, 50.0f, 0.0f));
+	m_pTutorial->SetCol(D3DXCOLOR(0.25f, 0.1f, 0.8f, 1.0f));
+	m_pTutorial->LoadTex(23);
+
+	m_pExit = CObject2D::Create();
+	m_pExit->SetPos(D3DXVECTOR3(640.0f, 670.0f, 0.0f));
+	m_pExit->SetSize(D3DXVECTOR3(170.0f, 50.0f, 0.0f));
+	m_pExit->SetCol(D3DXCOLOR(0.25f, 0.1f, 0.8f, 1.0f));
+	m_pExit->LoadTex(24);
+
 	CBG *pBG = CBG::Create();
 	pBG->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
 	return S_OK;
@@ -71,6 +91,12 @@ HRESULT CTitle::Init()
 //=============================================================================
 void CTitle::Uninit()
 {
+	// サウンド情報の取得
+	CSound *pSound = CApplication::GetSound();
+
+	// サウンド終了
+	pSound->StopSound();
+
 	// スコアの解放
 	Release();
 }
@@ -82,20 +108,48 @@ void CTitle::Uninit()
 //=============================================================================
 void CTitle::Update()
 {
+	// サウンド情報の取得
+	CSound *pSound = CApplication::GetSound();
+
 	// 入力情報の取得
 	CKeyboard *pKeyboard = CApplication::GetKeyboard();
 
-	FlashPE();
+	if (m_bPressEnter)
+	{
+		SelectMode();
+	}
+
+	FlashObj();
 
 	if (m_bPressEnter
 		&& pKeyboard->GetTrigger(DIK_RETURN))
 	{
+		pSound->PlaySound(CSound::SOUND_LABEL_SE_DECIDE);
 		m_bPressEnter = false;
 	}
 
-	if (m_nCntFrame >= 40)
+	if (!m_bPressEnter
+		&& m_nCntFrame >= 40)
 	{
-		CApplication::SetNextMode(CApplication::MODE_GAME);
+		switch (m_nextMode)
+		{
+		case MODE_GAME:
+			CApplication::SetNextMode(CApplication::MODE_GAME);
+			break;
+
+		case MODE_TUTORIAL:
+			CApplication::SetNextMode(CApplication::MODE_TUTORIAL);
+			break;
+
+		case MODE_EXIT:
+			// ウィンドウを破棄
+			DestroyWindow(CApplication::GetWnd());
+			break;
+
+		default:
+			assert(false);
+			break;
+		}
 	}
 }
 
@@ -110,21 +164,87 @@ void CTitle::Draw()
 }
 
 //=============================================================================
-// プレスエンターの点滅処理
+// オブジェクトの点滅
 // Author : 唐﨑結斗
-// 概要 : プレスエンターの点滅させる
+// 概要 : 指定のオブジェクトを点滅させる
 //=============================================================================
-void CTitle::FlashPE()
+void CTitle::FlashObj()
 {
+	CObject2D *pObj = nullptr;
+
 	if (m_bPressEnter)
 	{
-		m_fFrame += 0.07f;
+		m_fAddAlpha += 0.07f;
 	}
 	else if (!m_bPressEnter)
 	{
-		m_fFrame += 0.5f;
+		m_fAddAlpha += 0.5f;
 		m_nCntFrame++;
 	}
-	
-	m_pPressEnter->SetCol(D3DXCOLOR(0.25f, 0.1f, 0.8f, sinf(m_fFrame) * 3.0f));
+
+	switch (m_nextMode)
+	{
+	case MODE_GAME:
+		pObj = m_pNewGame;
+		m_pTutorial->SetCol(D3DXCOLOR(0.3f, 0.1f, 1.0f, 1.0f));
+		m_pExit->SetCol(D3DXCOLOR(0.3f, 0.1f, 1.0f, 1.0f));
+		break;
+
+	case MODE_TUTORIAL:
+		pObj = m_pTutorial;
+		m_pNewGame->SetCol(D3DXCOLOR(0.3f, 0.1f, 1.0f, 1.0f));
+		m_pExit->SetCol(D3DXCOLOR(0.3f, 0.1f, 1.0f, 1.0f));
+		break;
+
+	case MODE_EXIT:
+		pObj = m_pExit;
+		m_pTutorial->SetCol(D3DXCOLOR(0.3f, 0.1f, 1.0f, 1.0f));
+		m_pNewGame->SetCol(D3DXCOLOR(0.3f, 0.1f, 1.0f, 1.0f));
+		break;
+
+	default:
+		assert(false);
+		break;
+	}
+
+	pObj->SetCol(D3DXCOLOR(0.25f, 0.1f, 0.8f, sinf(m_fAddAlpha) * 3.0f));
+}
+
+//=============================================================================
+// モードの選択
+// Author : 唐﨑結斗
+// 概要 : モードの選択する
+//=============================================================================
+void CTitle::SelectMode()
+{
+	int nMode = (int)m_nextMode;
+
+	// サウンド情報の取得
+	CSound *pSound = CApplication::GetSound();
+
+	// 入力情報の取得
+	CKeyboard *pKeyboard = CApplication::GetKeyboard();
+
+	if (pKeyboard->GetTrigger(DIK_W))
+	{
+		pSound->PlaySound(CSound::SOUND_LABEL_SE_SELECT);
+		nMode--;
+
+		if (nMode < 0)
+		{
+			nMode = 2;
+		}
+	}
+	else if (pKeyboard->GetTrigger(DIK_S))
+	{
+		pSound->PlaySound(CSound::SOUND_LABEL_SE_SELECT);
+		nMode++;
+
+		if (nMode > 2)
+		{
+			nMode = 0;
+		}
+	}
+
+	m_nextMode = (NEXT_MODE)nMode;
 }

@@ -15,6 +15,7 @@
 #include "enemy_manager.h"
 #include "renderer.h"
 #include "application.h"
+#include "game.h"
 
 //=============================================================================
 // インスタンス生成
@@ -132,7 +133,7 @@ void CEnemyManager::Update()
 		// ゲーム終了
 		if (m_nCntFrame >= m_nGameEndFrame)
 		{
-			CApplication::SetNextMode(CApplication::MODE_RESULT);
+			CGame::SetGame(false);
 		}
 	}	
 }

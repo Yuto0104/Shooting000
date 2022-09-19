@@ -40,6 +40,7 @@ public:
 	static CEnemyManager *GetEnemyManager() { return m_pEnemyManager; }					// エネミーマネージャーの取得
 	static bool GetUsePlayer() { return m_bUsePlayer; }									// プレイヤーの使用状況の取得
 	static void SetUsePlayer(const bool bUse) { m_bUsePlayer = bUse; }					// プレイヤーの使用状況の設定
+	static void SetGame(const bool bGame) { m_bGame = bGame; }							// ゲームの状況の設定
 
 	//--------------------------------------------------------------------
 	// コンストラクタとデストラクタ
@@ -56,6 +57,7 @@ public:
 	static CEnergyGage *m_pEnergyGage;												// エネルギーゲージ
 	static CEnemyManager *m_pEnemyManager;											// エネミーマネージャークラス
 	static bool m_bUsePlayer;														// プレイヤーを使用しているか
+	static bool m_bGame;															// ゲームの状況
 
 	//--------------------------------------------------------------------
 	// メンバ関数

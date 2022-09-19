@@ -18,6 +18,7 @@
 #include "renderer.h"
 #include "application.h"
 #include "game.h"
+#include "tutorial.h"
 
 //=============================================================================
 // インスタンス生成
@@ -189,8 +190,23 @@ void CLifeManager::UninitLifeAll()
 //=============================================================================
 void CLifeManager::SetLife()
 {
-	// プレイヤーの取得
-	CMotionPlayer3D * pMotionPlayer3D = CGame::GetMotionPlayer3D();
+	CMotionPlayer3D * pMotionPlayer3D = nullptr;
+
+	switch (CApplication::GetMode())
+	{
+	case CApplication::MODE_GAME:
+		// プレイヤーの取得
+		pMotionPlayer3D = CGame::GetMotionPlayer3D();
+		break;
+
+	case CApplication::MODE_TUTORIAL:
+		// プレイヤーの取得
+		pMotionPlayer3D = CTutorial::GetMotionPlayer3D();
+		break;
+
+	default:
+		break;
+	}
 
 	// ライフの終了
 	UninitLifeAll();

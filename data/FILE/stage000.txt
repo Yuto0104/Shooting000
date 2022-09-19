@@ -1,8 +1,8 @@
 // 敵の配置数
-MAX_INSTALL = 46
+MAX_INSTALL = 55
 
 // ゲームの終了時間
-GAME_END_FRAME = 10000
+GAME_END_FRAME = 8000
 
 //***************************************
 // 敵の設置
@@ -337,7 +337,7 @@ ARRANGEMENT_SET
 ARRANGEMENT_END
 
 //***************************************
-// 第四ウェーブ [ 設置数 : 4 ]
+// 第四ウェーブ [ 設置数 : 6 ]
 //***************************************
 ARRANGEMENT_SET
 	POS = 250.0 0.0 -400.0
@@ -384,6 +384,81 @@ ARRANGEMENT_SET
 	FRAME =  5820
 	MOVE_ID = 9
 	ID = 5
+	DRAW_TYPE = 0
+ARRANGEMENT_END
+
+//***************************************
+// 第五ウェーブ [ 設置数 : 9 ]
+//***************************************
+ARRANGEMENT_SET
+	POS = 0.0 0.0 800.0
+	FRAME =  6300
+	MOVE_ID = 10
+	ID = 7
+	DRAW_TYPE = 0
+ARRANGEMENT_END
+
+ARRANGEMENT_SET
+	POS = 100.0 0.0 830.0
+	FRAME =  7000
+	MOVE_ID = 10
+	ID = 6
+	DRAW_TYPE = 0
+ARRANGEMENT_END
+
+ARRANGEMENT_SET
+	POS = -100.0 0.0 830.0
+	FRAME =  7000
+	MOVE_ID = 10
+	ID = 6
+	DRAW_TYPE = 0
+ARRANGEMENT_END
+
+ARRANGEMENT_SET
+	POS = 200.0 0.0 860.0
+	FRAME =  6400
+	MOVE_ID = 10
+	ID = 7
+	DRAW_TYPE = 0
+ARRANGEMENT_END
+
+ARRANGEMENT_SET
+	POS = -200.0 0.0 860.0
+	FRAME =  6400
+	MOVE_ID = 10
+	ID = 7
+	DRAW_TYPE = 0
+ARRANGEMENT_END
+
+ARRANGEMENT_SET
+	POS = 300.0 0.0 890.0
+	FRAME =  7100
+	MOVE_ID = 10
+	ID = 6
+	DRAW_TYPE = 0
+ARRANGEMENT_END
+
+ARRANGEMENT_SET
+	POS = -300.0 0.0 890.0
+	FRAME =  7100
+	MOVE_ID = 10
+	ID = 6
+	DRAW_TYPE = 0
+ARRANGEMENT_END
+
+ARRANGEMENT_SET
+	POS = 400.0 0.0 920.0
+	FRAME =  6500
+	MOVE_ID = 10
+	ID = 7
+	DRAW_TYPE = 0
+ARRANGEMENT_END
+
+ARRANGEMENT_SET
+	POS = -400.0 0.0 920.0
+	FRAME =  6500
+	MOVE_ID = 10
+	ID = 7
 	DRAW_TYPE = 0
 ARRANGEMENT_END
 

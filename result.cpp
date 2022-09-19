@@ -13,6 +13,7 @@
 
 #include "result.h"
 #include "keyboard.h"
+#include "sound.h"
 #include "object2D.h"
 #include "score.h"
 #include "bg.h"
@@ -54,6 +55,10 @@ CResult::~CResult()
 //=============================================================================
 HRESULT CResult::Init()
 {
+	// サウンド情報の取得
+	CSound *pSound = CApplication::GetSound();
+	pSound->PlaySound(CSound::SOUND_LABEL_BGM002);
+
 	// 次に行くモードの設定
 	m_nextMode = CApplication::MODE_TITLE;
 
@@ -105,6 +110,12 @@ HRESULT CResult::Init()
 //=============================================================================
 void CResult::Uninit()
 {
+	// サウンド情報の取得
+	CSound *pSound = CApplication::GetSound();
+
+	// サウンド終了
+	pSound->StopSound();
+
 	// スコアの解放
 	Release();
 }
@@ -116,6 +127,9 @@ void CResult::Uninit()
 //=============================================================================
 void CResult::Update()
 {
+	// サウンド情報の取得
+	CSound *pSound = CApplication::GetSound();
+
 	AutoTransition();
 
 	if (m_bPressEnter)
@@ -131,6 +145,7 @@ void CResult::Update()
 	if (m_bPressEnter
 		&& pKeyboard->GetTrigger(DIK_RETURN))
 	{
+		pSound->PlaySound(CSound::SOUND_LABEL_SE_DECIDE);
 		m_bPressEnter = false;
 	}
 
@@ -197,6 +212,9 @@ void CResult::FlashObj()
 //=============================================================================
 void CResult::SelectMode()
 {
+	// サウンド情報の取得
+	CSound *pSound = CApplication::GetSound();
+
 	int nMode = (int)m_nextMode;
 
 	// 入力情報の取得
@@ -204,6 +222,7 @@ void CResult::SelectMode()
 
 	if (pKeyboard->GetTrigger(DIK_A))
 	{
+		pSound->PlaySound(CSound::SOUND_LABEL_SE_SELECT);
 		nMode--;
 
 		if (nMode < 0)
@@ -213,6 +232,7 @@ void CResult::SelectMode()
 	}
 	else if (pKeyboard->GetTrigger(DIK_D))
 	{
+		pSound->PlaySound(CSound::SOUND_LABEL_SE_SELECT);
 		nMode++;
 
 		if (nMode > 1)
@@ -231,10 +251,14 @@ void CResult::SelectMode()
 //=============================================================================
 void CResult::AutoTransition()
 {
+	// サウンド情報の取得
+	CSound *pSound = CApplication::GetSound();
+
 	m_nCntFrame++;
 
-	if (m_nCntFrame >= 900)
+	if (m_nCntFrame >= 1800)
 	{
+		pSound->PlaySound(CSound::SOUND_LABEL_SE_DECIDE);
 		m_bPressEnter = false;
 		m_nextMode = CApplication::MODE_TITLE;
 		m_nCntFrame = 0;

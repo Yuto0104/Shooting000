@@ -14,6 +14,7 @@
 #include "game.h"
 
 #include "application.h"
+#include "sound.h"
 #include "model_manager.h"
 #include "enemy_manager.h"
 #include "camera_manager.h"
@@ -43,6 +44,7 @@ CLifeManager *CGame::m_pLifeManager = nullptr;			// ライフマネージャーインスタン
 CEnergyGage *CGame::m_pEnergyGage = nullptr;			// エネルギーゲージマネージャー
 CEnemyManager *CGame::m_pEnemyManager = nullptr;		// エネミーマネージャークラス
 bool CGame::m_bUsePlayer = false;						// プレイヤーを使用しているか
+bool CGame::m_bGame = false;							// ゲームの状況
 
 //=============================================================================
 // コンストラクタ
@@ -71,6 +73,10 @@ CGame::~CGame()
 //=============================================================================
 HRESULT CGame::Init()
 {
+	// サウンド情報の取得
+	CSound *pSound = CApplication::GetSound();
+	pSound->PlaySound(CSound::SOUND_LABEL_BGM001);
+
 	// 背景モデルの設置
 	CApplication::GetModelManager()->SetModelBG();
 
@@ -78,6 +84,7 @@ HRESULT CGame::Init()
 	CCameraManager *pCameraManager = CApplication::GetCameraManager();
 	CApplication::GetCameraBG()->MotionReset();
 	CApplication::GetCameraBG()->SetCamera(pCameraManager->GetPosV(), pCameraManager->GetPosR(), pCameraManager->GetRot());
+	CApplication::GetCameraBG()->SetNumMotion(0);
 
 	m_pEnemyManager = CEnemyManager::Create();
 	m_pEnemyManager->LoadFile("data/FILE/stage000.txt");
@@ -121,6 +128,8 @@ HRESULT CGame::Init()
 	m_pEnergyGage = CEnergyGage::Create();
 	m_pEnergyGage->SetPos(D3DXVECTOR3(0.0f + m_pEnergyGage->GetSize().x / 2.0f + 20.0f, 450.0f, 0.0f));
 
+	m_bGame = true;
+
 	return S_OK;
 }
 
@@ -131,7 +140,13 @@ HRESULT CGame::Init()
 //=============================================================================
 void CGame::Uninit()
 {
-	CApplication::SetScore(m_pScore->GetScore());
+	// サウンド情報の取得
+	CSound *pSound = CApplication::GetSound();
+
+	// サウンド終了
+	pSound->StopSound();
+
+	m_pEnergyGage->Uninit();
 
 	// スコアの解放
 	Release();
@@ -144,7 +159,11 @@ void CGame::Uninit()
 //=============================================================================
 void CGame::Update()
 {
-	
+	if (!m_bGame)
+	{
+		CApplication::SetScore(m_pScore->GetScore());
+		CApplication::SetNextMode(CApplication::MODE_RESULT);
+	}
 }
 
 //=============================================================================

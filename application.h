@@ -45,6 +45,7 @@ public:
 		MODE_TITLE = 0,			// タイトル
 		MODE_GAME,				// ゲーム
 		MODE_RESULT,			// リザルト
+		MODE_TUTORIAL,			// チュートリアル
 		MAX_MODE,				// シーンの最大数
 		MODE_NONE,				// シーン無し
 	};
@@ -69,6 +70,7 @@ public:
 	static SCENE_MODE GetMode() { return m_mode; }										// モードの取得
 	static void SetScore(const int nScore) { m_nScore = nScore; }						// スコアの設定
 	static int GetScore() { return m_nScore; }											// スコアの取得
+	static HWND GetWnd() { return m_hWnd; }												// ウィンドウの取得
 
 	//--------------------------------------------------------------------
 	// コンストラクタとデストラクタ
@@ -88,6 +90,7 @@ private:
 	//--------------------------------------------------------------------
 	// 静的メンバ変数
 	//--------------------------------------------------------------------
+	static HWND	m_hWnd;							// ウィンドウ
 	static CRenderer *m_pRenderer;				// rendererクラス
 	static CKeyboard *m_pKeyboard;				// キーボードクラス
 	static CMouse *m_pMouse;					// マウスクラス

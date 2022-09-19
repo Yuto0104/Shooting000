@@ -335,7 +335,10 @@ void CScore::CalScore()
 			m_nScore = m_nDestScore;
 		}
 
-		AddDigit();
+		if (m_bAddDigit)
+		{
+			AddDigit();
+		}
 	}
 
 	SetScore(m_nScore);
@@ -348,13 +351,15 @@ void CScore::CalScore()
 //=============================================================================
 void CScore::SetDigitNumbers()
 {
-	// ナンバーのメモリ確保
-	m_pNumber = new CNumber*[m_nDigit];
-	assert(m_pNumber != nullptr);
+	if (m_pNumber == nullptr)
+	{// ナンバーのメモリ確保
+		m_pNumber = new CNumber*[m_nDigit];
+		assert(m_pNumber != nullptr);
 
-	for (int nCntDigit = 0; nCntDigit < m_nDigit; nCntDigit++)
-	{// ナンバーの設定
-		m_pNumber[nCntDigit] = CNumber::Create();
+		for (int nCntDigit = 0; nCntDigit < m_nDigit; nCntDigit++)
+		{// ナンバーの設定
+			m_pNumber[nCntDigit] = CNumber::Create();
+		}
 	}
 }
 

@@ -1,6 +1,5 @@
 // モデルの最大数
-MAX_TYPE = 47
-
+MAX_TYPE = 49
 //***************************
 // Xファイル名の読み込み
 //***************************
@@ -51,4 +50,6 @@ MODEL_FILENAME = data/MODEL/enemy_white_001.x			# [43]
 MODEL_FILENAME = data/MODEL/enemy_black_001.x			# [44]
 MODEL_FILENAME = data/MODEL/enemy_white_002.x			# [45]
 MODEL_FILENAME = data/MODEL/enemy_black_002.x			# [46]
+MODEL_FILENAME = data/MODEL/enemy_white_003.x			# [47]
+MODEL_FILENAME = data/MODEL/enemy_black_003.x			# [48]
 

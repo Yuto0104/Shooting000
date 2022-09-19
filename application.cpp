@@ -28,11 +28,13 @@
 #include "title.h"
 #include "game.h"
 #include "result.h"
+#include "tutorial.h"
 #include "fade.h"
 
 //*****************************************************************************
 // 静的メンバ変数宣言
 //*****************************************************************************
+HWND CApplication::m_hWnd = nullptr;								// ウィンドウ
 CRenderer *CApplication::m_pRenderer = nullptr;						// レンダラーインスタンス
 CKeyboard *CApplication::m_pKeyboard = {};							// キーボードインスタンス
 CMouse *CApplication::m_pMouse = {};								// マウスインスタンス
@@ -43,7 +45,7 @@ CSound *CApplication::m_pSound = nullptr;							// サウンドインスタンス
 CCamera *CApplication::m_pCamera = nullptr;							// カメラインスタンス
 CCamera *CApplication::m_pCameraBG = nullptr;						// カメラインスタンス
 CApplication::SCENE_MODE CApplication::m_mode = MODE_NONE;			// 現在のモードの格納
-CApplication::SCENE_MODE CApplication::m_nextMode = MODE_GAME;		// 次のモードの格納
+CApplication::SCENE_MODE CApplication::m_nextMode = MODE_TITLE;		// 次のモードの格納
 CSceneMode *CApplication::pSceneMode = nullptr;						// シーンモードを格納
 CFade *CApplication::pFade = nullptr;								// フェードクラス
 int CApplication::m_nScore = 0;										// 現在のスコア
@@ -186,6 +188,10 @@ void CApplication::SetMode(SCENE_MODE mode)
 		pSceneMode = new CResult;
 		break;
 
+	case CApplication::MODE_TUTORIAL:
+		pSceneMode = new CTutorial;
+		break;
+
 	default:
 		break;
 	}
@@ -231,6 +237,9 @@ CApplication::~CApplication()
 //=============================================================================
 HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 {
+	// ウィンドウ
+	m_hWnd = hWnd;
+
 	// メモリの確保	
 	m_pRenderer = new CRenderer;
 	m_pTexture = new CTexture;
@@ -246,7 +255,7 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 
 	// 初期化処理
 	assert(m_pRenderer != nullptr);
-	if (FAILED(m_pRenderer->Init(hWnd, TRUE)) != 0)
+	if (FAILED(m_pRenderer->Init(m_hWnd, TRUE)) != 0)
 	{//初期化処理が失敗した場合
 		return-1;
 	}
@@ -265,7 +274,7 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 
 	// 初期化処理
 	assert(m_pSound != nullptr);
-	m_pSound->Init(hWnd);
+	m_pSound->Init(m_hWnd);
 
 	// 初期化処理
 	assert(m_pCamera != nullptr);
@@ -278,14 +287,14 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 
 	// 初期化処理
 	assert(m_pKeyboard != nullptr);
-	if (FAILED(m_pKeyboard->Init(hInstance, hWnd)))
+	if (FAILED(m_pKeyboard->Init(hInstance, m_hWnd)))
 	{
 		return E_FAIL;
 	}
 
 	// 初期化処理
 	assert(m_pMouse != nullptr);
-	if (FAILED(m_pMouse->Init(hInstance, hWnd)))
+	if (FAILED(m_pMouse->Init(hInstance, m_hWnd)))
 	{
 		return E_FAIL;
 	}
@@ -311,6 +320,9 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 //=============================================================================
 void CApplication::Uninit()
 {
+	// オブジェクトの解放
+	CObject::ReleaseAll();
+
 	if (m_pRenderer != nullptr)
 	{// 終了処理
 		m_pRenderer->Uninit();
@@ -394,9 +406,6 @@ void CApplication::Uninit()
 
 	// ライトの解放
 	CLight::ReleaseAll();
-
-	// オブジェクトの解放
-	CObject::ReleaseAll();
 }
 
 //=============================================================================

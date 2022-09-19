@@ -51,12 +51,18 @@ HRESULT CSound::Init(HWND hWnd)
 	HRESULT hr;
 
 	// 各音素材のパラメータ
-	m_aParam[SOUND_LABEL_BGM000] = SetSoundParam("data/BGM/bgm000.wav", -1);
+	m_aParam[SOUND_LABEL_BGM000] = SetSoundParam("data/BGM/title001.wav", -1);
 	m_aParam[SOUND_LABEL_BGM001] = SetSoundParam("data/BGM/bgm001.wav", -1);
-	m_aParam[SOUND_LABEL_BGM002] = SetSoundParam("data/BGM/bgm002.wav", -1);
+	m_aParam[SOUND_LABEL_BGM002] = SetSoundParam("data/BGM/result.wav", -1);
+	m_aParam[SOUND_LABEL_BGM003] = SetSoundParam("data/BGM/tutorial000.wav", -1);
 	m_aParam[SOUND_LABEL_SE_DECIDE] = SetSoundParam("data/SE/decide000.wav", 0);
 	m_aParam[SOUND_LABEL_SE_SELECT] = SetSoundParam("data/SE/select000.wav", 0);
 	m_aParam[SOUND_LABEL_SE_PAUSE] = SetSoundParam("data/SE/pause000.wav", 0);
+	m_aParam[SOUND_LABEL_SE_SHOT] = SetSoundParam("data/SE/shot000.wav", 0);
+	m_aParam[SOUND_LABEL_SE_HIT] = SetSoundParam("data/SE/hit000.wav", 0);
+	m_aParam[SOUND_LABEL_SE_EXPLOSION] = SetSoundParam("data/SE/explosion000.wav", 0);
+	m_aParam[SOUND_LABEL_SE_TRANCEFARM] = SetSoundParam("data/SE/trancefarm.wav", 0);
+	m_aParam[SOUND_LABEL_SE_HEEL] = SetSoundParam("data/SE/heel.wav", 0);
 
 	// COMライブラリの初期化
 	CoInitializeEx(NULL, COINIT_MULTITHREADED);
@@ -282,7 +288,7 @@ void CSound::StopSound(SOUND_LABEL label)
 	m_apSourceVoice[label]->GetState(&xa2state);
 	if (xa2state.BuffersQueued != 0)
 	{// 再生中
-	 // 一時停止
+		// 一時停止
 		m_apSourceVoice[label]->Stop(0);
 
 		// オーディオバッファの削除

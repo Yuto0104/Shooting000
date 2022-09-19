@@ -53,7 +53,7 @@ CCamera::CCamera()
 	m_fRotMove = 0.0f;								// 移動方向
 	m_nCntFrame = 0;								// フレームカウント
 	m_nCntKey = 0;									// キーカウント
-	m_nCntMotion = 0;								// モーションカウント
+	m_nNumMotion = 0;								// モーションカウント
 	m_nMaxMotion = 0;								// モーションの最大数
 	m_bAutoMove = false;							// 自動移動
 }
@@ -308,7 +308,18 @@ void CCamera::MotionReset(void)
 {
 	m_nCntFrame = 0;								// フレームカウント
 	m_nCntKey = 0;									// キーカウント
-	m_nCntMotion = 0;								// モーションカウント
+	m_nNumMotion = 0;								// モーションカウント
+}
+
+//=============================================================================
+// モーション番号の設定
+// Author : 唐﨑結斗
+// 概要 : 
+//=============================================================================
+void CCamera::SetNumMotion(const int nNumMotion)
+{
+	MotionReset();
+	m_nNumMotion = nNumMotion;
 }
 
 //=============================================================================
@@ -538,20 +549,18 @@ void CCamera::FollowCamera(void)
 //=============================================================================
 void CCamera::Action()
 {
-	if (m_pMotion != nullptr
-		&& CApplication::GetMode() == CApplication::MODE_GAME
-		&& m_nCntMotion < m_nMaxMotion)
+	if (m_pMotion != nullptr)
 	{
 		if (m_nCntFrame == 0)
 		{// 追加する数値の算出
-			m_posVDest = m_pMotion[m_nCntMotion].pCameraAction[m_nCntKey].posVDest - m_posV;
-			m_posRDest = m_pMotion[m_nCntMotion].pCameraAction[m_nCntKey].posRDest - m_posR;
+			m_posVDest = m_pMotion[m_nNumMotion].pCameraAction[m_nCntKey].posVDest - m_posV;
+			m_posRDest = m_pMotion[m_nNumMotion].pCameraAction[m_nCntKey].posRDest - m_posR;
 		}
 
 		m_nCntFrame++;
 
-		D3DXVECTOR3 addPosV = m_posVDest / (float)m_pMotion[m_nCntMotion].pCameraAction[m_nCntKey].nFrame;
-		D3DXVECTOR3 addPosR = m_posRDest / (float)m_pMotion[m_nCntMotion].pCameraAction[m_nCntKey].nFrame;
+		D3DXVECTOR3 addPosV = m_posVDest / (float)m_pMotion[m_nNumMotion].pCameraAction[m_nCntKey].nFrame;
+		D3DXVECTOR3 addPosR = m_posRDest / (float)m_pMotion[m_nNumMotion].pCameraAction[m_nCntKey].nFrame;
 
 		// 視点の移動
 		D3DXVECTOR3 posV = GetPosV() + addPosV;
@@ -565,20 +574,20 @@ void CCamera::Action()
 		// 注視点の設定
 		SetPosR(posR);
 
-		if (m_nCntFrame >= m_pMotion[m_nCntMotion].pCameraAction[m_nCntKey].nFrame)
+		if (m_nCntFrame >= m_pMotion[m_nNumMotion].pCameraAction[m_nCntKey].nFrame)
 		{
 			m_nCntKey++;
 			m_nCntFrame = 0;
 
-			if (m_nCntKey >= m_pMotion[m_nCntMotion].nMaxKey)
+			if (m_nCntKey >= m_pMotion[m_nNumMotion].nMaxKey)
 			{
-				if (m_pMotion[m_nCntMotion].bLoop)
+				if (m_pMotion[m_nNumMotion].bLoop)
 				{
 					m_nCntKey = 0;
 				}
 				else
 				{
-					m_nCntMotion++;
+					m_nNumMotion++;
 				}
 			}
 		}

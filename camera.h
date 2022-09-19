@@ -96,6 +96,7 @@ public:
 	void SetRot(const D3DXVECTOR3 rot, const int nShaft);
 	void SetCamera(const D3DXVECTOR3 posV, const D3DXVECTOR3 posR, const D3DXVECTOR3 rot);
 	void MotionReset(void);
+	void SetNumMotion(const int nNumMotion);
 
 private:
 	//--------------------------------------------------------------------
@@ -132,7 +133,7 @@ private:
 	int					m_nCntFrame;		// フレームカウント
 	int					m_nCntKey;			// キーカウント
 	int					m_nMaxMotion;		// モーションの最大数
-	int					m_nCntMotion;		// モーションカウント
+	int					m_nNumMotion;		// モーションカウント
 	bool				m_bAutoMove;		// 自動移動
 };
 
