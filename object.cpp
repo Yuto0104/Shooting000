@@ -20,6 +20,7 @@
 // 静的メンバ変数宣言
 //*****************************************************************************
 CObject *CObject::m_apObject[MAX_LEVEL][MAX_OBJECT] = {};		// 敵インスタンス
+bool CObject::m_bPause = false;									// ポーズを使用しているかどうか
 
 //=============================================================================
 // インスタンスの解放
@@ -53,7 +54,8 @@ void CObject::ReleaseScene(void)
 		for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
 		{
 			if (m_apObject[nCntPriority][nCntObject] != nullptr
-				&& m_apObject[nCntPriority][nCntObject]->GetObjType() != OBJTYPE_FADE)
+				&& m_apObject[nCntPriority][nCntObject]->GetObjType() != OBJTYPE_FADE
+				&& m_apObject[nCntPriority][nCntObject]->GetObjType() != OBJTYPE_PAUSE)
 			{// インスタンスが使用されてる
 				// オブジェクト終了処理
 				m_apObject[nCntPriority][nCntObject]->Uninit();
@@ -73,7 +75,15 @@ void CObject::UpdateAll(void)
 	{
 		for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
 		{
-			if (m_apObject[nCntPriority][nCntObject] != nullptr)
+			if (m_apObject[nCntPriority][nCntObject] != nullptr
+				&& !m_bPause)
+			{// インスタンスが使用されてる
+				// オブジェクト更新処理
+				m_apObject[nCntPriority][nCntObject]->Update();
+			}
+			else if (m_apObject[nCntPriority][nCntObject] != nullptr
+				&& m_bPause
+				&& m_apObject[nCntPriority][nCntObject]->m_objectType == OBJTYPE_PAUSE)
 			{// インスタンスが使用されてる
 				// オブジェクト更新処理
 				m_apObject[nCntPriority][nCntObject]->Update();

@@ -51,6 +51,7 @@ public:
 		OBJTYPE_3DENEMY,			// 3Dエネミー
 		OBJTYPE_3DBULLET,			// 3Dバレット
 		OBJTYPE_FADE,				// フェード
+		OBJTYPE_PAUSE,				// ポーズ
 		MAX_OBJTYPE,				// 種別の最大数
 	};
 
@@ -94,6 +95,7 @@ public:
 	static void UpdateAll(void);																						// すべてのオブジェクトの更新
 	static void DrawAll(EObjectDrowType objectDrowType);																// すべてのオブジェクトの描画
 	static CObject *MyGetObject(const int nPriority, const int nNumID) { return m_apObject[nPriority][nNumID]; }		// オブジェクト情報のゲッター
+	static void SetPause(const bool bPause) { m_bPause = bPause; }														// ポーズ状態のセッター
 
 	//--------------------------------------------------------------------
 	// コンストラクタとデストラクタ
@@ -141,6 +143,7 @@ private:
 	// 静的メンバ変数
 	//--------------------------------------------------------------------
 	static CObject *m_apObject[MAX_LEVEL][MAX_OBJECT];		// オブジェクト情報
+	static bool m_bPause;									// ポーズを使用しているかどうか
 
 	//--------------------------------------------------------------------
 	// メンバ変数

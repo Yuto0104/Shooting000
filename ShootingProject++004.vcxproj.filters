@@ -207,6 +207,9 @@
     <ClInclude Include="tutorial.h">
       <Filter>ヘッダー ファイル\object\scene</Filter>
     </ClInclude>
+    <ClInclude Include="pause.h">
+      <Filter>ヘッダー ファイル\object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="texture.cpp">
@@ -358,6 +361,9 @@
     </ClCompile>
     <ClCompile Include="tutorial.cpp">
       <Filter>ソース ファイル\object\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="pause.cpp">
+      <Filter>ソース ファイル\object</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

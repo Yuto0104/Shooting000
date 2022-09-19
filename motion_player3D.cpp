@@ -131,7 +131,7 @@ HRESULT CMotionPlayer3D::Init()
 	SetColorType(CModel3D::TYPE_WHITE);
 	SetColisonSize(D3DXVECTOR3(50.0f, 50.0f, 50.0f));
 	m_nLife = 5;
-	m_nInvalidLife = 100;
+	m_nInvalidLife = 0;
 	SetPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	SetRot(D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
 	SetSize(D3DXVECTOR3(1.2f, 1.2f, 1.2f));

@@ -12,7 +12,7 @@
 #include <assert.h>
 
 #include "game.h"
-
+#include "keyboard.h"
 #include "application.h"
 #include "sound.h"
 #include "model_manager.h"

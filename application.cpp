@@ -30,6 +30,7 @@
 #include "result.h"
 #include "tutorial.h"
 #include "fade.h"
+#include "pause.h"
 
 //*****************************************************************************
 // Ã“Iƒƒ“ƒo•Ï”éŒ¾
@@ -44,10 +45,11 @@ CCameraManager *CApplication::m_pCameraManager = nullptr;			// ƒJƒƒ‰ƒ}ƒl[ƒWƒƒ
 CSound *CApplication::m_pSound = nullptr;							// ƒTƒEƒ“ƒhƒCƒ“ƒXƒ^ƒ“ƒX
 CCamera *CApplication::m_pCamera = nullptr;							// ƒJƒƒ‰ƒCƒ“ƒXƒ^ƒ“ƒX
 CCamera *CApplication::m_pCameraBG = nullptr;						// ƒJƒƒ‰ƒCƒ“ƒXƒ^ƒ“ƒX
-CApplication::SCENE_MODE CApplication::m_mode = MODE_NONE;			// Œ»Ý‚Ìƒ‚[ƒh‚ÌŠi”[
-CApplication::SCENE_MODE CApplication::m_nextMode = MODE_TITLE;		// ŽŸ‚Ìƒ‚[ƒh‚ÌŠi”[
+CApplication::SCENE_MODE CApplication::m_mode = MODE_TITLE;			// Œ»Ý‚Ìƒ‚[ƒh‚ÌŠi”[
+CApplication::SCENE_MODE CApplication::m_nextMode = MODE_NONE;		// ŽŸ‚Ìƒ‚[ƒh‚ÌŠi”[
 CSceneMode *CApplication::pSceneMode = nullptr;						// ƒV[ƒ“ƒ‚[ƒh‚ðŠi”[
-CFade *CApplication::pFade = nullptr;								// ƒtƒF[ƒhƒNƒ‰ƒX
+CFade *CApplication::m_pFade = nullptr;								// ƒtƒF[ƒhƒNƒ‰ƒX
+CPause *CApplication::m_pPause = nullptr;							// ƒ|[ƒYƒNƒ‰ƒX
 int CApplication::m_nScore = 0;										// Œ»Ý‚ÌƒXƒRƒA
 
 //=============================================================================
@@ -255,10 +257,17 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 
 	// ‰Šú‰»ˆ—
 	assert(m_pRenderer != nullptr);
+#ifdef _DEBUG
 	if (FAILED(m_pRenderer->Init(m_hWnd, TRUE)) != 0)
 	{//‰Šú‰»ˆ—‚ªŽ¸”s‚µ‚½ê‡
 		return-1;
 	}
+#else
+	if (FAILED(m_pRenderer->Init(m_hWnd, FALSE)) != 0)
+	{//‰Šú‰»ˆ—‚ªŽ¸”s‚µ‚½ê‡
+		return-1;
+	}
+#endif
 
 	// ‰Šú‰»ˆ—
 	assert(m_pTexture != nullptr);
@@ -308,7 +317,11 @@ HRESULT CApplication::Init(HINSTANCE hInstance, HWND hWnd)
 	SetMode(CApplication::MODE_TITLE);
 
 	// ƒtƒF[ƒh‚ÌÝ’è
-	pFade = CFade::Create();
+	m_pFade = CFade::Create();
+
+	// ƒ|[ƒY‚Ì¶¬
+	m_pPause = CPause::Create();
+	m_pPause->SetPos(D3DXVECTOR3(640.0f, 360.0f, 0.0f));
 
 	return S_OK;
 }
@@ -415,15 +428,21 @@ void CApplication::Uninit()
 //=============================================================================
 void CApplication::Update()
 {
-	if (m_mode != m_nextMode)
+	if (m_nextMode != MODE_NONE)
 	{
-		pFade->SetFade(m_nextMode);
+		m_pFade->SetFade(m_nextMode);
+		m_nextMode = MODE_NONE;
 	}
 
 	m_pKeyboard->Update();
 	m_pMouse->Update();
 	m_pCamera->Update();
-	m_pCameraBG->Update();
+	
+	if (!m_pPause->GetPause())
+	{
+		m_pCameraBG->Update();
+	}
+
 	m_pRenderer->Update();
 }
 

@@ -26,6 +26,7 @@ class CSound;
 class CCamera;
 class CSceneMode;
 class CFade;
+class CPause;
 
 //=============================================================================
 // アプリケーションクラス
@@ -62,6 +63,7 @@ public:
 	static CSound *GetSound() { return m_pSound; }										// サウンドのゲッター
 	static CCamera *GetCamera() { return m_pCamera; }									// カメラのゲッター
 	static CCamera *GetCameraBG() { return m_pCameraBG; }								// 背景カメラのゲッター
+	static CFade *GetFade() { return m_pFade; }								// 背景カメラのゲッター
 	static D3DXVECTOR3 ScreenCastWorld(const D3DXVECTOR3 &pos);							// ワールド座標をスクリーン座標にキャストする
 	static D3DXVECTOR3 WorldCastScreen(const D3DXVECTOR3 &pos);							// ワールド座標をスクリーン座標にキャストする
 	static float RotNormalization(float fRot);											// 角度の設定
@@ -71,6 +73,7 @@ public:
 	static void SetScore(const int nScore) { m_nScore = nScore; }						// スコアの設定
 	static int GetScore() { return m_nScore; }											// スコアの取得
 	static HWND GetWnd() { return m_hWnd; }												// ウィンドウの取得
+	static CPause *GetPause() { return m_pPause; }										// ポーズの取得
 
 	//--------------------------------------------------------------------
 	// コンストラクタとデストラクタ
@@ -103,7 +106,8 @@ private:
 	static SCENE_MODE m_mode;					// 現在のモードの格納
 	static SCENE_MODE m_nextMode;				// 次に設定するモード
 	static CSceneMode *pSceneMode;				// シーンモードを格納
-	static CFade *pFade;						// フェードクラス
+	static CFade *m_pFade;						// フェードクラス
+	static CPause *m_pPause;					// ポーズクラス
 	static int m_nScore;						// 現在のスコア
 };
 
