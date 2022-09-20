@@ -89,9 +89,9 @@ HRESULT CGame::Init()
 	m_pEnemyManager = CEnemyManager::Create();
 	m_pEnemyManager->LoadFile("data/FILE/stage000.txt");
 
-	CMotionChar3D *pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
+	/*CMotionChar3D *pMotionChar3D = CMotionChar3D::Create("data/MOTION/motion.txt");
 	pMotionChar3D->SetPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-	pMotionChar3D->SetObjectDrowType(CObject::DROWTYPE_BG);
+	pMotionChar3D->SetObjectDrowType(CObject::DROWTYPE_BG);*/
 
 	m_MotionPlayer3D = CMotionPlayer3D::Create();
 	m_MotionPlayer3D->SetPos(D3DXVECTOR3(40.0f, 0.0f, -50.0f));
