@@ -124,7 +124,7 @@ void CEffect3D::Update()
 	// ƒ‰ƒCƒt‚ÌŒ¸­
 	DecreaseLife();
 
-	if (m_nLife <= 0)
+	if (m_nLife == 0)
 	{// I—¹
 		Uninit();
 	}
@@ -207,6 +207,11 @@ void CEffect3D::DecreaseLife()
 		m_nLife--;
 		SetSize(size - m_subSize);
 		SetColor(D3DXCOLOR(color.r, color.g, color.b, color.a - m_fSubAlpha));
+
+		if (m_nLife <= 0)
+		{
+			m_nLife = 0;
+		}
 	}
 }
 

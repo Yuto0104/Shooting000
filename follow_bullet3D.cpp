@@ -145,6 +145,7 @@ void CFollowBullet3D::SetTarget()
 
 				if (pObject != nullptr
 					&& (pObject->GetObjType() == CObject::OBJTYPE_3DENEMY
+						|| pObject->GetObjType() == CObject::OBJTYPE_3DBOSS
 						|| pObject->GetObjType() == CObject::OBJTYPE_3DPLAYER)
 					&& pObject->GetObjType() != CObject::OBJTYPE_3DBULLET
 					&& pObject->GetObjType() != GetParent())

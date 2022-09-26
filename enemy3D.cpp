@@ -22,6 +22,7 @@
 #include "game.h"
 #include "motion_player3D.h"
 #include "particle.h"
+#include "effect3D.h"
 
 //*****************************************************************************
 // 静的メンバ変数の定義
@@ -62,6 +63,7 @@ CEnemy3D::CEnemy3D()
 {// オブジェクトの種別設定
 	SetObjType(CObject::OBJTYPE_3DENEMY);
 
+	m_pEffect3D = nullptr;								// エフェクトのインスタンス
 	m_moveMode = MODE_NONE;								// 移動モード
 	m_shotMode = SHOTMODE_NONE;							// 弾の種別
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// 移動量
@@ -115,7 +117,16 @@ HRESULT CEnemy3D::Init(const int nNumModel)
 	CModel3D::Init(nNumModel);
 
 	// あたり判定の設定
+	SetColisonPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	SetColisonSize(D3DXVECTOR3(50.0f, 50.0f, 50.0f));
+
+	// エフェクトの設定
+	m_pEffect3D = CEffect3D::Create();
+	m_pEffect3D->SetPos(GetPos());
+	m_pEffect3D->SetSize(GetColisonSize());
+	m_pEffect3D->SetLife(-1);
+	m_pEffect3D->SetRenderMode(CEffect3D::MODE_ADD);
+	m_pEffect3D->LoadTex(27);
 
 	// 体力
 	m_nLife = 100;
@@ -174,6 +185,17 @@ void CEnemy3D::Update()
 
 	// 位置の設定
 	SetPos(pos);
+	m_pEffect3D->SetPos(pos);
+	m_pEffect3D->SetSize(GetColisonSize());
+
+	if (GetColorType() == CObject::TYPE_WHITE)
+	{
+		m_pEffect3D->SetColor(D3DXCOLOR(0.5f, 0.7f, 1.0f, 0.5f));
+	}
+	else if (GetColorType() == CObject::TYPE_BLACK)
+	{
+		m_pEffect3D->SetColor(D3DXCOLOR(1.0f, 0.1f, 0.1f, 0.5f));
+	}
 
 	// スクリーン内の判定
 	ScreenIn();
@@ -229,6 +251,7 @@ void CEnemy3D::Hit(COLOR_TYPE colorType, int nAttack)
 			}
 
 			pSound->PlaySound(CSound::SOUND_LABEL_SE_EXPLOSION);
+			m_pEffect3D->Uninit();
 
 			// データ格納用変数
 			CBullet3D * pBullet3D;
@@ -527,6 +550,7 @@ void CEnemy3D::ScreenIn()
 		|| screenPos.y - collision.y >= (float)CRenderer::SCREEN_HEIGHT)
 		&& m_bUse)
 	{
+		m_pEffect3D->Uninit();
 		Uninit();
 	}
 }

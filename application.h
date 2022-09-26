@@ -63,10 +63,11 @@ public:
 	static CSound *GetSound() { return m_pSound; }										// サウンドのゲッター
 	static CCamera *GetCamera() { return m_pCamera; }									// カメラのゲッター
 	static CCamera *GetCameraBG() { return m_pCameraBG; }								// 背景カメラのゲッター
-	static CFade *GetFade() { return m_pFade; }								// 背景カメラのゲッター
+	static CFade *GetFade() { return m_pFade; }											// 背景カメラのゲッター
 	static D3DXVECTOR3 ScreenCastWorld(const D3DXVECTOR3 &pos);							// ワールド座標をスクリーン座標にキャストする
 	static D3DXVECTOR3 WorldCastScreen(const D3DXVECTOR3 &pos);							// ワールド座標をスクリーン座標にキャストする
 	static float RotNormalization(float fRot);											// 角度の設定
+	static float RotNormalization(float fRot,float fMin,float fMax);					// 角度の設定
 	static void SetNextMode(SCENE_MODE mode) { m_nextMode = mode; }						// 次のモードの設定
 	static void SetMode(SCENE_MODE mode);												// モードの設定
 	static SCENE_MODE GetMode() { return m_mode; }										// モードの取得

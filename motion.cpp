@@ -81,6 +81,32 @@ void CMotion::Init(void)
 }
 
 //=============================================================================
+// モーションの設定
+// Author : 唐﨑結斗
+// 概要 : モーションの初期位置に設定
+//=============================================================================
+void CMotion::SetMotion(const int nCntMotionSet)
+{
+	CMotion::MyMotion *motion = (m_motion + nCntMotionSet);
+
+	for (int nCntParts = 0; nCntParts < m_nMaxParts; nCntParts++)
+	{
+		CMotion::Parts* parts = (m_parts + nCntParts);
+
+		// 位置の設定
+		parts->pos = (parts->posOrigin + motion->keySet[motion->nCntKeySet].key[nCntParts].pos);
+
+		//	向きの設定
+		parts->rot = (parts->rotOrigin + motion->keySet[motion->nCntKeySet].key[nCntParts].rot);
+
+		// 角度の正規化
+		parts->rot.x = RotNormalization(parts->rot.x);
+		parts->rot.y = RotNormalization(parts->rot.y);
+		parts->rot.z = RotNormalization(parts->rot.z);
+	}
+}
+
+//=============================================================================
 // パーツの設定
 // Author : 唐﨑結斗
 // 概要 : 行列を利用して、パーツの親子関係と描画設定を行う

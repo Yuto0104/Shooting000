@@ -49,6 +49,7 @@ public:
 		OBJTYPE_2DEXPLOSION,		// 爆発
 		OBJTYPE_3DPLAYER,			// 3Dプレイヤー
 		OBJTYPE_3DENEMY,			// 3Dエネミー
+		OBJTYPE_3DBOSS,				// 3Dボス
 		OBJTYPE_3DBULLET,			// 3Dバレット
 		OBJTYPE_FADE,				// フェード
 		OBJTYPE_PAUSE,				// ポーズ
@@ -124,6 +125,8 @@ public:
 	EObjectDrowType GetObjectDrowType() { return m_objectDrowType; }									// オブジェクトの描画方法の設定
 	void SetColorType(COLOR_TYPE colorType) { m_colorType = colorType; }								// 色タイプの設定
 	COLOR_TYPE GetColorType() { return m_colorType; }													// 色タイプの設定
+	void SetColisonPos(const D3DXVECTOR3 &colisonPos) { m_colisonPos = colisonPos; }					// あたり判定の位置のセッター
+	D3DXVECTOR3 GetColisonPos() { return m_colisonPos; }												// あたり判定の位置の取得
 	void SetColisonSize(const D3DXVECTOR3 &colisonSize) { m_colisonSize = colisonSize; }				// あたり判定の大きさのセッター
 	D3DXVECTOR3 GetColisonSize() { return m_colisonSize; }												// あたり判定の大きさの取得
 
@@ -151,6 +154,7 @@ private:
 	EObjectType			m_objectType;		// オブジェクトの種別
 	EObjectDrowType		m_objectDrowType;	// オブジェクトの描画方法
 	COLOR_TYPE			m_colorType;		// 色の種別
+	D3DXVECTOR3			m_colisonPos;		// あたり判定の位置
 	D3DXVECTOR3			m_colisonSize;		// あたり判定の大きさ
 	int					m_nNumID;			// 格納先の番号
 	int					m_nLevPriority;		// プライオリティのレベル

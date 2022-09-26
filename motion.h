@@ -99,6 +99,9 @@ public:
 	// 初期化
 	void Init(void);
 
+	// モーションの初期設定
+	void SetMotion(const int nCntMotionSet);
+
 	// パーツの設定
 	void SetParts(D3DXMATRIX mtxWorld);
 

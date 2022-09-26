@@ -130,7 +130,11 @@ void CObject::DrawAll(EObjectDrowType objectDrowType)
 CObject::CObject(int nPriority /*= PRIORITY_LEVEL0*/) :
 m_objectType(OBJTYPE_NONE),
 m_objectDrowType(DROWTYPE_GAME),
-m_colorType(TYPE_NONE)
+m_colorType(TYPE_NONE),
+m_colisonPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),
+m_colisonSize(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),
+m_nNumID(0),			
+m_nLevPriority(0)
 {
 	for (int nCntObject = 0; nCntObject < MAX_OBJECT; nCntObject++)
 	{
@@ -178,11 +182,11 @@ void CObject::Release(void)
 //=============================================================================
 bool CObject::ColisonRange2D(CObject * target)
 {// 自分の情報を取得する
-	D3DXVECTOR3 pos = GetPos();
+	D3DXVECTOR3 pos = GetPos() + m_colisonPos;
 	D3DXVECTOR3 size = GetSize();
 
 	// 目標の情報取得
-	D3DXVECTOR3 posTarget = target->GetPos();
+	D3DXVECTOR3 posTarget = target->GetPos() + target->GetColisonPos();
 	D3DXVECTOR3 sizeTarget = target->GetSize();
 
 	if (pos.x - size.x >= posTarget.x - sizeTarget.x
@@ -208,12 +212,12 @@ bool CObject::ColisonRectangle2D(CObject *target, bool bExtrude)
 	bool bColision = false;
 
 	// 自分の情報を取得する
-	D3DXVECTOR3 pos = GetPos();
+	D3DXVECTOR3 pos = GetPos() + m_colisonPos;
 	D3DXVECTOR3 posOld = GetPosOld();
 	D3DXVECTOR3 size = GetSize() / 2.0f;
 
 	// 目標の情報取得
-	D3DXVECTOR3 posTarget = target->GetPos();
+	D3DXVECTOR3 posTarget = target->GetPos() + target->GetColisonPos();
 	D3DXVECTOR3 sizeTarget = target->GetSize() / 2.0f;
 
 	if (pos.y - size.y  < posTarget.y + sizeTarget.y 
@@ -281,11 +285,11 @@ bool CObject::ColisonCircle2D(CObject * target, bool bExtrude)
 	bool bCollision = false;
 
 	// 自分の情報を取得する
-	D3DXVECTOR3 pos = GetPos();
+	D3DXVECTOR3 pos = GetPos() + m_colisonPos;
 	D3DXVECTOR3 size = GetSize() / 2.0f;
 
 	// 目標の情報取得
-	D3DXVECTOR3 posTarget = target->GetPos();
+	D3DXVECTOR3 posTarget = target->GetPos() + target->GetColisonPos();
 	D3DXVECTOR3 sizeTarget = target->GetSize() / 2.0f;
 
 	// 判定を行う距離を算出
@@ -323,12 +327,12 @@ bool CObject::ColisonRectangle3D(CObject * target, bool bExtrude)
 	bool bColision = false;
 
 	// 自分の情報を取得する
-	D3DXVECTOR3 pos = GetPos();
+	D3DXVECTOR3 pos = GetPos() + m_colisonPos;
 	D3DXVECTOR3 posOld = GetPosOld();
 	D3DXVECTOR3 size = GetSize() / 2.0f;
 
 	// 目標の情報取得
-	D3DXVECTOR3 posTarget = target->GetPos();
+	D3DXVECTOR3 posTarget = target->GetPos() + target->GetColisonPos();
 	D3DXVECTOR3 sizeTarget = target->GetSize() / 2.0f;
 
 	if ((pos.z - size.z / 2) < (posTarget.z + sizeTarget.z)
@@ -426,11 +430,11 @@ bool CObject::ColisonSphere3D(CObject *target, D3DXVECTOR3 size, D3DXVECTOR3 tar
 	bool bCollision = false;
 
 	// 自分の情報を取得する
-	D3DXVECTOR3 pos = GetPos();
+	D3DXVECTOR3 pos = GetPos() + m_colisonPos;
 	size /= 2.0f;
 
 	// 目標の情報取得
-	D3DXVECTOR3 posTarget = target->GetPos();
+	D3DXVECTOR3 posTarget = target->GetPos() + target->GetColisonPos();
 	targetSize /= 2.0f;
 
 	// 判定を行う距離を算出

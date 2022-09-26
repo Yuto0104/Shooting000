@@ -30,6 +30,7 @@
 #include "gauge2D.h"
 #include "score.h"
 #include "energy_gage.h"
+#include "effect3D.h"
 #include "particle.h"
 
 //*****************************************************************************
@@ -67,6 +68,7 @@ CMotionPlayer3D * CMotionPlayer3D::Create()
 //=============================================================================
 CMotionPlayer3D::CMotionPlayer3D()
 {
+	m_pEffect3D = nullptr;							// エフェクトのインスタンス
 	m_rotDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 目的の向き
 	m_nNumMotion = TYPE_NEUTRAL;					// モーションタイプ
 	m_state = STATE_NEUTRAL;						// 状態
@@ -126,7 +128,9 @@ HRESULT CMotionPlayer3D::Init()
 	// メンバ変数の初期化
 	m_nNumMotion = 0;
 	m_nNumMotionOld = m_nNumMotion;
-	m_bMotion = false;
+	m_pMotion[0]->SetMotion(m_nNumMotion);
+	m_pMotion[1]->SetMotion(m_nNumMotion);
+	m_bMotion = true;
 	m_bMotionBlend = false;
 	SetColorType(CModel3D::TYPE_WHITE);
 	SetColisonSize(D3DXVECTOR3(50.0f, 50.0f, 50.0f));
@@ -135,6 +139,12 @@ HRESULT CMotionPlayer3D::Init()
 	SetPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	SetRot(D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
 	SetSize(D3DXVECTOR3(1.2f, 1.2f, 1.2f));
+	m_pEffect3D = CEffect3D::Create();
+	m_pEffect3D->SetPos(GetPos());
+	m_pEffect3D->SetSize(D3DXVECTOR3(60.0f, 60.0f, 60.0f));
+	m_pEffect3D->SetLife(-1);
+	m_pEffect3D->SetRenderMode(CEffect3D::MODE_ADD);
+	m_pEffect3D->LoadTex(27);
 	m_bUse = true;
 
 	switch (CApplication::GetMode())
@@ -242,6 +252,16 @@ void CMotionPlayer3D::Update()
 
 		// 移動情報の設定
 		SetPos(pos);
+		m_pEffect3D->SetPos(pos);
+
+		if (GetColorType() == CObject::TYPE_WHITE)
+		{
+			m_pEffect3D->SetColor(D3DXCOLOR(0.5f, 0.7f, 1.0f, 0.5f));
+		}
+		else if (GetColorType() == CObject::TYPE_BLACK)
+		{
+			m_pEffect3D->SetColor(D3DXCOLOR(1.0f, 0.1f, 0.1f, 0.5f));
+		}
 
 		// 敵との当たり判定
 		CollisionEnemy();
@@ -931,7 +951,8 @@ void CMotionPlayer3D::CollisionEnemy()
 
 			if (pObject != nullptr)
 			{
-				if ((pObject->GetObjType() == CObject::OBJTYPE_3DENEMY))
+				if ((pObject->GetObjType() == CObject::OBJTYPE_3DENEMY
+					|| pObject->GetObjType() == CObject::OBJTYPE_3DBOSS))
 				{// タイプが一致した場合
 					if (ColisonSphere3D(pObject, GetColisonSize(), pObject->GetColisonSize(), true))
 					{
@@ -959,6 +980,7 @@ void CMotionPlayer3D::Death()
 
 		// 変数宣言
 		D3DXVECTOR3 pos = GetPos();
+		m_pEffect3D->Uninit();
 
 		// パーティクルの生成
 		CParticle *pParticle = CParticle::Create();

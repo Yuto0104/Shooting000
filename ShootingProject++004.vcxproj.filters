@@ -210,6 +210,9 @@
     <ClInclude Include="pause.h">
       <Filter>ヘッダー ファイル\object</Filter>
     </ClInclude>
+    <ClInclude Include="motion_boss.h">
+      <Filter>ヘッダー ファイル\object\3D\Motion</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="texture.cpp">
@@ -364,6 +367,9 @@
     </ClCompile>
     <ClCompile Include="pause.cpp">
       <Filter>ソース ファイル\object</Filter>
+    </ClCompile>
+    <ClCompile Include="motion_boss.cpp">
+      <Filter>ソース ファイル\object\3D\Motion</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

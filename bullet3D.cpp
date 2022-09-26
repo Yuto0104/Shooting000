@@ -17,6 +17,7 @@
 
 #include "motion_player3D.h"
 #include "enemy3D.h"
+#include "motion_boss.h"
 #include "score.h"
 #include "effect3D.h"
 
@@ -186,7 +187,8 @@ bool CBullet3D::Collision()
 			if (pObject != nullptr)
 			{
 				if ((pObject->GetObjType() == CObject::OBJTYPE_3DENEMY
-					|| pObject->GetObjType() == CObject::OBJTYPE_3DPLAYER)
+					|| pObject->GetObjType() == CObject::OBJTYPE_3DPLAYER
+					|| pObject->GetObjType() == CObject::OBJTYPE_3DBOSS)
 					&& pObject->GetObjType() != CObject::OBJTYPE_3DBULLET)
 				{// タイプが一致した場合
 					if (pObject->GetObjType() == CObject::OBJTYPE_3DENEMY
@@ -198,6 +200,20 @@ bool CBullet3D::Collision()
 
 						// 敵への攻撃処理
 						pEnemy3D->Hit(GetColorType(), m_nAttack);
+
+						bCollision = true;
+						break;
+					}
+
+					if (pObject->GetObjType() == CObject::OBJTYPE_3DBOSS
+						&& m_parent != CObject::OBJTYPE_3DBOSS
+						&& ColisonSphere3D(pObject, D3DXVECTOR3(GetSize().x, GetSize().y, GetSize().x), pObject->GetColisonSize(), true))
+					{
+						// ボスオブジェクトにキャスト
+						CMotionBoss *pMotionBoss = dynamic_cast<CMotionBoss*>(pObject);
+
+						// 敵への攻撃処理
+						pMotionBoss->Hit(GetColorType(), m_nAttack);
 
 						bCollision = true;
 						break;

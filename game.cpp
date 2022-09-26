@@ -34,6 +34,7 @@
 #include "life_manager.h"
 #include "energy_gage.h"
 #include "particle.h"
+#include "motion_boss.h"
 
 //*****************************************************************************
 // Ã“Iƒƒ“ƒo•Ï”éŒ¾
@@ -127,6 +128,9 @@ HRESULT CGame::Init()
 
 	m_pEnergyGage = CEnergyGage::Create();
 	m_pEnergyGage->SetPos(D3DXVECTOR3(0.0f + m_pEnergyGage->GetSize().x / 2.0f + 20.0f, 450.0f, 0.0f));
+
+	/*CMotionBoss *pMotionBoss = CMotionBoss::Create();
+	pMotionBoss->SetPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f));*/
 
 	m_bGame = true;
 

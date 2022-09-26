@@ -180,6 +180,7 @@
     <ClInclude Include="model3D.h" />
     <ClInclude Include="model_manager.h" />
     <ClInclude Include="motion.h" />
+    <ClInclude Include="motion_boss.h" />
     <ClInclude Include="motion_player3D.h" />
     <ClInclude Include="mouse.h" />
     <ClInclude Include="move.h" />
@@ -233,6 +234,7 @@
     <ClCompile Include="model3D.cpp" />
     <ClCompile Include="model_manager.cpp" />
     <ClCompile Include="motion.cpp" />
+    <ClCompile Include="motion_boss.cpp" />
     <ClCompile Include="motion_char3D.cpp" />
     <ClCompile Include="motion_player3D.cpp" />
     <ClCompile Include="mouse.cpp" />

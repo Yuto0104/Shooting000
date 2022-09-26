@@ -1,5 +1,6 @@
 // モデルの最大数
-MAX_TYPE = 49
+MAX_TYPE = 66
+
 //***************************
 // Xファイル名の読み込み
 //***************************
@@ -52,4 +53,21 @@ MODEL_FILENAME = data/MODEL/enemy_white_002.x			# [45]
 MODEL_FILENAME = data/MODEL/enemy_black_002.x			# [46]
 MODEL_FILENAME = data/MODEL/enemy_white_003.x			# [47]
 MODEL_FILENAME = data/MODEL/enemy_black_003.x			# [48]
+MODEL_FILENAME = data/MODEL/ボス/0_上半身.x				# [49]
+MODEL_FILENAME = data/MODEL/ボス/1_頭.x					# [50]
+MODEL_FILENAME = data/MODEL/ボス/2_右腕.x				# [51]
+MODEL_FILENAME = data/MODEL/ボス/3_左腕.x				# [52]
+MODEL_FILENAME = data/MODEL/ボス/4_右腕2.x				# [53]
+MODEL_FILENAME = data/MODEL/ボス/5_左腕2.x				# [54]
+MODEL_FILENAME = data/MODEL/ボス/6_右肩羽関節.x			# [55]
+MODEL_FILENAME = data/MODEL/ボス/7_右肩羽.x				# [56]
+MODEL_FILENAME = data/MODEL/ボス/8_左肩羽関節.x			# [57]
+MODEL_FILENAME = data/MODEL/ボス/9_左肩羽.x				# [58]
+MODEL_FILENAME = data/MODEL/ボス/10_腰.x				# [59]	
+MODEL_FILENAME = data/MODEL/ボス/11_右腿.x				# [60]	
+MODEL_FILENAME = data/MODEL/ボス/12_左腿.x				# [61]	
+MODEL_FILENAME = data/MODEL/ボス/13_右脛.x				# [62]	
+MODEL_FILENAME = data/MODEL/ボス/14_左脛.x				# [63]	
+MODEL_FILENAME = data/MODEL/ボス/15_右足.x				# [64]	
+MODEL_FILENAME = data/MODEL/ボス/16_左足.x				# [65]
 
