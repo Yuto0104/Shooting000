@@ -56,6 +56,7 @@ CCamera::CCamera()
 	m_nNumMotion = 0;								// モーションカウント
 	m_nMaxMotion = 0;								// モーションの最大数
 	m_bAutoMove = false;							// 自動移動
+	m_bAction = false;								// アクションを行うか否か
 }
 
 //=============================================================================
@@ -320,6 +321,7 @@ void CCamera::SetNumMotion(const int nNumMotion)
 {
 	MotionReset();
 	m_nNumMotion = nNumMotion;
+	m_bAction = true;
 }
 
 //=============================================================================
@@ -549,7 +551,8 @@ void CCamera::FollowCamera(void)
 //=============================================================================
 void CCamera::Action()
 {
-	if (m_pMotion != nullptr)
+	if (m_pMotion != nullptr
+		&& m_bAction)
 	{
 		if (m_nCntFrame == 0)
 		{// 追加する数値の算出
@@ -585,9 +588,9 @@ void CCamera::Action()
 				{
 					m_nCntKey = 0;
 				}
-				else
+				else if(!m_pMotion[m_nNumMotion].bLoop)
 				{
-					m_nNumMotion++;
+					m_bAction = false;
 				}
 			}
 		}

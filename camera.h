@@ -135,6 +135,7 @@ private:
 	int					m_nMaxMotion;		// モーションの最大数
 	int					m_nNumMotion;		// モーションカウント
 	bool				m_bAutoMove;		// 自動移動
+	bool				m_bAction;			// アクションを行うか否か
 };
 
 #endif

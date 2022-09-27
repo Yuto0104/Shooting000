@@ -17,6 +17,10 @@
 #include "keyboard.h"
 #include "sound.h"
 #include "object2D.h"
+#include "model_manager.h"
+#include "camera_manager.h"
+#include "mesh.h"
+#include "sphere.h"
 #include "bg.h"
 
 //=============================================================================
@@ -79,8 +83,37 @@ HRESULT CTitle::Init()
 	m_pExit->SetCol(D3DXCOLOR(0.25f, 0.1f, 0.8f, 1.0f));
 	m_pExit->LoadTex(24);
 
-	CBG *pBG = CBG::Create();
-	pBG->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
+	// 背景モデルの設置
+	CApplication::GetModelManager()->SetModelBG();
+
+	// カメラマネージャーのインスタンス取得
+	CCameraManager *pCameraManager = CApplication::GetCameraManager();
+	CApplication::GetCameraBG()->MotionReset();
+	CApplication::GetCameraBG()->SetCamera(pCameraManager->GetPosV(), pCameraManager->GetPosR(), pCameraManager->GetRot());
+	CApplication::GetCameraBG()->SetNumMotion(1);
+
+	CMesh3D *pMesh3D = CMesh3D::Create();
+	pMesh3D->SetRot(D3DXVECTOR3(D3DX_PI * -0.15f, 0.0f, 0.0f));
+	pMesh3D->SetSize(D3DXVECTOR3(100000.0f, 0, 100000.0f));
+	pMesh3D->SetBlock(CMesh3D::DOUBLE_INT(100, 100));
+	pMesh3D->SetSplitTex(true);
+	pMesh3D->SetObjectDrowType(CObject::DROWTYPE_BG);
+	pMesh3D->LoadTex(13);
+	pMesh3D->SetScrollTex(D3DXVECTOR2(-0.08f, -0.06f), true);
+
+	CSphere *pSphere = CSphere::Create();
+	pSphere->SetRot(D3DXVECTOR3(D3DX_PI * 0.85f, 0.0f, 0.0f));
+	pSphere->SetSize(D3DXVECTOR3(100.0f, 0, 100.0f));
+	pSphere->SetBlock(CMesh3D::DOUBLE_INT(100, 100));
+	pSphere->SetRadius(50000.0f);
+	pSphere->SetSphereRange(D3DXVECTOR2(D3DX_PI * 2.0f, D3DX_PI * -0.5f));
+	pSphere->SetObjectDrowType(CObject::DROWTYPE_BG);
+	pSphere->SetScrollTex(D3DXVECTOR2(0.005f, 0.0f), true);
+	pSphere->LoadTex(12);
+
+	//CBG *pBG = CBG::Create();
+	//pBG->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
+
 	return S_OK;
 }
 

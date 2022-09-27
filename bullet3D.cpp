@@ -135,8 +135,6 @@ void CBullet3D::Update()
 	}
 	else if (MyColorType == CObject::TYPE_BLACK)
 	{// エフェクトの色の設定
-		/*pEffect3D->SetRenderMode(CEffect3D::MODE_SUB);
-		pEffect3D->SetColor(D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f));*/
 		pEffect3D->SetRenderMode(CEffect3D::MODE_ADD);
 		pEffect3D->SetColor(D3DXCOLOR(1.0f, 0.1f, 0.1f, 1.0f));
 	}

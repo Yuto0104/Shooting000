@@ -104,8 +104,8 @@ HRESULT CMotionBoss::Init()
 	SetRot(D3DXVECTOR3(D3DX_PI * 0.5f, 0.0f, 0.0f));
 	SetSize(D3DXVECTOR3(1.2f, 1.2f, 1.2f));
 	SetColorType(CObject::TYPE_WHITE);
-	m_nLife = 100000;
-	m_actionType = ACTION_DIFFUSIONSHOT;
+	m_nLife = 10000;
+	m_actionType = ACTION_NONE;
 	m_fMoveVec = D3DX_PI * 0.5f;	
 	m_fSpeed = 2.0f;	
 
