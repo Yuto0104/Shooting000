@@ -130,8 +130,8 @@ HRESULT CGame::Init()
 	m_pEnergyGage->SetPos(D3DXVECTOR3(0.0f + m_pEnergyGage->GetSize().x / 2.0f + 20.0f, 450.0f, 0.0f));
 
 	/*CMotionBoss *pMotionBoss = CMotionBoss::Create();
-	pMotionBoss->SetPos(D3DXVECTOR3(18.0f, 14750.0f, -12.0f));
-	pMotionBoss->SetObjectDrowType(CObject::DROWTYPE_BG);*/
+	pMotionBoss->SetPos(D3DXVECTOR3(0.0f, 0.0f, -0.0f));*/
+	/*pMotionBoss->SetObjectDrowType(CObject::DROWTYPE_BG);*/
 
 	m_bGame = true;
 
